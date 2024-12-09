@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:recruiter_app/core/constants.dart';
-import 'package:recruiter_app/features/onboarding/onboarding1.dart';
+import 'package:recruiter_app/features/onboarding/onboarding.dart';
+import 'package:recruiter_app/features/onboarding/landing_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -39,7 +40,7 @@ class _SplashScreenState extends State<SplashScreen>
           context,
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
-                const Onboarding1(),
+                const LandingScreen(),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               var fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(

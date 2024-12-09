@@ -4,13 +4,12 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/core/theme.dart';
 import 'package:recruiter_app/core/utils/navigation_animation.dart';
-import 'package:recruiter_app/features/onboarding/onboarding2.dart';
-import 'package:recruiter_app/features/onboarding/onboarding3.dart';
+import 'package:recruiter_app/features/navbar/view/navbar.dart';
 import 'package:recruiter_app/features/onboarding/widgets/circles.dart';
 import 'package:recruiter_app/widgets/reusable_button.dart';
 
-class Onboarding1 extends StatelessWidget {
-  const Onboarding1({Key? key}) : super(key: key);
+class Onboarding3 extends StatelessWidget {
+  const Onboarding3({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -40,38 +39,59 @@ class Onboarding1 extends StatelessWidget {
                             width: double.infinity,
                             height: screenHeight * 0.45,
                             child: SvgPicture.asset(
-                              "assets/svgs/onboard_1.svg",
+                              "assets/svgs/onboard_3.svg",
                               fit: BoxFit.cover,
                             ),
                           ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              InkWell(
-                                onTap: (){
-
-                                },
-                                child: Padding(
-                                  padding:
-                                      const EdgeInsets.only(right: 8, top: 8),
-                                  child: Text(
-                                    "Skip",
-                                    style: AppTheme.bodyText(secondaryColor)
-                                        .copyWith(fontWeight: FontWeight.w500),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 15),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                InkWell(
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: Padding(
+                                    padding:
+                                        const EdgeInsets.only(left: 8, top: 8),
+                                    child: Text(
+                                      "Back",
+                                      style: AppTheme.bodyText(secondaryColor)
+                                          .copyWith(
+                                              fontWeight: FontWeight.w500),
+                                    ),
                                   ),
                                 ),
-                              )
-                            ],
+                                InkWell(
+                                  onTap: () {},
+                                  child: Padding(
+                                    padding:
+                                        const EdgeInsets.only(right: 0, top: 8),
+                                    child: Text(
+                                      "Skip",
+                                      style: AppTheme.bodyText(secondaryColor)
+                                          .copyWith(
+                                              fontWeight: FontWeight.w500),
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
                           ),
                           Align(
                               alignment: Alignment.center,
                               child: CircleAvatar(
-                                radius: screenHeight * 0.14,
+                                radius: screenHeight * 0.12,
                                 backgroundColor: buttonColor,
                               )),
-                          Positioned.fill(
-                              child: Image.asset(
-                                  "assets/images/onboard_photo1.png"))
+                          Align(
+                            alignment: Alignment.center,
+                            child: Image.asset(
+                              "assets/images/onboard_photo3.png",
+                              height: screenHeight * 0.36,
+                            ),
+                          )
                         ],
                       ),
                     ),
@@ -85,13 +105,13 @@ class Onboarding1 extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Find the perfect candidates for your team effortlessly',
+                            'Your hiring journey starts here',
                             style: AppTheme.headingText(lightTextColor),
                             textAlign: TextAlign.center,
                           ),
                           SizedBox(height: 20.h),
                           Text(
-                            'A one-stop platform for connecting with top talent, streamlining hiring processes, and building exceptional teams',
+                            'Streamline your hiring process by connecting with qualified candidates and making better hiring decisions with ease',
                             style: AppTheme.smallText(lightTextColor),
                             textAlign: TextAlign.center,
                           ),
@@ -108,8 +128,7 @@ class Onboarding1 extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     child: ReusableButton(
                       action: () {
-                        Navigator.push(context,
-                            AnimatedNavigation().fadeAnimation(Onboarding2()));
+                       Navigator.push(context, MaterialPageRoute(builder: (context) => Navbar()));
                       },
                       text: "Next",
                       width: 100.h,
@@ -127,29 +146,4 @@ class Onboarding1 extends StatelessWidget {
       ),
     );
   }
-}
-
-class HalfCirclePainter extends CustomPainter {
-  final Color color;
-
-  HalfCirclePainter(this.color);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.fill;
-
-    // Draw a half-circle
-    canvas.drawArc(
-      Rect.fromLTWH(0, 0, size.width, size.height), // Rect for the arc
-      -3.14 / 2, // Start angle (top center)
-      3.14, // Sweep angle (half-circle)
-      true, // Use center to fill the shape
-      paint,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
