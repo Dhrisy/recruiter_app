@@ -13,6 +13,7 @@ const borderColor = Color(0xff31265199);
 
 // ligtTheme
 const lightTextColor = Colors.black;
+const greyTextColor = Colors.grey;
 
 
 

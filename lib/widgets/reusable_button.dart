@@ -12,6 +12,7 @@ class ReusableButton extends StatefulWidget {
   final double? radius;
   final Color buttonColor;
   final Color? textColor;
+  final double? textSize;
   const ReusableButton(
       {Key? key,
       required this.action,
@@ -21,6 +22,7 @@ class ReusableButton extends StatefulWidget {
       this.width,
       this.radius,
       required this.buttonColor,
+      this.textSize,
       this.textColor})
       : super(key: key);
 
@@ -37,7 +39,6 @@ class _ReusableButtonState extends State<ReusableButton> {
       child: Container(
         height: widget.height ?? 45.h,
         width: widget.width ?? double.infinity,
-        
         decoration: BoxDecoration(
             color: widget.buttonColor,
             borderRadius: BorderRadius.circular(widget.radius ?? 15.r)),
@@ -45,8 +46,9 @@ class _ReusableButtonState extends State<ReusableButton> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              "Next",
-              style: AppTheme.bodyText(widget.textColor ?? lightTextColor),
+              widget.text,
+              style: AppTheme.bodyText(widget.textColor ?? lightTextColor)
+                  .copyWith(fontSize: widget.textSize ?? mediumSmallFont),
             )
           ],
         ),

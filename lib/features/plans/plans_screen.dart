@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/core/theme.dart';
+import 'package:recruiter_app/features/plans/widgets/plan_card_widget.dart';
 
 class PlansScreen extends StatefulWidget {
   const PlansScreen({Key? key}) : super(key: key);
@@ -13,6 +14,40 @@ class PlansScreen extends StatefulWidget {
 
 class _PlansScreenState extends State<PlansScreen> {
   int _currentIndex = 0;
+
+  List<Map<String, dynamic>> _stdLists = [
+    {"title": "Upto 250 character job description", "is_applicable": true, "plan_name": "Standard"},
+    {"title": "1 job location", "is_applicable": true, "plan_name": "Standard"},
+    {"title": "200 applies", "is_applicable": true, "plan_name": "Standard"},
+    {"title": "Applies expiry 30 days", "is_applicable": true, "plan_name": "Standard"},
+    {"title": "1 job location", "is_applicable": true, "plan_name": "Standard"},
+    {"title": "Jobseeker contact details are visible", "is_applicable": false, "plan_name": "Standard"},
+    {"title": "Boost on Job Search Page", "is_applicable": false, "plan_name": "Standard"},
+    {"title": "Job Branding", "is_applicable": false, "plan_name": "Standard"},
+  ];
+  List<Map<String, dynamic>> _classicLists = [
+    {"title": "Upto 250 character job description", "is_applicable": true, "plan_name": "Classic"},
+    {"title": "1 job location", "is_applicable": true, "plan_name": "Classic"},
+    {"title": "200 applies", "is_applicable": true, "plan_name": "Classic"},
+    {"title": "Applies expiry 30 days", "is_applicable": true, "plan_name": "Classic"},
+    {"title": "1 job location", "is_applicable": true, "plan_name": "Classic"},
+    {"title": "Jobseeker contact details are visible", "is_applicable": true, "plan_name": "Classic"},
+    {"title": "Boost on Job Search Page", "is_applicable": false, "plan_name": "Classic"},
+    {"title": "Job Branding", "is_applicable": false, "plan_name": "Classic"},
+  ];
+
+  List<List<Map<String, dynamic>>> jobPostingPlans = [];
+
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      jobPostingPlans.add(_stdLists);
+      jobPostingPlans.add(_classicLists);
+    });
+
+    print(jobPostingPlans.length);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,39 +116,25 @@ class _PlansScreenState extends State<PlansScreen> {
     return Center(
       child: CarouselSlider(
         items: List.generate(
-          5,
+          jobPostingPlans.length,
           (index) => AnimatedContainer(
             duration: const Duration(milliseconds: 300),
-            height: 100,
             width: double.infinity,
             decoration: BoxDecoration(
-                color: _currentIndex == index ? secondaryColor : buttonColor,
-                borderRadius: BorderRadius.circular(20.r)),
-            child: Padding(
-              padding: const EdgeInsets.all(15),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("Standard",
-                  style: AppTheme.headingText(Colors.white),),
-                  
-                  Text('\$ 400',
-                  style: AppTheme.headingText(Colors.white),)
-                ],
-              ),
+              color: _currentIndex == index ? secondaryColor : buttonColor,
+              borderRadius: BorderRadius.circular(20.r),
+            ),
+            child: PlanCardWidget(
+              lists: jobPostingPlans[index],
             ),
           ),
         ),
         options: CarouselOptions(
           aspectRatio: 2 / 3,
-
-          //  height: 245,
-          // viewportFraction: 0.57,
           enlargeCenterPage: true,
           autoPlay: false,
-          autoPlayInterval: Duration(seconds: 3),
-          autoPlayAnimationDuration: Duration(milliseconds: 800),
+          autoPlayInterval: const Duration(seconds: 3),
+          autoPlayAnimationDuration: const Duration(milliseconds: 800),
           autoPlayCurve: Curves.fastOutSlowIn,
           onPageChanged: (index, reason) {
             setState(() {

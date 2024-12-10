@@ -21,6 +21,14 @@ class AppTheme {
   }
 
 
+static TextStyle mediumTitleText(Color color) {
+    return GoogleFonts.beVietnamPro(
+      fontSize: mediumTitleFont, // Ensure this is defined as a constant
+      color: color,
+      fontWeight: FontWeight.normal,
+    );
+  }
+
   static TextStyle bodyText(Color color) {
     return GoogleFonts.beVietnamPro(
       fontSize: mediumSmallFont, // Ensure this is defined as a constant
