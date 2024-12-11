@@ -6,6 +6,7 @@ import 'package:recruiter_app/core/theme.dart';
 import 'package:recruiter_app/core/utils/navigation_animation.dart';
 import 'package:recruiter_app/features/navbar/view/navbar.dart';
 import 'package:recruiter_app/features/onboarding/widgets/circles.dart';
+import 'package:recruiter_app/features/plans/plans_screen.dart';
 import 'package:recruiter_app/widgets/reusable_button.dart';
 
 class Onboarding3 extends StatelessWidget {
@@ -16,7 +17,7 @@ class Onboarding3 extends StatelessWidget {
     // Use MediaQuery to get screen dimensions
     final screenWidth = MediaQuery.of(context).size.width.w;
     final screenHeight = MediaQuery.of(context).size.height.h;
-
+ final theme = Theme.of(context);
     return Scaffold(
       body: SafeArea(
         child: Container(
@@ -57,9 +58,7 @@ class Onboarding3 extends StatelessWidget {
                                         const EdgeInsets.only(left: 8, top: 8),
                                     child: Text(
                                       "Back",
-                                      style: AppTheme.bodyText(secondaryColor)
-                                          .copyWith(
-                                              fontWeight: FontWeight.w500),
+                                      style: theme.textTheme.bodyMedium,
                                     ),
                                   ),
                                 ),
@@ -70,9 +69,7 @@ class Onboarding3 extends StatelessWidget {
                                         const EdgeInsets.only(right: 0, top: 8),
                                     child: Text(
                                       "Skip",
-                                      style: AppTheme.bodyText(secondaryColor)
-                                          .copyWith(
-                                              fontWeight: FontWeight.w500),
+                                      style: theme.textTheme.bodyMedium,
                                     ),
                                   ),
                                 )
@@ -106,13 +103,13 @@ class Onboarding3 extends StatelessWidget {
                         children: [
                           Text(
                             'Your hiring journey starts here',
-                            style: AppTheme.headingText(lightTextColor),
+                            style:theme.textTheme.headlineMedium,
                             textAlign: TextAlign.center,
                           ),
                           SizedBox(height: 20.h),
                           Text(
                             'Streamline your hiring process by connecting with qualified candidates and making better hiring decisions with ease',
-                            style: AppTheme.smallText(lightTextColor),
+                            style: theme.textTheme.bodyMedium,
                             textAlign: TextAlign.center,
                           ),
                         ],
@@ -128,7 +125,7 @@ class Onboarding3 extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     child: ReusableButton(
                       action: () {
-                       Navigator.push(context, MaterialPageRoute(builder: (context) => Navbar()));
+                       Navigator.push(context, AnimatedNavigation().fadeAnimation(PlansScreen()));
                       },
                       text: "Next",
                       width: 100.h,

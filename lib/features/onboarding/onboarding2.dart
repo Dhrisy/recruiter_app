@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/core/theme.dart';
+import 'package:recruiter_app/core/utils/app_theme_data.dart';
 import 'package:recruiter_app/core/utils/navigation_animation.dart';
 import 'package:recruiter_app/features/onboarding/onboarding3.dart';
 import 'package:recruiter_app/features/onboarding/widgets/circles.dart';
 import 'package:recruiter_app/widgets/reusable_button.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Onboarding2 extends StatelessWidget {
   const Onboarding2({Key? key}) : super(key: key);
@@ -16,6 +19,7 @@ class Onboarding2 extends StatelessWidget {
     // Use MediaQuery to get screen dimensions
     final screenWidth = MediaQuery.of(context).size.width.w;
     final screenHeight = MediaQuery.of(context).size.height.h;
+     final theme = Theme.of(context);
 
     return Scaffold(
       body: SafeArea(
@@ -57,22 +61,41 @@ class Onboarding2 extends StatelessWidget {
                                         const EdgeInsets.only(left: 8, top: 8),
                                     child: Text(
                                       "Back",
-                                      style: AppTheme.bodyText(secondaryColor)
-                                          .copyWith(
-                                              fontWeight: FontWeight.w500),
+                                      style: theme.textTheme.bodyMedium,
                                     ),
                                   ),
                                 ),
                                 InkWell(
-                                  onTap: () {},
+                                  onTap: () async {
+                                
+
+                                    final prefs =
+                                        await SharedPreferences.getInstance();
+                                    final value = prefs.getBool("isDarkMode");
+                                    final AppThemeDataBloc _themeBloc =
+                                        BlocProvider.of<AppThemeDataBloc>(
+                                            context);
+
+                                            print("kkkkkk $value");
+                                 
+                                    if (value == true) {
+                                      prefs.setBool("isDarkMode", false);
+                                      _themeBloc
+                                          .add(ChangeTheme(isDarkMode: false));
+                                    } else {
+                                      prefs.setBool("isDarkMode", true);
+                                      _themeBloc
+                                          .add(ChangeTheme(isDarkMode: true));
+                                    }
+
+                                  
+                                  },
                                   child: Padding(
                                     padding:
                                         const EdgeInsets.only(right: 0, top: 8),
                                     child: Text(
                                       "Skip",
-                                      style: AppTheme.bodyText(secondaryColor)
-                                          .copyWith(
-                                              fontWeight: FontWeight.w500),
+                                      style: theme.textTheme.bodyMedium,
                                     ),
                                   ),
                                 )
@@ -106,13 +129,13 @@ class Onboarding2 extends StatelessWidget {
                         children: [
                           Text(
                             'All your recruitment needs in one powerful platform',
-                            style: AppTheme.headingText(lightTextColor),
+                            style: theme.textTheme.headlineMedium,
                             textAlign: TextAlign.center,
                           ),
                           SizedBox(height: 20.h),
                           Text(
                             'A comprehensive solution for managing job postings, candidate applications, and seamless communication with potential hires',
-                            style: AppTheme.smallText(lightTextColor),
+                            style:theme.textTheme.bodyMedium,
                             textAlign: TextAlign.center,
                           ),
                         ],
@@ -125,7 +148,7 @@ class Onboarding2 extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Padding(
-                     padding: const EdgeInsets.symmetric(vertical: 10),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
                     child: ReusableButton(
                       action: () {
                         Navigator.push(context,

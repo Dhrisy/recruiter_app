@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:recruiter_app/features/home/home_screen.dart';
 import 'package:recruiter_app/features/navbar/view_model/navbar_viewmodel.dart';
 import 'package:water_drop_nav_bar/water_drop_nav_bar.dart';
 
@@ -30,9 +31,7 @@ class _NavbarState extends State<Navbar> {
         body: PageView(
           controller: pageController,
           children: [
-            Center(
-              child: Text("Home"),
-            ),
+           HomeScreen(),
             Center(
               child: Text("rofilw"),
             ),
