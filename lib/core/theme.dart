@@ -22,7 +22,7 @@ class AppTheme {
   }
 
   static TextStyle titleText(Color color) {
-    return GoogleFonts.beVietnamPro(
+    return GoogleFonts.montserrat(
       fontSize: titleFont, // Ensure this is defined as a constant
       color: color,
       fontWeight: FontWeight.normal,
@@ -30,7 +30,7 @@ class AppTheme {
   }
 
   static TextStyle mediumTitleText(Color color) {
-    return GoogleFonts.beVietnamPro(
+    return GoogleFonts.montserrat(
       fontSize: mediumTitleFont, // Ensure this is defined as a constant
       color: color,
       fontWeight: FontWeight.normal,
@@ -38,7 +38,7 @@ class AppTheme {
   }
 
   static TextStyle bodyText(Color color) {
-    return GoogleFonts.beVietnamPro(
+    return GoogleFonts.montserrat(
       fontSize: mediumSmallFont, // Ensure this is defined as a constant
       color: color,
       fontWeight: FontWeight.normal,
@@ -46,7 +46,7 @@ class AppTheme {
   }
 
   static TextStyle smallText(Color color) {
-    return GoogleFonts.beVietnamPro(
+    return GoogleFonts.wixMadeforDisplay(
       fontSize: smallTextFont, // Ensure this is defined as a constant
       color: color,
       fontWeight: FontWeight.normal,

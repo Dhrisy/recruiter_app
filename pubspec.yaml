@@ -45,6 +45,8 @@ dependencies:
   flutter_bloc: ^8.1.6
   carousel_slider: ^5.0.0
   shared_preferences: ^2.3.3
+  video_player: ^2.9.2
+  pin_code_fields: ^8.0.1
   
 
 

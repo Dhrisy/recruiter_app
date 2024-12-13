@@ -31,6 +31,7 @@ class ReusableButton extends StatefulWidget {
 }
 
 class _ReusableButtonState extends State<ReusableButton> {
+  
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -41,7 +42,8 @@ class _ReusableButtonState extends State<ReusableButton> {
         width: widget.width ?? double.infinity,
         decoration: BoxDecoration(
             color: widget.buttonColor,
-            borderRadius: BorderRadius.circular(widget.radius ?? 15.r)),
+            borderRadius: BorderRadius.circular(widget.radius ?? 15.r),
+            gradient: LinearGradient(colors: [buttonColor, Color(0xffFF582B)])),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

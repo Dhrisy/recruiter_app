@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 const buttonColor = Color(0xffFA7754);
 const backGroundColor = Colors.white;
 const secondaryColor = Color(0xff312651);
+const gradientColor = Color(0xff6F56B7);
 const buttonTextColor = Colors.white;
 const borderColor = Color(0xff31265199);
 
