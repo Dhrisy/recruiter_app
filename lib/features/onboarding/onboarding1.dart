@@ -194,6 +194,7 @@ import 'package:recruiter_app/core/utils/navigation_animation.dart';
 import 'package:recruiter_app/features/onboarding/onboarding2.dart';
 import 'package:recruiter_app/features/onboarding/onboarding3.dart';
 import 'package:recruiter_app/features/onboarding/widgets/circles.dart';
+import 'package:recruiter_app/features/plans/plans_screen.dart';
 import 'package:recruiter_app/widgets/reusable_button.dart';
 
 class Onboarding1 extends StatelessWidget {
@@ -240,14 +241,16 @@ class Onboarding1 extends StatelessWidget {
                                
                                 InkWell(
                                   onTap: () {
-                                    print("wwwwwwwwwwww");
+                                   Navigator.pushAndRemoveUntil(context, 
+                                   AnimatedNavigation().fadeAnimation(PlansScreen()), 
+                                   (Route<dynamic> route) => false);
                                   },
                                   child: Padding(
                                     padding:
                                         const EdgeInsets.only(right: 0, top: 8),
                                     child: Text(
                                       "Skip",
-                                      style: theme.textTheme.bodyMedium,
+                                      // style: theme.textTheme.bodyMedium,
                                     ),
                                   ),
                                 )

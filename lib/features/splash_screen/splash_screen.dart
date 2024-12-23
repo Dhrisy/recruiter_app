@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:recruiter_app/core/constants.dart';
+import 'package:recruiter_app/core/utils/custom_functions.dart';
+import 'package:recruiter_app/features/navbar/view/navbar.dart';
 import 'package:recruiter_app/features/onboarding/onboarding.dart';
 import 'package:recruiter_app/features/onboarding/landing_screen.dart';
 
@@ -14,7 +17,8 @@ class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
-  bool _isOpen = false; // Track the state of the "open" container
+  bool _isOpen = false;
+  bool _isLoogedIn = false;
 
   @override
   void initState() {
@@ -33,6 +37,8 @@ class _SplashScreenState extends State<SplashScreen>
     // Start the animation
     _controller.forward();
 
+    _checkLoginStatus();
+
     // Navigate to the next screen after animation completes
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
@@ -40,7 +46,8 @@ class _SplashScreenState extends State<SplashScreen>
           context,
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
-                const LandingScreen(),
+                _isLoogedIn ? Navbar() : LandingScreen(),
+            // const LandingScreen(),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               var fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
@@ -54,6 +61,20 @@ class _SplashScreenState extends State<SplashScreen>
         );
       }
     });
+  }
+
+  void _checkLoginStatus() async {
+    _isLoogedIn = await isLoggedIn();
+    setState(() {});
+  }
+
+  Future<bool> isLoggedIn() async {
+    final token = await CustomFunctions().retrieveCredentials("access_token");
+   if (token != null) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   @override

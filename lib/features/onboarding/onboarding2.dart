@@ -8,6 +8,7 @@ import 'package:recruiter_app/core/utils/app_theme_data.dart';
 import 'package:recruiter_app/core/utils/navigation_animation.dart';
 import 'package:recruiter_app/features/onboarding/onboarding3.dart';
 import 'package:recruiter_app/features/onboarding/widgets/circles.dart';
+import 'package:recruiter_app/features/plans/plans_screen.dart';
 import 'package:recruiter_app/widgets/reusable_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -69,24 +70,28 @@ class Onboarding2 extends StatelessWidget {
                                   onTap: () async {
                                 
 
-                                    final prefs =
-                                        await SharedPreferences.getInstance();
-                                    final value = prefs.getBool("isDarkMode");
-                                    final AppThemeDataBloc _themeBloc =
-                                        BlocProvider.of<AppThemeDataBloc>(
-                                            context);
+                                    // final prefs =
+                                    //     await SharedPreferences.getInstance();
+                                    // final value = prefs.getBool("isDarkMode");
+                                    // final AppThemeDataBloc _themeBloc =
+                                    //     BlocProvider.of<AppThemeDataBloc>(
+                                    //         context);
 
-                                            print("kkkkkk $value");
+                                    //         print("kkkkkk $value");
                                  
-                                    if (value == true) {
-                                      prefs.setBool("isDarkMode", false);
-                                      _themeBloc
-                                          .add(ChangeTheme(isDarkMode: false));
-                                    } else {
-                                      prefs.setBool("isDarkMode", true);
-                                      _themeBloc
-                                          .add(ChangeTheme(isDarkMode: true));
-                                    }
+                                    // if (value == true) {
+                                    //   prefs.setBool("isDarkMode", false);
+                                    //   _themeBloc
+                                    //       .add(ChangeTheme(isDarkMode: false));
+                                    // } else {
+                                    //   prefs.setBool("isDarkMode", true);
+                                    //   _themeBloc
+                                    //       .add(ChangeTheme(isDarkMode: true));
+                                    // }
+
+                                      Navigator.pushAndRemoveUntil(context, 
+                                   AnimatedNavigation().fadeAnimation(PlansScreen()), 
+                                   (Route<dynamic> route) => false);
 
                                   
                                   },

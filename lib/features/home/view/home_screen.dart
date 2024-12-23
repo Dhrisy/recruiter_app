@@ -3,11 +3,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/core/utils/app_theme_data.dart';
+import 'package:recruiter_app/core/utils/navigation_animation.dart';
 import 'package:recruiter_app/features/home/view/banner_widget.dart';
+import 'package:recruiter_app/features/home/view/job_credit_meter.dart';
+import 'package:recruiter_app/features/splash_screen/splash_screen.dart';
 import 'package:recruiter_app/widgets/profile_completion_card.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
@@ -53,6 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(
                       height: 10,
@@ -61,13 +66,121 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(
                       height: 20,
                     ),
-                    ProfileCompletionCard()
+                    ProfileCompletionCard(),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          "Analytics",
+                          style: theme.textTheme.titleLarge!
+                              .copyWith(fontWeight: FontWeight.bold),
+                        )
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        spacing: 10,
+                        children: [
+                          _countContainer(
+                            theme: theme,
+                            color: secondaryColor,
+                            count: "29",
+                            title: "New",
+                            subtitle: "Application",
+                          ),
+                          _countContainer(
+                            theme: theme,
+                            color: buttonColor,
+                            count: "29",
+                            title: "New",
+                            subtitle: "Application",
+                          ),
+                          _countContainer(
+                            theme: theme,
+                            color: secondaryColor,
+                            count: "29",
+                            title: "New",
+                            subtitle: "Application",
+                          ),
+                          _countContainer(
+                            theme: theme,
+                            color: buttonColor,
+                            count: "29",
+                            title: "New",
+                            subtitle: "Application",
+                          )
+                        ],
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    JobCreditMeter()
                   ],
                 ),
               )
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _countContainer({
+    required ThemeData theme,
+    required Color color,
+    required String count,
+    required String title,
+    required String subtitle,
+  }) {
+    return Container(
+      height: 60.h,
+      width: 80.w,
+      decoration: BoxDecoration(
+          color: color, borderRadius: BorderRadius.circular(20.r)),
+      child: _buildCountColumn(
+          count: count, title: title, subtitle: subtitle, theme: theme),
+    );
+  }
+
+  Widget _buildCountColumn({
+    required String count,
+    required String title,
+    required String subtitle,
+    required ThemeData theme,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            count,
+            style: theme.textTheme.bodySmall!.copyWith(
+                fontSize: 15.sp,
+                fontWeight: FontWeight.bold,
+                color: Colors.white),
+          ),
+          Text(
+            title,
+            style: theme.textTheme.bodySmall!
+                .copyWith(fontSize: 10.sp, color: Colors.white),
+          ),
+          Expanded(
+              child: Text(
+            subtitle,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.bodySmall!
+                .copyWith(fontSize: 10.sp, color: Colors.white),
+          ))
+        ],
       ),
     );
   }
@@ -93,15 +206,40 @@ class _HomeScreenState extends State<HomeScreen> {
                     width: 20,
                   ),
                   Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("asdfghj"),
-                      Text("asdfghj"),
+                      Text(
+                        "Hello ",
+                        style: theme.textTheme.bodyLarge!.copyWith(
+                            color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        "Good morning...!",
+                        style: theme.textTheme.bodyMedium!
+                            .copyWith(color: Colors.white),
+                      ),
                     ],
                   ),
                 ],
               ),
               Row(
                 children: [
+                  InkWell(
+                      onTap: () async {
+                        final _storage =
+                            FlutterSecureStorage(); // Remove 'await' from the constructor
+                        await _storage
+                            .deleteAll(); // Await the asynchronous method call
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          AnimatedNavigation().slideAnimation(SplashScreen()),
+                          (Route<dynamic> route) => false,
+                        );
+                      },
+                      child: Icon(
+                        Icons.logout,
+                        color: Colors.white,
+                      )),
                   Icon(
                     Icons.bookmark,
                     color: Colors.white,

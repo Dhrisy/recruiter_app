@@ -56,7 +56,7 @@ class PlanCardWidget extends StatelessWidget {
               ),
               ReusableButton(
                   action: () {
-                    Navigator.push(context, AnimatedNavigation().slideAnimation(Navbar()));
+                    Navigator.push(context, AnimatedNavigation().slideAnimation(Register()));
                   },
                   text: "Buy now",
                   textColor: Colors.white,

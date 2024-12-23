@@ -69,6 +69,7 @@ class RecruiterAppTheme {
       titleLarge: AppTheme.titleText(lightTextColor),
       bodyMedium: AppTheme.smallText(lightTextColor),
       bodyLarge: AppTheme.mediumTitleText(lightTextColor),
+      bodySmall: AppTheme.smallText(lightTextColor)
 
 
       ),
@@ -88,6 +89,7 @@ class RecruiterAppTheme {
        titleLarge: AppTheme.titleText(darkTextColor),
       bodyMedium: AppTheme.smallText(darkTextColor),
       bodyLarge: AppTheme.mediumTitleText(darkTextColor),
+      bodySmall: AppTheme.smallText(darkTextColor)
       ),
   );
 }

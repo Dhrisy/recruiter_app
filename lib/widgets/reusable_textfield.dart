@@ -7,13 +7,18 @@ class ReusableTextfield extends StatefulWidget {
   final String? Function(String?)? validation;
   final TextInputType? keyBoardType;
   final bool? isRequired;
+  final void Function(String)? onChanged;
+  final int? maxLines;
   const ReusableTextfield(
       {Key? key,
       this.labelText,
       required this.controller,
       this.keyBoardType,
       this.validation,
-      this.isRequired})
+      this.isRequired,
+      this.onChanged,
+      this.maxLines
+      })
       : super(key: key);
 
   @override
@@ -27,23 +32,27 @@ class _ReusableTextfieldState extends State<ReusableTextfield> {
       controller: widget.controller,
       validator: widget.validation,
       keyboardType: widget.keyBoardType,
+      onChanged: widget.onChanged ?? (_){},
+      maxLines: widget.maxLines ?? 1,
       decoration: InputDecoration(
-          hintText: widget.isRequired == true
-              ? "${widget.labelText ?? ""}*"
-              : widget.labelText ?? "",
-          labelText: widget.labelText ?? "",
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(borderRadius),
-        borderSide: BorderSide(
-          color: borderColor
-        )
-      ),
-      disabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(borderRadius)
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(borderRadius)
-      ),
+        hintText: widget.isRequired == true
+            ? "${widget.labelText ?? ""}*"
+            : widget.labelText ?? "",
+        labelText: widget.labelText ?? "",
+        
+        enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(borderRadius),
+            borderSide: BorderSide(color: borderColor)),
+        disabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(borderRadius)),
+        focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(borderRadius)),
+        errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(borderRadius),
+            borderSide: BorderSide(color: Colors.red.shade900)),
+        focusedErrorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(borderRadius),
+            borderSide: BorderSide(color: Colors.red.shade900)),
       ),
     );
   }

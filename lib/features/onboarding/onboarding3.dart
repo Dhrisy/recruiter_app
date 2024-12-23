@@ -63,7 +63,11 @@ class Onboarding3 extends StatelessWidget {
                                   ),
                                 ),
                                 InkWell(
-                                  onTap: () {},
+                                  onTap: () {
+                                      Navigator.pushAndRemoveUntil(context, 
+                                   AnimatedNavigation().fadeAnimation(PlansScreen()), 
+                                   (Route<dynamic> route) => false);
+                                  },
                                   child: Padding(
                                     padding:
                                         const EdgeInsets.only(right: 0, top: 8),

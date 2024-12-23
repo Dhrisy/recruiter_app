@@ -9,6 +9,7 @@ import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/core/utils/navigation_animation.dart';
 import 'package:recruiter_app/features/navbar/view/navbar.dart';
+import 'package:recruiter_app/features/questionaires/questionaire1.dart';
 import 'package:recruiter_app/widgets/reusable_button.dart';
 
 class OtpScreen extends StatefulWidget {
@@ -67,6 +68,9 @@ class _OtpScreenState extends State<OtpScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
+                     const SizedBox(
+                height: 40,
+              ),
                     Row(
                       children: [
                         InkWell(
@@ -169,7 +173,7 @@ class _OtpScreenState extends State<OtpScreen> {
                     action: () {
                       _showAlertDialogue(context);
                       Future.delayed(Duration(seconds: 1), (){
-                        Navigator.push(context, AnimatedNavigation().fadeAnimation(Navbar()));
+                        Navigator.push(context, AnimatedNavigation().fadeAnimation(Questionaire1()));
                       });
                     },
                     text: "Confirm",
@@ -215,7 +219,7 @@ class _OtpScreenState extends State<OtpScreen> {
         inactiveColor: greyTextColor,
         selectedColor: buttonColor,
         activeFillColor: Colors.white,
-        inactiveFillColor: Colors.grey[200], // Optional: Inactive fill color
+        inactiveFillColor: Colors.white,
         selectedFillColor: Colors.white,
       ),
       onChanged: (value) => {},

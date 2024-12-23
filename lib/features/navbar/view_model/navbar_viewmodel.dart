@@ -1,7 +1,9 @@
 // event
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-abstract class NavBarEvent {}
+abstract class NavBarEvent{
+  
+}
 
 class ChangeIndex extends NavBarEvent {
   final int currentIndex;

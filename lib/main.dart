@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:recruiter_app/core/theme.dart';
 import 'package:recruiter_app/core/utils/app_theme_data.dart';
+import 'package:recruiter_app/features/auth/bloc/auth_bloc.dart';
+import 'package:recruiter_app/features/auth/data/auth_repository.dart';
 import 'package:recruiter_app/features/auth/view/register.dart';
 import 'package:recruiter_app/features/navbar/view_model/navbar_viewmodel.dart';
 import 'package:recruiter_app/features/splash_screen/splash_screen.dart';
@@ -70,7 +72,8 @@ class _MyAppState extends State<MyApp> {
       builder: (context, child) => MultiBlocProvider(
         providers: [
           BlocProvider(create: (context) => NavBarBloc()),
-          BlocProvider.value(value: _themeBloc)
+          BlocProvider.value(value: _themeBloc),
+          BlocProvider(create: (context) => AuthBloc(AuthRepository()))
         ],
         child: BlocBuilder<AppThemeDataBloc, AppThemeDataState>(
           bloc: _themeBloc,
@@ -81,7 +84,7 @@ class _MyAppState extends State<MyApp> {
               theme: state.isDarkMode
                   ? RecruiterAppTheme.darkTheme
                   : RecruiterAppTheme.lightTheme,
-              home: Register(),
+              home: SplashScreen(),
             );
           },
         ),

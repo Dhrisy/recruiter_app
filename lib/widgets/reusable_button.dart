@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/core/theme.dart';
+import 'package:recruiter_app/widgets/loading_widget.dart';
 
 class ReusableButton extends StatefulWidget {
   final VoidCallback action;
@@ -13,6 +14,7 @@ class ReusableButton extends StatefulWidget {
   final Color buttonColor;
   final Color? textColor;
   final double? textSize;
+  final bool? isLoading;
   const ReusableButton(
       {Key? key,
       required this.action,
@@ -23,7 +25,8 @@ class ReusableButton extends StatefulWidget {
       this.radius,
       required this.buttonColor,
       this.textSize,
-      this.textColor})
+      this.textColor,
+      this.isLoading})
       : super(key: key);
 
   @override
@@ -31,7 +34,6 @@ class ReusableButton extends StatefulWidget {
 }
 
 class _ReusableButtonState extends State<ReusableButton> {
-  
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -47,11 +49,15 @@ class _ReusableButtonState extends State<ReusableButton> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              widget.text,
-              style: AppTheme.bodyText(widget.textColor ?? lightTextColor)
-                  .copyWith(fontSize: widget.textSize ?? mediumSmallFont),
-            )
+            widget.isLoading == true
+                ? LoadingWidget(
+                  color: Colors.white,
+                )
+                : Text(
+                    widget.text,
+                    style: AppTheme.bodyText(widget.textColor ?? lightTextColor)
+                        .copyWith(fontSize: widget.textSize ?? mediumSmallFont),
+                  )
           ],
         ),
       ),
