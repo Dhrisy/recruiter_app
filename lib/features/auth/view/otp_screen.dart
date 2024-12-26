@@ -9,7 +9,7 @@ import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/core/utils/navigation_animation.dart';
 import 'package:recruiter_app/features/navbar/view/navbar.dart';
-import 'package:recruiter_app/features/questionaires/questionaire1.dart';
+import 'package:recruiter_app/features/questionaires/view/questionaire1.dart';
 import 'package:recruiter_app/widgets/reusable_button.dart';
 
 class OtpScreen extends StatefulWidget {

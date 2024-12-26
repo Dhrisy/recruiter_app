@@ -10,7 +10,7 @@ import 'package:recruiter_app/features/auth/bloc/auth_event.dart';
 import 'package:recruiter_app/features/auth/bloc/auth_state.dart';
 import 'package:recruiter_app/features/auth/view/login_screen.dart';
 import 'package:recruiter_app/features/auth/view/otp_screen.dart';
-import 'package:recruiter_app/features/questionaires/questionaire1.dart';
+import 'package:recruiter_app/features/questionaires/view/questionaire1.dart';
 import 'package:recruiter_app/widgets/common_snackbar.dart';
 import 'package:recruiter_app/widgets/loading_widget.dart';
 import 'package:recruiter_app/widgets/reusable_button.dart';

@@ -202,6 +202,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   children: [
                     ReusableButton(
+                    isLoading: state is AuthLoading,
                       action: () {
                         if (_loginFormKey.currentState!.validate()) {
                           context.read<AuthBloc>().add(LoginEvent(

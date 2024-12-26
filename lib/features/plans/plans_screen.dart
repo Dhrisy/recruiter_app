@@ -17,7 +17,7 @@ class PlansScreen extends StatefulWidget {
 class _PlansScreenState extends State<PlansScreen> {
   int _currentIndex = 0;
 
-  List<Map<String, dynamic>> _stdLists = [
+  final List<Map<String, dynamic>> _stdLists =  [
     {
       "title": "Upto 250 character job description",
       "is_applicable": true,
@@ -67,7 +67,7 @@ class _PlansScreenState extends State<PlansScreen> {
       "rupees": "400"
     },
   ];
-  List<Map<String, dynamic>> _classicLists = [
+ final List<Map<String, dynamic>> _classicLists = [
     {
       "title": "Upto 250 character job description",
       "is_applicable": true,
@@ -117,7 +117,7 @@ class _PlansScreenState extends State<PlansScreen> {
       "rupees": "800"
     },
   ];
-  List<Map<String, dynamic>> _premiumLists = [
+final  List<Map<String, dynamic>> _premiumLists = [
     {
       "title": "Upto 250 character job description",
       "is_applicable": true,
@@ -168,7 +168,7 @@ class _PlansScreenState extends State<PlansScreen> {
     },
   ];
 
-  List<Map<String, dynamic>> _resdexLiteLists = [
+ final List<Map<String, dynamic>> _resdexLiteLists = [
     {
       "title": "100 CV views per requirement",
       "is_applicable": true,
@@ -219,7 +219,7 @@ class _PlansScreenState extends State<PlansScreen> {
     },
   ];
 
-  List<Map<String, dynamic>> _resdexPremiumLists = [
+final  List<Map<String, dynamic>> _resdexPremiumLists = [
     {
       "title": "100 CV views per requirement",
       "is_applicable": true,

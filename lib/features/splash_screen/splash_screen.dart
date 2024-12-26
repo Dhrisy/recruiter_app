@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/core/utils/custom_functions.dart';
+import 'package:recruiter_app/features/auth/view/login_screen.dart';
 import 'package:recruiter_app/features/navbar/view/navbar.dart';
 import 'package:recruiter_app/features/onboarding/onboarding.dart';
 import 'package:recruiter_app/features/onboarding/landing_screen.dart';
@@ -19,6 +20,7 @@ class _SplashScreenState extends State<SplashScreen>
   late Animation<double> _animation;
   bool _isOpen = false;
   bool _isLoogedIn = false;
+  bool isInstalled = false;
 
   @override
   void initState() {
@@ -46,7 +48,11 @@ class _SplashScreenState extends State<SplashScreen>
           context,
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
-                _isLoogedIn ? Navbar() : LandingScreen(),
+                _isLoogedIn
+                ? Navbar() 
+                : _isLoogedIn == false && isInstalled == true
+                ? LoginScreen()
+               : LandingScreen(),
             // const LandingScreen(),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
@@ -64,12 +70,18 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   void _checkLoginStatus() async {
+       final _storage = FlutterSecureStorage();
+       final installed = await _storage.read(key: "user");
+    
     _isLoogedIn = await isLoggedIn();
+    isInstalled = installed != null;
     setState(() {});
   }
 
   Future<bool> isLoggedIn() async {
+ 
     final token = await CustomFunctions().retrieveCredentials("access_token");
+    
    if (token != null) {
       return true;
     } else {

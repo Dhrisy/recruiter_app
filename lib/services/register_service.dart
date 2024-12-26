@@ -36,6 +36,7 @@ class RegisterService {
     required String role,
     required bool whatsappUpdations,
   }) async {
+    
     final url = Uri.parse(ApiLists.registerEndPoint);
    return await http.post(
         url,

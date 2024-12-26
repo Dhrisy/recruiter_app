@@ -1,10 +1,12 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:recruiter_app/features/auth/bloc/auth_event.dart';
 import 'package:recruiter_app/features/auth/bloc/auth_state.dart';
 import 'package:recruiter_app/features/auth/data/auth_repository.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository authRepository;
+  final _storage = FlutterSecureStorage();
   AuthBloc(this.authRepository) : super(AuthInitial()) {
     on<RegisterEvent>((event, emit) async {
       emit(AuthLoading());
@@ -34,9 +36,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       try {
         final success = await authRepository.emailLogin(
             email: event.email, password: event.password);
-            print("wwww ${success}");
 
         if (success == "success") {
+         await _storage.write(key: "user", value: "installed");
           emit(AuthSuccess());
         } else {
           emit(AuthFailure(success.toString()));

@@ -35,6 +35,8 @@ class AuthRepository {
           responseData["message"] == "User already exists") {
         return responseData["message"];
       } else if (responseData.containsKey("access")) {
+        await _secureStorage.write(key: "access_token", value: responseData["access"]);
+        await _secureStorage.write(key: "refresh_token", value: responseData["refresh"]);
         return "success";
       }
     } catch (e) {

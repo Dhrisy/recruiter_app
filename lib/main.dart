@@ -8,6 +8,9 @@ import 'package:recruiter_app/features/auth/bloc/auth_bloc.dart';
 import 'package:recruiter_app/features/auth/data/auth_repository.dart';
 import 'package:recruiter_app/features/auth/view/register.dart';
 import 'package:recruiter_app/features/navbar/view_model/navbar_viewmodel.dart';
+import 'package:recruiter_app/features/questionaires/bloc/questionaire_bloc.dart';
+import 'package:recruiter_app/features/questionaires/data/questionaire_repository.dart';
+import 'package:recruiter_app/features/questionaires/view/questionaire1.dart';
 import 'package:recruiter_app/features/splash_screen/splash_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -73,7 +76,8 @@ class _MyAppState extends State<MyApp> {
         providers: [
           BlocProvider(create: (context) => NavBarBloc()),
           BlocProvider.value(value: _themeBloc),
-          BlocProvider(create: (context) => AuthBloc(AuthRepository()))
+          BlocProvider(create: (context) => AuthBloc(AuthRepository())),
+          BlocProvider(create: (context) => QuestionaireBloc(QuestionaireRepository()))
         ],
         child: BlocBuilder<AppThemeDataBloc, AppThemeDataState>(
           bloc: _themeBloc,
@@ -84,7 +88,7 @@ class _MyAppState extends State<MyApp> {
               theme: state.isDarkMode
                   ? RecruiterAppTheme.darkTheme
                   : RecruiterAppTheme.lightTheme,
-              home: SplashScreen(),
+              home: const SplashScreen(),
             );
           },
         ),

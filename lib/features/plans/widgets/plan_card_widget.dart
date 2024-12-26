@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/core/theme.dart';
 import 'package:recruiter_app/core/utils/navigation_animation.dart';
+import 'package:recruiter_app/features/auth/view/login_screen.dart';
 import 'package:recruiter_app/features/auth/view/register.dart';
 import 'package:recruiter_app/features/navbar/view/navbar.dart';
 import 'package:recruiter_app/widgets/reusable_button.dart';
@@ -56,7 +57,7 @@ class PlanCardWidget extends StatelessWidget {
               ),
               ReusableButton(
                   action: () {
-                    Navigator.push(context, AnimatedNavigation().slideAnimation(Register()));
+                    Navigator.push(context, AnimatedNavigation().slideAnimation(LoginScreen()));
                   },
                   text: "Buy now",
                   textColor: Colors.white,
