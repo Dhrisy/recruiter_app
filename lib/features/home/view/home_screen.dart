@@ -34,6 +34,11 @@ class _HomeScreenState extends State<HomeScreen> {
     final _themeBloc = context.read<AppThemeDataBloc>();
     return Material(
       child: Scaffold(
+        // floatingActionButton: FloatingActionButton(onPressed: (){
+
+        // },
+        // child: Icon(Icons.add),
+        // ),
         body: SingleChildScrollView(
           child: Column(
             children: [
@@ -121,7 +126,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(
                       height: 10,
                     ),
-                    JobCreditMeter()
+                    JobCreditMeter(),
                   ],
                 ),
               )

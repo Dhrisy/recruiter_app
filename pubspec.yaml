@@ -53,6 +53,7 @@ dependencies:
   dropdown_search: ^6.0.1
   percent_indicator: ^4.2.4
   linear_progress_bar: ^1.1.2
+  flutter_floating_bottom_bar: ^1.2.1+1
  
   
 
