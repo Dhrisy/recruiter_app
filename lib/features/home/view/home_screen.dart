@@ -233,8 +233,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       onTap: () async {
                         final _storage =
                             FlutterSecureStorage(); // Remove 'await' from the constructor
-                        await _storage
-                            .deleteAll(); // Await the asynchronous method call
+                        await _storage.deleteAll();
+                        await _storage.write(key: "user", value: "installed");
+
                         Navigator.pushAndRemoveUntil(
                           context,
                           AnimatedNavigation().slideAnimation(SplashScreen()),

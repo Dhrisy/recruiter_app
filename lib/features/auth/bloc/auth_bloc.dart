@@ -38,18 +38,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             email: event.email, password: event.password);
 
         if (success == "success") {
-         await _storage.write(key: "user", value: "installed");
+          await _storage.write(key: "user", value: "installed");
+
           emit(AuthSuccess());
         } else {
           emit(AuthFailure(success.toString()));
         }
-        
       } catch (e) {
         print("Auth repository error  $e");
         emit(AuthFailure(e.toString()));
       }
     });
-
-    
   }
 }

@@ -11,6 +11,7 @@ import 'package:recruiter_app/features/auth/bloc/auth_bloc.dart';
 import 'package:recruiter_app/features/auth/bloc/auth_event.dart';
 import 'package:recruiter_app/features/auth/bloc/auth_state.dart';
 import 'package:recruiter_app/features/auth/view/otp_screen.dart';
+import 'package:recruiter_app/features/auth/view/welcome_screen.dart';
 import 'package:recruiter_app/features/navbar/view/navbar.dart';
 import 'package:recruiter_app/widgets/common_snackbar.dart';
 import 'package:recruiter_app/widgets/reusable_button.dart';
@@ -32,6 +33,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isOtp = false;
   final _createPwFormKey = GlobalKey<FormState>();
   bool _isLoading = false;
+  bool isVisisble = false;
 
   final _loginFormKey = GlobalKey<FormState>();
   // String label
@@ -47,6 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final theme = Theme.of(context);
     return Material(
         child: Scaffold(
+        
       body: Container(
         height: double.infinity,
         width: double.infinity,
@@ -96,151 +99,210 @@ class _LoginScreenState extends State<LoginScreen> {
       // color: Colors.green,
       height: double.infinity,
       width: double.infinity,
-      child: Stack(
-        children: [
-          SingleChildScrollView(
-            child: Form(
-              key: _loginFormKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.1,
-                        ),
-                        Text(
-                          "Sign in",
-                          style: GoogleFonts.beVietnamPro(
-                              fontSize: 23.sp, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        ReusableTextfield(
-                          controller: _emailCont,
-                          labelText: "Email",
-                          validation: (_) {
-                            if (_emailCont.text.trim().isEmpty) {
-                              return "This field is required";
-                            } else if (!isValidEmail(_emailCont.text)) {
-                              return "Enter a valid email address";
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        ReusableTextfield(
-                          controller: _pwCont,
-                          labelText: "Password",
-                          validation: (_) {
-                            if (_pwCont.text.trim().isEmpty) {
-                              return "This field is required";
-                            } else if (_pwCont.text.length < 8) {
-                              return "Password must contain atleast 8 letters";
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            //  InkWell(
-                            //     onTap: () async {
-                            //       _pageController.nextPage(
-                            //           duration: Duration(milliseconds: 550),
-                            //           curve: Curves.easeInOut);
-                            //     },
-                            //     child: Text(
-                            //       "Use phone number",
-                            //       style: theme.textTheme.bodyMedium!
-                            //           .copyWith(color: buttonColor),
-                            //     )),
-                            InkWell(
-                                onTap: () async {
-                                  _pageController.nextPage(
-                                      duration: Duration(milliseconds: 550),
-                                      curve: Curves.easeInOut);
-                                },
-                                child: Text(
-                                  "Forgot password?",
-                                  style: theme.textTheme.bodyMedium!
-                                      .copyWith(color: buttonColor),
-                                )),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
-            ),
-          ),
-          BlocConsumer<AuthBloc, AuthState>(listener: (context, state) {
-            if (state is AuthSuccess) {
-              Navigator.push(
-                  context, AnimatedNavigation().fadeAnimation(Navbar()));
-              CommonSnackbar.show(context, message: "Successfully logged in");
-            } else if (state is AuthFailure) {
-              CommonSnackbar.show(context, message: state.error);
-            }
-          }, builder: (context, state) {
-            return Align(
-              alignment: Alignment.bottomCenter,
-              child: SizedBox(
-                height: 400,
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            SingleChildScrollView(
+              child: Form(
+                key: _loginFormKey,
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    ReusableButton(
-                    isLoading: state is AuthLoading,
-                      action: () {
-                        if (_loginFormKey.currentState!.validate()) {
-                          context.read<AuthBloc>().add(LoginEvent(
-                              email: _emailCont.text, password: _pwCont.text));
-                        } else {
-                          print("Form validation eror");
-                        }
-                      },
-                      text: "Sign in",
-                      buttonColor: buttonColor,
-                      height: 40.h,
-                      textColor: Colors.white,
-                    ),
-                    const SizedBox(
-                      height: 15,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text("Don't you have an account? "),
-                        InkWell(
-                            onTap: () {
-                              Navigator.pop(context);
+                    Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.1,
+                          ),
+                          Text(
+                            "Sign in",
+                            style: GoogleFonts.beVietnamPro(
+                                fontSize: 23.sp, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          ReusableTextfield(
+                            controller: _emailCont,
+                            labelText: "Email",
+                            hintText: "Email",
+                            validation: (_) {
+                              if (_emailCont.text.trim().isEmpty) {
+                                return "This field is required";
+                              } else if (!isValidEmail(_emailCont.text)) {
+                                return "Enter a valid email address";
+                              }
+                              return null;
                             },
-                            child: Text(
-                              "Sign up",
-                              style: theme.textTheme.bodyMedium!.copyWith(
-                                  color: buttonColor,
-                                  fontWeight: FontWeight.w600),
-                            ))
-                      ],
+                          ),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          _passWordField(
+                            keyboardType: TextInputType.visiblePassword,
+                            controller: _pwCont,
+                            labelText: "Password",
+                            validation: (_) {
+                              if (_pwCont.text.trim().isEmpty) {
+                                return "This field is required";
+                              } else if (_pwCont.text.length < 8) {
+                                return "Password must contain atleast 8 letters";
+                              }
+                              return null;
+                            },
+                          ),
+                          // ReusableTextfield(
+                          //   controller: _pwCont,
+                          //   labelText: "Password",
+                          //   validation: (_) {
+                          //     if (_pwCont.text.trim().isEmpty) {
+                          //       return "This field is required";
+                          //     } else if (_pwCont.text.length < 8) {
+                          //       return "Password must contain atleast 8 letters";
+                          //     }
+                          //     return null;
+                          //   },
+                          // ),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              //  InkWell(
+                              //     onTap: () async {
+                              //       _pageController.nextPage(
+                              //           duration: Duration(milliseconds: 550),
+                              //           curve: Curves.easeInOut);
+                              //     },
+                              //     child: Text(
+                              //       "Use phone number",
+                              //       style: theme.textTheme.bodyMedium!
+                              //           .copyWith(color: buttonColor),
+                              //     )),
+                              InkWell(
+                                  onTap: () async {
+                                    _pageController.nextPage(
+                                        duration: Duration(milliseconds: 550),
+                                        curve: Curves.easeInOut);
+                                  },
+                                  child: Text(
+                                    "Forgot password?",
+                                    style: theme.textTheme.bodyMedium!
+                                        .copyWith(color: buttonColor),
+                                  )),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                        ],
+                      ),
                     )
                   ],
                 ),
               ),
-            );
-          })
-        ],
+            ),
+          const SizedBox(
+            height: 150,
+          ),
+            BlocConsumer<AuthBloc, AuthState>(listener: (context, state) {
+              if (state is AuthSuccess) {
+                Navigator.push(
+                    context, AnimatedNavigation().fadeAnimation(const WelcomeScreen()));
+                CommonSnackbar.show(context, message: "Successfully logged in");
+              } else if (state is AuthFailure) {
+                CommonSnackbar.show(context, message: state.error);
+              }
+            }, builder: (context, state) {
+              return Align(
+                alignment: Alignment.center,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 0),
+                  child: Column(
+                    children: [
+                      ReusableButton(
+                        isLoading: state is AuthLoading,
+                        action: () {
+                          if (_loginFormKey.currentState!.validate()) {
+                            context.read<AuthBloc>().add(LoginEvent(
+                                email: _emailCont.text, password: _pwCont.text));
+                          } else {
+                            print("Form validation eror");
+                          }
+                        },
+                        text: "Sign in",
+                        buttonColor: buttonColor,
+                        height: 40.h,
+                        textColor: Colors.white,
+                      ),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text("Don't you have an account? "),
+                          InkWell(
+                              onTap: () {
+                                Navigator.pop(context);
+                              },
+                              child: Text(
+                                "Sign up",
+                                style: theme.textTheme.bodyMedium!.copyWith(
+                                    color: buttonColor,
+                                    fontWeight: FontWeight.w600),
+                              ))
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              );
+            })
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _passWordField({
+    required TextEditingController controller,
+    required String? Function(String?)? validation,
+    required TextInputType keyboardType,
+    required String labelText,
+  }) {
+    return TextFormField(
+      controller: controller,
+      validator: validation,
+      keyboardType: keyboardType,
+      maxLines: 1,
+      obscureText: !isVisisble,
+      decoration: InputDecoration(
+        hintText: "",
+        labelText: labelText,
+        suffixIcon: InkWell(
+            onTap: () {
+              setState(() {
+                isVisisble = !isVisisble;
+              });
+            },
+            child: Icon(
+                isVisisble == false ? Icons.visibility : Icons.visibility_off)),
+        enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(borderRadius),
+            borderSide: BorderSide(color: borderColor)),
+        disabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(borderRadius)),
+        focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(borderRadius)),
+        errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(borderRadius),
+            borderSide: BorderSide(color: Colors.red.shade900)),
+        focusedErrorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(borderRadius),
+            borderSide: BorderSide(color: Colors.red.shade900)),
       ),
     );
   }
@@ -249,13 +311,14 @@ class _LoginScreenState extends State<LoginScreen> {
     final TextEditingController _emailController = TextEditingController();
     final TextEditingController _otpController = TextEditingController();
 
+
     return _createPw == true
         ? _buildCreateNewPassword(context: context, theme: theme)
         : SizedBox(
             // color: Colors.green,
             height: double.infinity,
             width: double.infinity,
-            child: Stack(
+            child: Column(
               children: [
                 SingleChildScrollView(
                   child: Column(
@@ -300,7 +363,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             ReusableTextfield(
                               controller: _emailController,
-                              labelText: "Enter your email address",
+                              labelText: "Email",
+                              hintText: "Enter your email address",
                             ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.start,
@@ -332,32 +396,29 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 Align(
                   alignment: Alignment.bottomCenter,
-                  child: SizedBox(
-                    height: 400,
-                    child: Column(
-                      children: [
-                        ReusableButton(
-                          action: () {
-                            if (_isOtp == true) {
-                              setState(() {
-                                _createPw = true;
-                              });
-                            } else {
-                              setState(() {
-                                _isOtp = true;
-                              });
-                            }
-                          },
-                          text: _isOtp == true ? "Confirm" : "Send OTP",
-                          buttonColor: buttonColor,
-                          height: 40.h,
-                          textColor: Colors.white,
-                        ),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                      ],
-                    ),
+                  child: Column(
+                    children: [
+                      ReusableButton(
+                        action: () {
+                          if (_isOtp == true) {
+                            setState(() {
+                              _createPw = true;
+                            });
+                          } else {
+                            setState(() {
+                              _isOtp = true;
+                            });
+                          }
+                        },
+                        text: _isOtp == true ? "Confirm" : "Send OTP",
+                        buttonColor: buttonColor,
+                        height: 40.h,
+                        textColor: Colors.white,
+                      ),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                    ],
                   ),
                 )
               ],
@@ -390,7 +451,13 @@ class _LoginScreenState extends State<LoginScreen> {
                           children: [
                             InkWell(
                               onTap: () {
-                                Navigator.pop(context);
+                                setState(() {
+                                  _createPw = false;
+                                  _isOtp = false;
+                                });
+                                _pageController.previousPage(
+                                    duration: Duration(milliseconds: 550),
+                                    curve: Curves.easeInOut);
                               },
                               child: Icon(Icons.arrow_back),
                             ),
@@ -410,6 +477,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ReusableTextfield(
                           controller: _pwCont,
                           labelText: "Password",
+                          
                           validation: (_) {
                             if (_pwCont.text.trim().isEmpty) {
                               return "This field is required";

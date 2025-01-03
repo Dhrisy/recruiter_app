@@ -6,4 +6,5 @@ class ApiLists {
  static String emailLoginEndPoint = "$baseUrl/user/email_login";
  static String companyDetailAddEndPoint = "$baseUrl/company/";
  static String refreshTokenEndPoint = "$baseUrl/user/refresh";
+ static String jobPostEndPoint = "$baseUrl/jobs/";
 }

@@ -9,6 +9,10 @@ class ReusableTextfield extends StatefulWidget {
   final bool? isRequired;
   final void Function(String)? onChanged;
   final int? maxLines;
+  final String? hintText;
+  final Color? borderColor;
+  final void Function(String)? onSubmit;
+  final FloatingLabelBehavior? float;
   const ReusableTextfield(
       {Key? key,
       this.labelText,
@@ -17,7 +21,11 @@ class ReusableTextfield extends StatefulWidget {
       this.validation,
       this.isRequired,
       this.onChanged,
-      this.maxLines
+      this.maxLines,
+      this.hintText,
+      this.onSubmit,
+      this.float,
+      this.borderColor
       })
       : super(key: key);
 
@@ -33,20 +41,23 @@ class _ReusableTextfieldState extends State<ReusableTextfield> {
       validator: widget.validation,
       keyboardType: widget.keyBoardType,
       onChanged: widget.onChanged ?? (_){},
+      onFieldSubmitted: widget.onSubmit ?? (_){},
       maxLines: widget.maxLines ?? 1,
       decoration: InputDecoration(
         hintText: widget.isRequired == true
-            ? "${widget.labelText ?? ""}*"
-            : widget.labelText ?? "",
+            ? "${widget.hintText ?? ""}*"
+            : widget.hintText ?? "",
         labelText: widget.labelText ?? "",
-        
+        floatingLabelBehavior: widget.float ??  FloatingLabelBehavior.auto,
         enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(borderRadius),
-            borderSide: BorderSide(color: borderColor)),
+            borderSide: BorderSide(color: widget.borderColor ?? borderColor)),
         disabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(borderRadius)),
+            borderRadius: BorderRadius.circular(borderRadius),
+            borderSide: BorderSide(color: widget.borderColor ?? borderColor)),
         focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(borderRadius)),
+            borderRadius: BorderRadius.circular(borderRadius),
+            borderSide: BorderSide(color: widget.borderColor ?? borderColor)),
         errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(borderRadius),
             borderSide: BorderSide(color: Colors.red.shade900)),

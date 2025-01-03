@@ -74,7 +74,7 @@ class _SplashScreenState extends State<SplashScreen>
        final installed = await _storage.read(key: "user");
     
     _isLoogedIn = await isLoggedIn();
-    isInstalled = installed != null;
+    isInstalled = installed != null ? true : false;
     setState(() {});
   }
 
