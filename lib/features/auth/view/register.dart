@@ -79,6 +79,7 @@ class _RegisterState extends State<Register> {
                     children: [
                       _buildRegisterModule(context, theme),
                       OtpScreen(
+                        phone: _phnCont.text,
                         controller: _pageController,
                       ),
                     ],
@@ -109,9 +110,12 @@ class _RegisterState extends State<Register> {
     return SingleChildScrollView(
         child: BlocConsumer<AuthBloc, AuthState>(listener: (context, state) {
       if (state is AuthSuccess) {
-        Navigator.pushAndRemoveUntil(context, 
-        AnimatedNavigation().slideAnimation(Questionaire1()), (Route<dynamic> route) => false);
-        CommonSnackbar.show(context, message: "Successfully logged in");
+        _pageController.nextPage(duration: Duration(
+                            milliseconds: 300
+                          ), curve: Curves.easeInOut);
+        // Navigator.pushAndRemoveUntil(context, 
+        // AnimatedNavigation().slideAnimation(Questionaire1()), (Route<dynamic> route) => false);
+        // CommonSnackbar.show(context, message: "Successfully logged in");
       } else if (state is AuthExists) {
         CommonSnackbar.show(context, message: "User already exists");
       } else if (state is AuthFailure) {
@@ -158,7 +162,7 @@ class _RegisterState extends State<Register> {
                           return null;
                         },
                         labelText: "Company name",
-                        isRequired: true,
+                        // isRequired: true,
                       ),
                       const SizedBox(
                         height: 20,
@@ -175,7 +179,7 @@ class _RegisterState extends State<Register> {
                           return null;
                         },
                         labelText: "Email",
-                        isRequired: true,
+                        // isRequired: true,
                       ),
                       const SizedBox(
                         height: 20,
@@ -191,7 +195,7 @@ class _RegisterState extends State<Register> {
                           return null;
                         },
                         labelText: "Contact number",
-                        isRequired: true,
+                        // isRequired: true,
                       ),
                       const SizedBox(
                         height: 20,
@@ -220,7 +224,7 @@ class _RegisterState extends State<Register> {
                           return null;
                         },
                         labelText: "Password",
-                        isRequired: true,
+                        // isRequired: true,
                       ),
                       Text(
                         "Password must contain alphabets, numerics, and special characters",
@@ -305,11 +309,16 @@ class _RegisterState extends State<Register> {
                                 password: _pwCont.text,
                                 role: "recruiter",
                                 whatsappUpdations: _whatsapp_updations));
+
+
+
                           }
+
+                          
 
                           FocusScope.of(context).unfocus();
                         },
-                        text: "Next",
+                        text: "Send OTP",
                         textSize: 15.sp,
                         width: MediaQuery.of(context).size.width * 0.5.w,
                         height: 40.h,
@@ -355,4 +364,14 @@ class _RegisterState extends State<Register> {
       );
     }));
   }
+
+
+Widget _buildOtpScreen({required String phn}){
+  return Column(
+    children: [
+      Text("aaaaaaaaaaa")
+    ],
+  );
+}
+
 }

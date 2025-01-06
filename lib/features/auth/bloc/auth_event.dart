@@ -28,11 +28,11 @@ class RegisterEvent extends AuthEvent{
 }
 
 
-class LoginEvent extends AuthEvent{
+class EmailLoginEvent extends AuthEvent{
   final String email;
   final String password;
 
-  LoginEvent({
+  EmailLoginEvent({
     required this.email,
     required this.password
   });
@@ -40,3 +40,31 @@ class LoginEvent extends AuthEvent{
   @override
   List<Object?> get props => [email, password];
 }
+
+class GetOtpEVent extends AuthEvent{
+  final String phone;
+
+  GetOtpEVent({required this.phone});
+  @override
+  List<Object?> get props => [phone];
+
+}
+
+class PhoneLoginEvent extends AuthEvent{
+  final String phone;
+  PhoneLoginEvent({required this.phone});
+   @override
+  List<Object?> get props => [phone];
+}
+
+class MobileOtpVerifyEvent extends AuthEvent{
+  final String phone;
+  final String otp;
+
+  MobileOtpVerifyEvent({ required this.phone, required this.otp});
+   @override
+  List<Object?> get props => [phone];
+}
+
+
+class ClearEvent extends AuthEvent{}

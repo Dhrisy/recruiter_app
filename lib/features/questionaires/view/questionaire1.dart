@@ -21,7 +21,8 @@ import 'package:recruiter_app/widgets/reusable_button.dart';
 import 'package:recruiter_app/widgets/reusable_textfield.dart';
 
 class Questionaire1 extends StatefulWidget {
-  const Questionaire1({super.key});
+  final bool? isFromHome;
+  const Questionaire1({super.key, this.isFromHome});
 
   @override
   State<Questionaire1> createState() => _Questionaire1State();
@@ -59,6 +60,9 @@ class _Questionaire1State extends State<Questionaire1> {
     return Material(
       child: SafeArea(
           child: Scaffold(
+            appBar: AppBar(
+              
+            ),
         body: Stack(
           children: [
             Positioned(
@@ -1018,49 +1022,66 @@ class _Questionaire1State extends State<Questionaire1> {
                 const SizedBox(
                   height: 55,
                 ),
-                ReusableButton(
-                    action: () async {
-                      if (_contactFormKey.currentState!.validate()) {
-                        context.read<QuestionaireBloc>().add(
-                            QuestionaireSubmitEvent(
-                                aboutCompany: _aboutCont.text,
-                                address: _addressCont.text,
-                                city: _selectedCity,
-                                contactPersonName: _personNameCont.text,
-                                country: _selectedCountry,
-                                designation: _designationCont.text,
-                                functionalArea: _selectedFunctionalArea,
-                                industry: _selectedIndustry,
-                                mobilePhn: _mobileNumberCont.text,
-                                postalCode: _postalCodeCont.text,
-                                website: _companyWesiteCont.text));
-                        // final questionaire = QuestionaireModel(
-                        //     landlineNumber: _landlineNumberCont.text,
-                        //     about: _aboutCont.text,
-                        //     industry: _selectedIndustry,
-                        //     functionalArea: _selectedFunctionalArea,
-                        //     address: _addressCont.text,
-                        //     city: _selectedCity,
-                        //     country: _selectedCountry,
-                        //     postalCode: _postalCodeCont.text,
-                        //     mobileNumber: _mobileNumberCont.text,
-                        //     designation: _designationCont.text,
-                        //     website: _companyWesiteCont.text,
-                        //     contactPersonName: _personNameCont.text);
 
-                        // _submitQuestionaire(questionaire: questionaire);
-                      }
-                      // Navigator.pushAndRemoveUntil(
-                      //     context,
-                      //     AnimatedNavigation()
-                      //         .scaleAnimation(SuccessfullyRegisteredScreen()),
-                      //     (Route<dynamic> route) => false);
-                    },
-                    textSize: 18.sp,
-                    height: 40.h,
-                    text: "Save",
-                    textColor: Colors.white,
-                    buttonColor: buttonColor)
+                BlocConsumer<QuestionaireBloc, QuestionaireState>(
+                    listener: (context, state) {
+                  if (widget.isFromHome == true) {
+                    if (state is QuestionaireSuccess) {
+                      Navigator.pop(context);
+                      CommonSnackbar.show(context,
+                          message: "Job posted successfully");
+                    }
+                    if (state is QuestionaireFailure) {
+                      CommonSnackbar.show(context,
+                          message: "Failed to post job");
+                    }
+                  }
+                }, builder: (context, state) {
+                  return ReusableButton(
+                      action: () async {
+                        if (_contactFormKey.currentState!.validate()) {
+                          context.read<QuestionaireBloc>().add(
+                              QuestionaireSubmitEvent(
+                                  aboutCompany: _aboutCont.text,
+                                  address: _addressCont.text,
+                                  city: _selectedCity,
+                                  contactPersonName: _personNameCont.text,
+                                  country: _selectedCountry,
+                                  designation: _designationCont.text,
+                                  functionalArea: _selectedFunctionalArea,
+                                  industry: _selectedIndustry,
+                                  mobilePhn: _mobileNumberCont.text,
+                                  postalCode: _postalCodeCont.text,
+                                  website: _companyWesiteCont.text));
+
+                          // final questionaire = QuestionaireModel(
+                          //     landlineNumber: _landlineNumberCont.text,
+                          //     about: _aboutCont.text,
+                          //     industry: _selectedIndustry,
+                          //     functionalArea: _selectedFunctionalArea,
+                          //     address: _addressCont.text,
+                          //     city: _selectedCity,
+                          //     country: _selectedCountry,
+                          //     postalCode: _postalCodeCont.text,
+                          //     mobileNumber: _mobileNumberCont.text,
+                          //     designation: _designationCont.text,
+                          //     website: _companyWesiteCont.text,
+                          //     contactPersonName: _personNameCont.text);
+
+                          // _submitQuestionaire(questionaire: questionaire);
+                        }
+                        // Navigator.pushAndRemoveUntil(
+                        //     context,
+                        //     AnimatedNavigation()
+                        //         .scaleAnimation(SuccessfullyRegisteredScreen()),
+                        //     (Route<dynamic> route) => false);
+                      },
+                      textSize: 18.sp,
+                      height: 40.h,
+                      text: "Save",
+                      textColor: Colors.white,
+                      buttonColor: buttonColor);
+                })
               ],
             ),
           ),

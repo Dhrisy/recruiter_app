@@ -108,7 +108,9 @@ import 'package:recruiter_app/core/utils/navigation_animation.dart';
 import 'package:recruiter_app/features/account/account.dart';
 import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/features/home/view/home_screen.dart';
+import 'package:recruiter_app/features/job_post/data/job_post_repository.dart';
 import 'package:recruiter_app/features/job_post/view/job_post_form.dart';
+import 'package:recruiter_app/features/job_post/view/preview_job.dart';
 import 'package:recruiter_app/features/resdex/resedex.dart';
 
 class Navbar extends StatefulWidget {
@@ -137,109 +139,109 @@ class _NavbarState extends State<Navbar> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Material(
-          child: BottomBar(
-            barColor: Colors.transparent, // Color(0xffFFF4F2),
-            fit: StackFit.expand,
+    return Scaffold(
+      body: Stack(
+        children: [
+          Material(
+            child: BottomBar(
+              barColor: Colors.transparent, // Color(0xffFFF4F2),
+              fit: StackFit.expand,
 
-            borderRadius: BorderRadius.circular(0),
-            duration: const Duration(seconds: 1),
-            curve: Curves.decelerate,
-            showIcon: true,
-            width: double.infinity, 
-            start: 0,
-            end: 0,
-            offset: 0,
-            iconHeight: 25,
-            iconWidth: 35,
-            reverse: false,
-            barDecoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(500),
-            ),
-            iconDecoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(500),
-            ),
-            hideOnScroll: true,
-            scrollOpposite: false,
-            onBottomBarHidden: () {},
-            onBottomBarShown: () {},
-            body: (context, controller) => TabBarView(
-              controller: tabController,
-              physics: const BouncingScrollPhysics(),
-              children: screens,
-            ),
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 0),
-              child: Container(
-                height: 45.h,
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                          color: const Color.fromARGB(255, 201, 200, 200),
-                          blurRadius: 1.r,
-                          offset: const Offset(0, -5))
+              borderRadius: BorderRadius.circular(0),
+              duration: const Duration(seconds: 1),
+              curve: Curves.decelerate,
+              showIcon: true,
+              width: double.infinity,
+              start: 0,
+              end: 0,
+              offset: 0,
+              iconHeight: 25,
+              iconWidth: 35,
+              reverse: false,
+              barDecoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(500),
+              ),
+              iconDecoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(500),
+              ),
+              hideOnScroll: true,
+              scrollOpposite: false,
+              onBottomBarHidden: () {},
+              onBottomBarShown: () {},
+              body: (context, controller) => TabBarView(
+                controller: tabController,
+                physics: const BouncingScrollPhysics(),
+                children: screens,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 0),
+                child: Container(
+                  height: 45.h,
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                            color: const Color.fromARGB(255, 201, 200, 200),
+                            blurRadius: 1.r,
+                            offset: const Offset(0, -5))
+                      ],
+                      border: BorderDirectional(
+                          top: BorderSide(color: borderColor))),
+                  child: TabBar(
+                    controller: tabController,
+                    indicatorColor: Colors.transparent,
+                    dividerHeight: 0,
+                    dividerColor: Colors.black,
+                    tabs: const [
+                      Tab(
+                          icon: Padding(
+                            padding: EdgeInsets.only(top: 10),
+                            child: Icon(Icons.home),
+                          ),
+                          text: "Home"),
+                      Tab(
+                          icon: Padding(
+                            padding: EdgeInsets.only(top: 10),
+                            child: Icon(Icons.search),
+                          ),
+                          text: "Resdex"),
+                      Tab(
+                          icon: Padding(
+                            padding: EdgeInsets.only(top: 10),
+                            child: Icon(Icons.search),
+                          ),
+                          text: "Resdex"),
+                      Tab(
+                          icon: Padding(
+                            padding: EdgeInsets.only(top: 10),
+                            child: Icon(Icons.business),
+                          ),
+                          text: "Account"),
                     ],
-                    border:
-                        BorderDirectional(top: BorderSide(color: borderColor))),
-                child: TabBar(
-                  controller: tabController,
-
-                  indicatorColor: Colors.transparent,
-                  dividerHeight: 0,
-                  dividerColor: Colors.black,
-
-                  tabs: const [
-                    Tab(
-                        icon: Padding(
-                          padding: EdgeInsets.only(top: 10),
-                          child: Icon(Icons.home),
-                        ),
-                        text: "Home"),
-                    Tab(
-                        icon: Padding(
-                          padding: EdgeInsets.only(top: 10),
-                          child: Icon(Icons.search),
-                        ),
-                        text: "Resdex"),
-                    Tab(
-                        icon: Padding(
-                          padding: EdgeInsets.only(top: 10),
-                          child: Icon(Icons.home),
-                        ),
-                        text: "Account"),
-                    Tab(
-                        icon: Padding(
-                          padding: EdgeInsets.only(top: 10),
-                          child: Icon(Icons.search),
-                        ),
-                        text: "Resdex"),
-                  ],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: Padding(
-            padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).size.height * 0.06),
-            child: FloatingActionButton(
-              onPressed: () {
-                Navigator.push(context, 
-                AnimatedNavigation().fadeAnimation(JobPostForm()));
-              },
-              backgroundColor: buttonColor,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(50.r)),
-              child: const Icon(Icons.add, color: Colors.white),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).size.height * 0.06),
+              child: FloatingActionButton(
+                onPressed: () async {
+                  Navigator.push(context,
+                      AnimatedNavigation().fadeAnimation(const JobPostForm()));
+                },
+                backgroundColor: buttonColor,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(50.r)),
+                child: const Icon(Icons.add, color: Colors.white),
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

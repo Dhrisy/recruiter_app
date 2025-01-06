@@ -6,14 +6,14 @@ import 'package:recruiter_app/services/api_lists.dart';
 class LoginService {
   static Future<http.Response> mobileLoginService({
     required String username,
-    required String password,
+    
   }) async {
     final url = Uri.parse(ApiLists.mobieLoginEndPoint);
    return await http.post(
         url,
         body: jsonEncode({
           
-          "password": password,
+          
           "username": username,
           
         }),
@@ -32,8 +32,7 @@ class LoginService {
         url,
         body: jsonEncode({
           
-          "password": password,
-          "email": email,
+          "username": email,
           
         }),
         headers: {
@@ -41,4 +40,32 @@ class LoginService {
         },
       );
   }
+
+
+
+  static Future<http.Response>  retryOtp({required String phone}) async{
+    final url = Uri.parse(ApiLists.mobileOtpRetryEndPoint);
+    final response = await http.post(url,
+    body: jsonEncode({
+      "phone": phone
+    }));
+
+    print("Response of retyr otp  ${response.statusCode},  ${response.body}");
+
+    return response;
+  }
+
+  static Future<http.Response>  mobileOtpVerify({required String phone, required String otp}) async{
+    final url = Uri.parse(ApiLists.mobileOtpVerifyEndPoint);
+    final response = await http.post(url,
+    body: jsonEncode({
+      "phone": phone,
+      "otp": otp
+    }));
+
+    return response;
+  }
+
+
+
 }

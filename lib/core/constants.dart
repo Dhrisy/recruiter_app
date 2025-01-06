@@ -38,3 +38,7 @@ FontWeight normalFontWeight = FontWeight.normal;
 
 // radius
 final borderRadius = 10.r;
+
+
+final secondGradient =
+    LinearGradient(colors: [Color(0xff312651), Color(0xff6F56B7)]);

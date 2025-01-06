@@ -35,58 +35,7 @@ class _AccountState extends State<Account> {
               padding: const EdgeInsets.symmetric(horizontal: 15),
               child: Column(
                 children: [
-                  const SizedBox(
-                    height: 40,
-                  ),
-                  Row(
-                    children: [
-                      Icon(Icons.arrow_back_ios),
-                      const SizedBox(
-                        width: 40,
-                      ),
-                      Text(
-                        "Resdex",
-                        style: theme.textTheme.titleLarge!.copyWith(
-                            fontWeight: FontWeight.bold, fontSize: 20.sp),
-                      )
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 25,
-                  ),
-                  Column(
-                    spacing: 15,
-                    children: [
-                      Row(
-                        spacing: 10.w,
-                        children: [
-                          Expanded(
-                              child:
-                                  _buildOptionContainer(title: "Search CV's")),
-                          Expanded(
-                              child: _buildOptionContainer(
-                                  title: "Application Response")),
-                          Expanded(
-                              child: _buildOptionContainer(
-                                  title: "Interview Scheduled"))
-                        ],
-                      ),
-                      Row(
-                        spacing: 10.w,
-                        children: [
-                          Expanded(
-                              child:
-                                  _buildOptionContainer(title: "Saved CV's")),
-                          Expanded(
-                              child: _buildOptionContainer(
-                                  title: "Saved searches")),
-                          Expanded(
-                              child: _buildOptionContainer(
-                                  title: "Email templates"))
-                        ],
-                      )
-                    ],
-                  )
+                  Text("Account")
                 ],
               ),
             ),

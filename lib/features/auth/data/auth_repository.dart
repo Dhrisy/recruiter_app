@@ -31,17 +31,22 @@ class AuthRepository {
       final Map<String, dynamic> responseData =
           jsonDecode(registerResponse.body);
 
-      if (responseData.containsKey("message") &&
+      if (registerResponse.statusCode == 201) {
+        return "success";
+      } else if (responseData.containsKey("message") &&
           responseData["message"] == "User already exists") {
         return responseData["message"];
-      } else if (responseData.containsKey("access")) {
-        await _secureStorage.write(key: "access_token", value: responseData["access"]);
-        await _secureStorage.write(key: "refresh_token", value: responseData["refresh"]);
-        
-        return "success";
       }
 
-     
+      // if (responseData.containsKey("message") &&
+      //     responseData["message"] == "User already exists") {
+      //   return responseData["message"];
+      // } else if (responseData.containsKey("access")) {
+      //   await _secureStorage.write(key: "access_token", value: responseData["access"]);
+      //   await _secureStorage.write(key: "refresh_token", value: responseData["refresh"]);
+
+      //   return "success";
+      // }
     } catch (e) {
       log(e.toString());
       return null;
@@ -68,7 +73,6 @@ class AuthRepository {
 
           return "success";
         } else if (responseData.containsKey("message")) {
-
           return responseData["message"];
         } else {
           return "Something went wrong! Please try again later";
@@ -79,6 +83,67 @@ class AuthRepository {
     } catch (e) {
       print(e);
       return "Something went wrong! Please try again later";
+    }
+  }
+
+  Future<String?> phoneLogin({required String phone}) async {
+    try {
+      final response = await LoginService.mobileLoginService(username: phone);
+      print("xxxxxxxxxxxxxx ${response.statusCode}, ${response.body}");
+      final Map<String, dynamic> responseData = jsonDecode(response.body);
+      if (response.statusCode == 201) {
+        return "success";
+      } else {
+        return responseData["message"];
+      }
+
+      // if (response.statusCode == 201) {
+      //   return "success";
+      // } else {
+      //   return responseData["message"];
+      // }
+    } catch (e) {
+      return e.toString();
+    }
+  }
+
+  Future<String?> getPhoneOtp({required String phone}) async {
+    try {
+      final response = await LoginService.retryOtp(phone: phone);
+      print("Get otp auth ${response.statusCode}, ${response.body}");
+      final Map<String, dynamic> responseData = jsonDecode(response.body);
+
+      if (response.statusCode == 201) {
+        return "success";
+      } else {
+        return responseData["message"];
+      }
+    } catch (e) {
+      return e.toString();
+    }
+  }
+
+  Future<String?> mobileOtpVerify(
+      {required String phone, required String otp}) async {
+    try {
+      final response =
+          await LoginService.mobileOtpVerify(phone: phone, otp: otp);
+
+      print(
+          'Response of mobilt otp verify ${response.statusCode}, ${response.body}');
+      final responseData = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        CustomFunctions()
+            .storeCredentials("access_token", responseData["access"]);
+        CustomFunctions()
+            .storeCredentials("refresh_token", responseData["refresh"]);
+
+        return "success";
+      } else {
+        return responseData["message"];
+      }
+    } catch (e) {
+      return e.toString();
     }
   }
 }

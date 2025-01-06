@@ -16,6 +16,7 @@ import 'package:recruiter_app/core/utils/skills.dart';
 import 'package:recruiter_app/core/utils/states.dart';
 import 'package:recruiter_app/features/job_post/data/job_post_repository.dart';
 import 'package:recruiter_app/features/job_post/model/job_post_model.dart';
+import 'package:recruiter_app/features/job_post/view/preview_job.dart';
 import 'package:recruiter_app/features/job_post/viewmodel.dart/jobpost_provider.dart';
 import 'package:recruiter_app/features/navbar/view/navbar.dart';
 import 'package:recruiter_app/widgets/common_snackbar.dart';
@@ -69,6 +70,8 @@ class _JobPostFormState extends State<JobPostForm> {
   final _candidateDetailsForm = GlobalKey<FormState>();
   final _salaryDetailsForm = GlobalKey<FormState>();
 
+  int _currentStep = 0;
+
   @override
   void initState() {
     super.initState();
@@ -79,6 +82,112 @@ class _JobPostFormState extends State<JobPostForm> {
     for (var item in states) {
       _states.add(item["name"]);
     }
+  }
+
+  bool validateCurrentStep() {
+    switch (_currentStep) {
+      case 0:
+        return _jobDetailsForm.currentState?.validate() ?? false;
+      case 1:
+        return _candidateDetailsForm.currentState?.validate() ?? false;
+      case 2:
+        return _salaryDetailsForm.currentState?.validate() ?? false;
+      default:
+        return false;
+    }
+  }
+
+  void handleNext(ThemeData theme) async {
+    if (validateCurrentStep()) {
+      setState(() {
+        if (_currentStep < getSteps(theme).length - 1) {
+          _currentStep++;
+        } else {
+          submitForm();
+        }
+      });
+    }
+  }
+
+  void submitForm() {
+    final job = JobPostModel(
+      candidateLocation: _selectedLocation,
+      city: _selectedCity,
+      country: _selectedCountry,
+      description: 
+          "Roles and responsibilities:${_roleDescriptionCont.text}\nCandidate's desired profile:\n${_descriptionCont.text}",
+      education: _selectedEducation,
+      functionalArea: _selectedFunctionalArea,
+      gender: _selectedGender,
+      industry: _selectedIndustry,
+      jobType: _selectedType,
+      maximumExperience: int.parse(_minExpCont.text),
+      maximumSalary: int.parse(_maxSalaryCont.text),
+      minimumExperience: int.parse(_minExpCont.text),
+      minimumSalary: int.parse(_minSalaryCont.text),
+      nationality: _selectedNationality,
+      title: _titleCont.text,
+      vaccancy: int.parse(_vaccancyCont.text),
+    );
+
+    context.read<JobPostBloc>().add(JobPostFormEvent(job: job));
+  }
+
+  List<Step> getSteps(ThemeData theme) {
+    return [
+      Step(
+        title: const Text('Personal'),
+        content: _buildJobDetailsForm(theme: theme),
+        isActive: _currentStep >= 0,
+        state: _currentStep > 0 ? StepState.complete : StepState.indexed,
+      ),
+      Step(
+        title: const Text('Address'),
+        content: _buildCandidateProfile(theme: theme),
+        isActive: _currentStep >= 1,
+        state: _currentStep > 1 ? StepState.complete : StepState.indexed,
+      ),
+      Step(
+        title: const Text('Confirm'),
+        content: _buildSalaryDetailsForm(theme: theme),
+        isActive: _currentStep >= 2,
+      ),
+    ];
+  }
+
+  Widget _buildStep(int index, String title, bool isActive, StepState state) {
+    return Container(
+      child: Row(
+        children: [
+          // Circle with number
+          Container(
+            width: 30,
+            height: 30,
+            decoration: BoxDecoration(
+              color: isActive ? secondaryColor : Colors.grey,
+              shape: BoxShape.circle,
+            ),
+            child: Center(
+              child: state == StepState.complete
+                  ? const Icon(Icons.check, color: Colors.white, size: 16)
+                  : Text(
+                      '${index + 1}',
+                      style: const TextStyle(color: Colors.white),
+                    ),
+            ),
+          ),
+          if (index < 2) _buildDivider(), // Don't add divider after last step
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDivider() {
+    return Container(
+      width: 70,
+      height: 1,
+      color: Colors.grey,
+    );
   }
 
   @override
@@ -103,79 +212,158 @@ class _JobPostFormState extends State<JobPostForm> {
               padding: const EdgeInsets.symmetric(horizontal: 15),
               child: SingleChildScrollView(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // job details input
-                    _buildJobDetailsForm(theme: theme),
-
-                    const SizedBox(
-                      height: 20,
+                    Container(
+                      padding: const EdgeInsets.symmetric(vertical: 20),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(3, (index) {
+                          bool isActive = _currentStep >= index;
+                          StepState state = _currentStep > index
+                              ? StepState.complete
+                              : StepState.indexed;
+                          return _buildStep(
+                            index,
+                            ['Personal', 'Address', 'Confirm'][index],
+                            isActive,
+                            state,
+                          );
+                        }),
+                      ),
                     ),
-                    // candidate profile
-                    _buildCandidateProfile(theme: theme),
-                    const SizedBox(
-                      height: 20,
+                    Column(
+                      children: [
+                        getSteps(theme)[_currentStep].content,
+                        Container(
+                          margin: const EdgeInsets.symmetric(vertical: 20),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              if (_currentStep > 0)
+                                Expanded(
+                                  child: ReusableButton(
+                                      action: () {
+                                        setState(() {
+                                          if (_currentStep > 0) {
+                                            _currentStep--;
+                                          }
+                                        });
+                                      },
+                                      text: "BACK",
+                                      buttonColor: buttonColor),
+                                ),
+                              if (_currentStep > 0) const SizedBox(width: 16),
+
+                              Expanded(
+                                child: ReusableButton(
+                                    action: () async {
+                                      handleNext(theme);
+                                    },
+                                    text: _currentStep <
+                                            getSteps(theme).length - 1
+                                        ? 'NEXT'
+                                        : 'FINISH',
+                                    buttonColor: buttonColor),
+                              ),
+
+                              // ElevatedButton(
+                              //   onPressed: () {
+                              //     setState(() {
+                              //       if (_currentStep < getSteps(theme).length - 1) {
+                              //         _currentStep++;
+                              //       }
+                              //     });
+                              //   },
+                              //   child: Text(
+                              //     _currentStep < getSteps(theme).length - 1
+                              //         ? 'NEXT'
+                              //         : 'FINISH',
+                              //   ),
+                              // ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                    //  salary details of job
-                    _buildSalaryDetailsForm(theme: theme),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    _buildQuestionsWidget(theme: theme),
-
-                    BlocConsumer<JobPostBloc, JobPostState>(
-                        listener: (context, state) {
-                      if (state is JobSubmitSuccess) {
-                        CommonSnackbar.show(context,
-                            message: "Job posted successfully");
-                        Navigator.pushReplacement(context,
-                            AnimatedNavigation().slideAnimation(Navbar()));
-                      }
-
-                      if (state is JobSubmitFailure) {
-                        CommonSnackbar.show(context,
-                            message:
-                                "Failed to create job. Please try again later");
-                      }
-                    }, builder: (context, state) {
-                      return ReusableButton(
-                          isLoading: state is JobPostLoading,
-                          textColor: Colors.white,
-                          action: () async {
-                            if (_jobDetailsForm.currentState!.validate() &&
-                                _candidateDetailsForm.currentState!
-                                    .validate() &&
-                                _salaryDetailsForm.currentState!.validate()) {
-                              final job = JobPostModel(
-                                candidateLocation: _selectedLocation,
-                                city: _selectedCity,
-                                country: _selectedCountry,
-                                description:
-                                    "Roles and responsibilities:\n${_roleDescriptionCont.text}\nCandidate's desired profile:\n${_descriptionCont.text}",
-                                education: _selectedEducation,
-                                functionalArea: _selectedFunctionalArea,
-                                gender: _selectedGender,
-                                industry: _selectedIndustry,
-                                jobType: _selectedType,
-                                maximumExperience: int.parse(_minExpCont.text),
-                                maximumSalary: int.parse(_maxSalaryCont.text),
-                                minimumExperience: int.parse(_minExpCont.text),
-                                minimumSalary: int.parse(_minSalaryCont.text),
-                                nationality: _selectedNationality,
-                                title: _titleCont.text,
-                                vaccancy: int.parse(_vaccancyCont.text),
-                              );
-
-                              context
-                                  .read<JobPostBloc>()
-                                  .add(JobPostFormEvent(job: job));
-                            }
-                          },
-                          text: "Post job",
-                          buttonColor: buttonColor);
-                    })
                   ],
                 ),
+
+                // child: Column(
+                //   crossAxisAlignment: CrossAxisAlignment.start,
+                //   children: [
+                //     // job details input
+                //     _buildJobDetailsForm(theme: theme),
+
+                //     const SizedBox(
+                //       height: 20,
+                //     ),
+                //     // candidate profile
+                //     _buildCandidateProfile(theme: theme),
+                //     const SizedBox(
+                //       height: 20,
+                //     ),
+                //     //  salary details of job
+                //     _buildSalaryDetailsForm(theme: theme),
+                //     const SizedBox(
+                //       height: 20,
+                //     ),
+                //     _buildQuestionsWidget(theme: theme),
+
+                //     BlocConsumer<JobPostBloc, JobPostState>(
+                //         listener: (context, state) {
+                //       if (state is JobSubmitSuccess) {
+                //         CommonSnackbar.show(context,
+                //             message: "Job posted successfully");
+                //         Navigator.pushReplacement(context,
+                //             AnimatedNavigation().slideAnimation(Navbar()));
+                //       }
+
+                //       if (state is JobSubmitFailure) {
+                //         CommonSnackbar.show(context,
+                //             message:
+                //                 "Failed to create job. Please try again later");
+                //       }
+                //     }, builder: (context, state) {
+                //       return ReusableButton(
+                //           isLoading: state is JobPostLoading,
+                //           textColor: Colors.white,
+                //           action: () async {
+                //             if (_jobDetailsForm.currentState!.validate() &&
+                //                 _candidateDetailsForm.currentState!
+                //                     .validate() &&
+                //                 _salaryDetailsForm.currentState!.validate()) {
+                //               final job = JobPostModel(
+                //                 candidateLocation: _selectedLocation,
+                //                 city: _selectedCity,
+                //                 country: _selectedCountry,
+                //                 description:
+                //                     "Roles and responsibilities:\n${_roleDescriptionCont.text}\nCandidate's desired profile:\n${_descriptionCont.text}",
+                //                 education: _selectedEducation,
+                //                 functionalArea: _selectedFunctionalArea,
+                //                 gender: _selectedGender,
+                //                 industry: _selectedIndustry,
+                //                 jobType: _selectedType,
+                //                 maximumExperience: int.parse(_minExpCont.text),
+                //                 maximumSalary: int.parse(_maxSalaryCont.text),
+                //                 minimumExperience: int.parse(_minExpCont.text),
+                //                 minimumSalary: int.parse(_minSalaryCont.text),
+                //                 nationality: _selectedNationality,
+                //                 title: _titleCont.text,
+                //                 vaccancy: int.parse(_vaccancyCont.text),
+                //               );
+
+                //               // Navigator.push(context, AnimatedNavigation().slideAnimation(PreviewJob(jobData: job)));
+
+                //               // context
+                //               //     .read<JobPostBloc>()
+                //               //     .add(JobPostFormEvent(job: job));
+                //             }
+                //           },
+                //           text: "Post job",
+                //           buttonColor: buttonColor);
+                //     })
+                //   ],
+                // ),
               ),
             ),
           ),

@@ -14,7 +14,8 @@ import 'package:recruiter_app/widgets/reusable_button.dart';
 
 class OtpScreen extends StatefulWidget {
   final PageController controller;
-  const OtpScreen({Key? key, required this.controller}) : super(key: key);
+  final String phone;
+  const OtpScreen({Key? key, required this.controller, required this.phone}) : super(key: key);
 
   @override
   State<OtpScreen> createState() => _OtpScreenState();
@@ -94,7 +95,7 @@ class _OtpScreenState extends State<OtpScreen> {
                       height: 20,
                     ),
                     Text(
-                      "We have send a verification code to the mobile number +9198xxxx00",
+                      "We have send a verification code to the mobile number +91${widget.phone}",
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(
@@ -172,9 +173,9 @@ class _OtpScreenState extends State<OtpScreen> {
                   child: ReusableButton(
                     action: () {
                       _showAlertDialogue(context);
-                      Future.delayed(Duration(seconds: 1), (){
-                        Navigator.push(context, AnimatedNavigation().fadeAnimation(Questionaire1()));
-                      });
+                      // Future.delayed(Duration(seconds: 1), (){
+                      //   Navigator.push(context, AnimatedNavigation().fadeAnimation(Questionaire1()));
+                      // });
                     },
                     text: "Confirm",
                     buttonColor: buttonColor,
@@ -233,7 +234,7 @@ class _OtpScreenState extends State<OtpScreen> {
   void _showAlertDialogue(BuildContext context) {
     showDialog(
       context: context,
-      barrierDismissible: false,
+      barrierDismissible: true,
       builder: (BuildContext context) {
         return AlertDialog(
           title: SvgPicture.asset("assets/svgs/success_image.svg"),

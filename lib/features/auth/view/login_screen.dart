@@ -11,6 +11,7 @@ import 'package:recruiter_app/features/auth/bloc/auth_bloc.dart';
 import 'package:recruiter_app/features/auth/bloc/auth_event.dart';
 import 'package:recruiter_app/features/auth/bloc/auth_state.dart';
 import 'package:recruiter_app/features/auth/view/otp_screen.dart';
+import 'package:recruiter_app/features/auth/view/phone_signin.dart';
 import 'package:recruiter_app/features/auth/view/welcome_screen.dart';
 import 'package:recruiter_app/features/navbar/view/navbar.dart';
 import 'package:recruiter_app/widgets/common_snackbar.dart';
@@ -170,17 +171,19 @@ class _LoginScreenState extends State<LoginScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              //  InkWell(
-                              //     onTap: () async {
-                              //       _pageController.nextPage(
-                              //           duration: Duration(milliseconds: 550),
-                              //           curve: Curves.easeInOut);
-                              //     },
-                              //     child: Text(
-                              //       "Use phone number",
-                              //       style: theme.textTheme.bodyMedium!
-                              //           .copyWith(color: buttonColor),
-                              //     )),
+                               InkWell(
+                                  onTap: () async {
+                                  Navigator.push(context, 
+                                  AnimatedNavigation().slideAnimation(PhoneSignin()));
+                                  },
+                                  child: Text(
+                                    "Use phone number",
+                                    style: theme.textTheme.bodyMedium!
+                                        .copyWith(color: buttonColor),
+                                  )),
+                                  const SizedBox(
+                                    width: 15,
+                                  ),
                               InkWell(
                                   onTap: () async {
                                     _pageController.nextPage(
@@ -226,7 +229,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         isLoading: state is AuthLoading,
                         action: () {
                           if (_loginFormKey.currentState!.validate()) {
-                            context.read<AuthBloc>().add(LoginEvent(
+                            context.read<AuthBloc>().add(EmailLoginEvent(
                                 email: _emailCont.text, password: _pwCont.text));
                           } else {
                             print("Form validation eror");

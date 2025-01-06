@@ -15,6 +15,9 @@ class JobPostModel {
   String? education;
   int? minimumSalary;
   int? maximumSalary;
+
+
+  
   // String? description;
   // String? jobType;
   // String? city;
@@ -38,23 +41,46 @@ class JobPostModel {
       this.title,
       this.vaccancy});
 
+    //    {
+    //     "id": 2,
+    //     "company": 5,
+    //     "title": "string",
+    //     "description": "string",
+    //     "type": "string",
+    //     "category": "string",
+    //     "city": "string",
+    //     "country": "string",
+    //     "vacancy": 0,
+    //     "industry": "string",
+    //     "functional_area": "string",
+    //     "gender": "string",
+    //     "nationality": "string",
+    //     "experience_min": 0,
+    //     "experience_max": 0,
+    //     "candidate_location": "string",
+    //     "education": "string",
+    //     "salary_min": 0,
+    //     "salary_max": 0
+    // },
+
   factory JobPostModel.fromJson(Map<String, dynamic> json) {
     return JobPostModel(
-      candidateLocation: json["candidate_location"] ?? "N/A",
-      city: json["city"] ?? "N/A",
-      country: json["country"] ?? "N/A",
-      description: json["description"] ?? "N/A",
-      education: json["candidate_education"] ?? "N/A",
-      functionalArea: json["functional_area"] ?? "N/A",
-      gender: json["gender"] ?? "N/A",
-      industry: json["industry"] ?? "N/A",
-      jobType: json["experience_min"] ?? 0,
-      minimumExperience: json["experience_max"] ?? 0,
-      maximumSalary: json["salary_max"] ?? 0,
-      minimumSalary: json["salary_min"] ?? 0,
-      nationality: json["nationality"] ?? "N/A",
-      title: json["title"] ?? "N/A",
-      vaccancy: json["vaccancy"] ?? 0,
+      candidateLocation: json["candidate_location"] ,
+      city: json["city"] ,
+      country: json["country"] ,
+      description: json["description"] ,
+      education: json["education"] ,
+      functionalArea: json["functional_area"] ,
+      gender: json["gender"] ,
+      industry: json["industry"] ,
+      jobType: json["type"] ,
+      minimumExperience: json["experience_min"] ,
+      maximumExperience: json["experience_max"] ,
+      maximumSalary: json["salary_max"] ,
+      minimumSalary: json["salary_min"] ,
+      nationality: json["nationality"] ,
+      title: json["title"] ,
+      vaccancy: json["vacancy"] ,
     );
   }
 
@@ -74,7 +100,7 @@ class JobPostModel {
       "salary_max": maximumSalary,
       "title": title,
       "nationality": nationality,
-      "vaccancy": vaccancy
+      "vacancy": vaccancy
     };
   }
 }

@@ -28,34 +28,29 @@ class JobsService {
           "nationality": job.nationality,
           "experience_min": job.minimumExperience,
           "experience_max": job.maximumExperience,
-          "candidate_location": job.candidateLocation,
+          "candidate_location": [job.candidateLocation],
           "education": job.education,
           "salary_min": job.minimumSalary,
-          "salary_max": job.maximumSalary
+          "salary_max": job.maximumSalary,
+          "skills": [],
+          "custom-qns": []
         }),
-        //  body: jsonEncode({
-        //   "title": job.title,
-        //   "description": job.description,
-        //   "type": job.jobType,
-        //   "category": "",
-        //   "city": job.city,
-        //   "country": job.country,
-        //   "vacancy": job.vaccancy,
-        //   "industry": job.industry,
-        //   "functional_area": job.functionalArea,
-        //   "gender": job.gender,
-        //   "nationality": job.nationality,
-        //   "experience_min": job.minimumExperience,
-        //   "experience_max": job.maximumExperience,
-        //   "candidate_location": job.candidateLocation,
-        //   "education": job.education,
-        //   "salary_min": job.minimumSalary,
-        //   "salary_max": job.maximumSalary
-        // }),
         headers: {
           'Authorization': 'Bearer ${accessToken.toString()}',
           'Content-Type': 'application/json',
         });
+
+    return response;
+  }
+
+ static Future<http.Response> fetchPostedJobs() async {
+    final url = Uri.parse(ApiLists.jobPostEndPoint);
+    final accessToken =
+        await CustomFunctions().retrieveCredentials("access_token");
+
+    final response = await http.get(url, headers: {
+      'Authorization': 'Bearer ${accessToken.toString()}',
+    });
 
     return response;
   }

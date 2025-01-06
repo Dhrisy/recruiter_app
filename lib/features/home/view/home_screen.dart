@@ -11,7 +11,10 @@ import 'package:recruiter_app/core/utils/app_theme_data.dart';
 import 'package:recruiter_app/core/utils/navigation_animation.dart';
 import 'package:recruiter_app/features/home/view/banner_widget.dart';
 import 'package:recruiter_app/features/home/view/job_credit_meter.dart';
+import 'package:recruiter_app/features/home/view/recently_added_jobs_lists.dart';
+import 'package:recruiter_app/features/job_post/viewmodel.dart/jobpost_provider.dart';
 import 'package:recruiter_app/features/splash_screen/splash_screen.dart';
+import 'package:recruiter_app/viewmodels/job_viewmodel.dart';
 import 'package:recruiter_app/widgets/profile_completion_card.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
@@ -127,6 +130,16 @@ class _HomeScreenState extends State<HomeScreen> {
                       height: 10,
                     ),
                     JobCreditMeter(),
+                     const SizedBox(
+                      height: 10,
+                    ),
+                    RecentlyAddedJobsLists(),
+
+                    SizedBox(
+                      height: 100,
+                    )
+
+
                   ],
                 ),
               )
@@ -343,4 +356,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ],
     );
   }
+
+
+
 }

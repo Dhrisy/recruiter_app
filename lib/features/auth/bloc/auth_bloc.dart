@@ -3,6 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:recruiter_app/features/auth/bloc/auth_event.dart';
 import 'package:recruiter_app/features/auth/bloc/auth_state.dart';
 import 'package:recruiter_app/features/auth/data/auth_repository.dart';
+import 'package:recruiter_app/services/login_service.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository authRepository;
@@ -31,7 +32,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       }
     });
 
-    on<LoginEvent>((event, emit) async {
+    on<EmailLoginEvent>((event, emit) async {
       emit(AuthLoading());
       try {
         final success = await authRepository.emailLogin(
@@ -48,6 +49,58 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         print("Auth repository error  $e");
         emit(AuthFailure(e.toString()));
       }
+    });
+
+    on<GetOtpEVent>((event, emit) async {
+      emit(GetOtpInitial());
+      emit(AuthLoading());
+
+      try {
+        final response = await authRepository.getPhoneOtp(phone: event.phone);
+
+        
+
+        if (response != null && response == "success") {
+          emit(GetOtpSuccess());
+        } else {
+          emit(GetOtpFailure(error: response.toString()));
+        }
+      } catch (e) {
+        emit(GetOtpFailure(error: e.toString()));
+      }
+    });
+
+    on<PhoneLoginEvent>((event, emit) async {
+      emit(GetOtpInitial());
+      try {
+        final response = await authRepository.phoneLogin(phone: event.phone);
+        if(response == "success"){
+          emit(GetOtpSuccess());
+        }else{
+          emit(GetOtpFailure(error: response.toString()));
+        }
+      } catch (e) {
+         emit(GetOtpFailure(error: e.toString()));
+      }
+    });
+
+    on<MobileOtpVerifyEvent>((event, emit) async {
+      emit(AuthLoading());
+      try {
+        final response = await authRepository.mobileOtpVerify(
+            phone: event.phone, otp: event.otp);
+        if (response == "success") {
+          emit(OtpVerified());
+        } else {
+          emit(OtpVerifiedFailed(response.toString()));
+        }
+      } catch (e) {
+        emit(OtpVerifiedFailed(e.toString()));
+      }
+    });
+
+    on<ClearEvent>((event, emit) {
+      emit(AuthInitial());
     });
   }
 }

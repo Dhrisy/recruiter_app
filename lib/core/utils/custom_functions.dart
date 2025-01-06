@@ -19,4 +19,11 @@ class CustomFunctions {
         RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
     return emailRegex.hasMatch(email);
   }
+
+    static String toSentenceCase(String input) {
+    if (input.isEmpty) return input;
+
+    // Convert first letter to uppercase and the rest to lowercase
+    return input[0].toUpperCase() + input.substring(1).toLowerCase();
+  }
 }
