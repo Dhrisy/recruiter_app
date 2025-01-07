@@ -1,5 +1,6 @@
 class ApiLists {
   static const String baseUrl = "https://job.emergiogames.com/api";
+  static const String imageBaseUrl = "https://job.emergiogames.com/";
 
  static String registerEndPoint = "$baseUrl/user/register";
  static String mobieLoginEndPoint = "$baseUrl/user/mobile_login";

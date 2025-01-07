@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:recruiter_app/core/theme.dart';
 import 'package:recruiter_app/core/utils/app_theme_data.dart';
+import 'package:recruiter_app/features/account/account_provider.dart';
 import 'package:recruiter_app/features/auth/bloc/auth_bloc.dart';
 import 'package:recruiter_app/features/auth/data/auth_repository.dart';
 import 'package:recruiter_app/features/auth/provider/login_provider.dart';
@@ -79,7 +80,8 @@ class _MyAppState extends State<MyApp> {
       designSize: const Size(360, 690),
       builder: (context, child) => MultiProvider(
         providers: [
-          ChangeNotifierProvider(create: (context) => LoginProvider(authRepository: AuthRepository()))
+          ChangeNotifierProvider(create: (context) => LoginProvider(authRepository: AuthRepository())),
+          ChangeNotifierProvider(create: (context) => AccountProvider())
         ],
         child: MultiBlocProvider(
           providers: [

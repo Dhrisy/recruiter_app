@@ -278,6 +278,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.1+1"
+  flutter_hooks:
+    dependency: transitive
+    description:
+      name: flutter_hooks
+      sha256: cde36b12f7188c85286fba9b38cc5a902e7279f36dd676967106c041dc9dde70
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.20.5"
   flutter_linkify:
     dependency: transitive
     description:
@@ -778,6 +786,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  sliver_snap:
+    dependency: "direct main"
+    description:
+      name: sliver_snap
+      sha256: bc259fe082264bfe0e8c3dd12cad47bfd828bc211c3d485c5616ff4d499b9c8b
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.0"
   smooth_page_indicator:
     dependency: "direct main"
     description:
@@ -851,7 +867,7 @@ packages:
     source: hosted
     version: "1.4.0"
   url_launcher:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: url_launcher
       sha256: "9d06212b1362abc2f0f0d78e6f09f726608c74e3b9462e8368bb03314aa8d603"

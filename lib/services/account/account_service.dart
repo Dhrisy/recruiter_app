@@ -8,7 +8,7 @@ class AccountService {
 
   static Future<http.Response> fetchAccountDetails() async {
     final token = await CustomFunctions().retrieveCredentials("access_token");
-    final url = Uri.parse(ApiLists.companyEndPoint);
+    final url = Uri.parse(ApiLists.companyDetailAddEndPoint);
     final response = await http.get(url, headers: {
       'Authorization': 'Bearer ${token.toString()}',
     });

@@ -36,6 +36,8 @@ final smallTextFont = 12.sp;
 FontWeight titleFontWeight = FontWeight.bold;
 FontWeight normalFontWeight = FontWeight.normal;
 
+Color scaffoldbacgroundColor = const Color.fromARGB(255, 237, 237, 237);
+
 // radius
 final borderRadius = 10.r;
 
