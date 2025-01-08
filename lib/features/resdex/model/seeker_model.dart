@@ -71,7 +71,7 @@ class SeekerPersonalModel {
         certificates: json["certificates"] ?? {},
         city: json["city"] ?? "N/A",
         cv: json["cv"],
-        employed: json["emplyed"] ?? false,
+        employed: json["employed"] ?? false,
         gender: json["gender"] ?? "N/A",
         user: User.fromJson(json["user"]),
         introduction: json["intro"] ?? "N/A",
