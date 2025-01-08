@@ -3,7 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:recruiter_app/features/auth/bloc/auth_event.dart';
 import 'package:recruiter_app/features/auth/bloc/auth_state.dart';
 import 'package:recruiter_app/features/auth/data/auth_repository.dart';
-import 'package:recruiter_app/services/login_service.dart';
+import 'package:recruiter_app/services/auth_services/login_service.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository authRepository;

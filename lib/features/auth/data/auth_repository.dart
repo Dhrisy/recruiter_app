@@ -3,8 +3,9 @@ import 'dart:developer';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:recruiter_app/core/utils/custom_functions.dart';
-import 'package:recruiter_app/services/login_service.dart';
-import 'package:recruiter_app/services/register_service.dart';
+import 'package:recruiter_app/services/auth_services/forgot_pw_service.dart';
+import 'package:recruiter_app/services/auth_services/login_service.dart';
+import 'package:recruiter_app/services/auth_services/register_service.dart';
 
 class AuthRepository {
   final _secureStorage = const FlutterSecureStorage();
@@ -89,19 +90,12 @@ class AuthRepository {
   Future<String?> phoneLogin({required String phone}) async {
     try {
       final response = await LoginService.mobileLoginService(username: phone);
-      print("xxxxxxxxxxxxxx ${response.statusCode}, ${response.body}");
       final Map<String, dynamic> responseData = jsonDecode(response.body);
       if (response.statusCode == 201) {
         return "success";
       } else {
         return responseData["message"];
       }
-
-      // if (response.statusCode == 201) {
-      //   return "success";
-      // } else {
-      //   return responseData["message"];
-      // }
     } catch (e) {
       return e.toString();
     }
@@ -146,4 +140,30 @@ class AuthRepository {
       return e.toString();
     }
   }
+
+
+
+  // Future<String?>  forgotPw({required String phone}) async{
+  //   try {
+  //     final response = await ForgotPwService().forgotPw(phone: phone);
+      
+  //   // Handle the success response
+  //   if (response.statusCode == 200) {
+      
+  //   }
+
+  //   // Handle unauthorized error and retry only for 401
+  //   if (response.statusCode == 401 && retryCount < maxRetries) {
+  //     print("Unauthorized (401). Refreshing token and retrying...");
+  //     await RefreshTokenService.refreshToken();
+  //     return fetchPostedJobs(retryCount: retryCount + 1, maxRetries: maxRetries); // Recursive call for 401
+  //   }
+
+  //   // Handle other failure cases
+  //   print("Failed to fetch jobs. Status: ${response.statusCode}");
+  //   return null;
+  //   } catch (e) {
+      
+  //   }
+  // }
 }

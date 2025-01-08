@@ -77,9 +77,9 @@ class _JobCardWidgetState extends State<JobCardWidget> {
                 // ),
                 CircleAvatar(
                   radius: 40.0.r,
-                  backgroundColor: const Color(0xFFE1BEE7),
-                  backgroundImage:
-                      NetworkImage(widget.profilePictureUrl.toString()),
+                  backgroundColor: Colors.transparent,
+                  backgroundImage: widget.profilePictureUrl != null
+                    ?  NetworkImage(widget.profilePictureUrl!) : AssetImage("assets/images/default_company_logo.png"),
                 ),
                 SizedBox(width: 15.0.w),
                 Expanded(

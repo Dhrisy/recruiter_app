@@ -69,7 +69,7 @@ class _ResedexState extends State<Resedex> {
                                     title: "Application Response", index: 1)),
                             Expanded(
                                 child: _buildOptionContainer(
-                                    title: "Interview Scheduled", index: 2))
+                                    title: "Schedule Interview ", index: 2))
                           ],
                         ),
                         Row(
@@ -88,13 +88,14 @@ class _ResedexState extends State<Resedex> {
                         )
                       ],
                     ),
-                
+
                     const SizedBox(
                       height: 20,
                     ),
-                  //  serach cv form
-                  currentScreenIndex == 0
-                 ? SearchCvFormWidget() : SizedBox.shrink()
+                    //  serach cv form
+                    currentScreenIndex == 0
+                        ? SearchCvFormWidget()
+                        : SizedBox.shrink()
                   ],
                 ),
               ),
@@ -107,7 +108,7 @@ class _ResedexState extends State<Resedex> {
 
   Widget _buildOptionContainer({required String title, required int index}) {
     return InkWell(
-      onTap: (){
+      onTap: () {
         setState(() {
           currentScreenIndex = index;
         });
@@ -115,11 +116,11 @@ class _ResedexState extends State<Resedex> {
       child: Container(
         height: 40.h,
         decoration: BoxDecoration(
-            color: currentScreenIndex == index 
-            ? buttonColor : Colors.white, 
+            color: currentScreenIndex == index ? buttonColor : Colors.white,
             border: Border.all(
-              color: currentScreenIndex == index 
-            ? Colors.transparent : secondaryColor, 
+              color: currentScreenIndex == index
+                  ? Colors.transparent
+                  : secondaryColor,
             ),
             borderRadius: BorderRadius.circular(10.r)),
         child: Padding(

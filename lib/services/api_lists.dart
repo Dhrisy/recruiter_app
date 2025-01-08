@@ -11,4 +11,6 @@ class ApiLists {
  static String mobileOtpRetryEndPoint = "$baseUrl/user/retry_otp";
  static String mobileOtpVerifyEndPoint = "$baseUrl/user/mobile_otp_verify";
  static String companyEndPoint = "$baseUrl/user/mobile_otp_verify";
+ static String forgotPwEndPoint = "$baseUrl/user/forgot_password";
+ static String allSeekersEndPoint = "$baseUrl/recruiter_actions/all_seekers";
 }

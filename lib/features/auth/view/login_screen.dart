@@ -171,19 +171,19 @@ class _LoginScreenState extends State<LoginScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                               InkWell(
-                                  onTap: () async {
-                                  Navigator.push(context, 
-                                  AnimatedNavigation().slideAnimation(PhoneSignin()));
-                                  },
-                                  child: Text(
-                                    "Use phone number",
-                                    style: theme.textTheme.bodyMedium!
-                                        .copyWith(color: buttonColor),
-                                  )),
-                                  const SizedBox(
-                                    width: 15,
-                                  ),
+                              //  InkWell(
+                              //     onTap: () async {
+                              //     Navigator.push(context, 
+                              //     AnimatedNavigation().slideAnimation(PhoneSignin()));
+                              //     },
+                              //     child: Text(
+                              //       "Use phone number",
+                              //       style: theme.textTheme.bodyMedium!
+                              //           .copyWith(color: buttonColor),
+                              //     )),
+                              //     const SizedBox(
+                              //       width: 15,
+                              //     ),
                               InkWell(
                                   onTap: () async {
                                     _pageController.nextPage(

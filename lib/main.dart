@@ -9,19 +9,19 @@ import 'package:recruiter_app/features/account/account_provider.dart';
 import 'package:recruiter_app/features/auth/bloc/auth_bloc.dart';
 import 'package:recruiter_app/features/auth/data/auth_repository.dart';
 import 'package:recruiter_app/features/auth/provider/login_provider.dart';
-import 'package:recruiter_app/features/auth/view/register.dart';
 import 'package:recruiter_app/features/job_post/data/job_post_repository.dart';
 import 'package:recruiter_app/features/job_post/viewmodel.dart/jobpost_provider.dart';
 import 'package:recruiter_app/features/navbar/view_model/navbar_viewmodel.dart';
 import 'package:recruiter_app/features/questionaires/bloc/questionaire_bloc.dart';
 import 'package:recruiter_app/features/questionaires/data/questionaire_repository.dart';
-import 'package:recruiter_app/features/questionaires/view/questionaire1.dart';
+import 'package:recruiter_app/features/resdex/provider/search_seeker_provider.dart';
 import 'package:recruiter_app/features/splash_screen/splash_screen.dart';
 import 'package:recruiter_app/viewmodels/job_viewmodel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 
-
+int retryCount = 0;
+  int maxRetries = 3;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -81,7 +81,8 @@ class _MyAppState extends State<MyApp> {
       builder: (context, child) => MultiProvider(
         providers: [
           ChangeNotifierProvider(create: (context) => LoginProvider(authRepository: AuthRepository())),
-          ChangeNotifierProvider(create: (context) => AccountProvider())
+          ChangeNotifierProvider(create: (context) => AccountProvider()),
+          ChangeNotifierProvider(create: (context) => SearchSeekerProvider())
         ],
         child: MultiBlocProvider(
           providers: [

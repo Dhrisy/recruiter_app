@@ -1,5 +1,5 @@
 import 'package:recruiter_app/features/questionaires/model/questionaire_model.dart';
-import 'package:recruiter_app/services/company_services.dart';
+import 'package:recruiter_app/services/account/company_services.dart';
 import 'package:recruiter_app/services/refresh_token_service.dart';
 
 class QuestionaireRepository {

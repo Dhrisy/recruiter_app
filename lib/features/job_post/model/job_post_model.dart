@@ -11,7 +11,7 @@ class JobPostModel {
   String? nationality;
   int? minimumExperience;
   int? maximumExperience;
-  String? candidateLocation;
+  List<dynamic>? candidateLocation;
   String? education;
   int? minimumSalary;
   int? maximumSalary;

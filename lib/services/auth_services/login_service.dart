@@ -33,6 +33,7 @@ class LoginService {
         body: jsonEncode({
           
           "username": email,
+          "password": password
           
         }),
         headers: {

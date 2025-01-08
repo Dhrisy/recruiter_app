@@ -111,7 +111,7 @@ class _JobPostFormState extends State<JobPostForm> {
 
   void submitForm() {
     final job = JobPostModel(
-      candidateLocation: _selectedLocation,
+      candidateLocation: [_selectedLocation],
       city: _selectedCity,
       country: _selectedCountry,
       description: 

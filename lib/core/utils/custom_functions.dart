@@ -1,4 +1,5 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:recruiter_app/services/api_lists.dart';
 
 class CustomFunctions {
   final _secureStorage = const FlutterSecureStorage();
@@ -25,5 +26,30 @@ class CustomFunctions {
 
     // Convert first letter to uppercase and the rest to lowercase
     return input[0].toUpperCase() + input.substring(1).toLowerCase();
+  }
+
+
+   static String? validateUrl(String? url) {
+    const String baseUrl = ApiLists.imageBaseUrl;
+
+    if (url == null || url.isEmpty) {
+      return null;
+    }
+
+    Uri? uri;
+    try {
+      uri = Uri.parse(url);
+      if (!uri.hasScheme) {
+        url = url.startsWith('/') ? url.substring(1) : url;
+        url = baseUrl + url;
+        uri = Uri.parse(url);
+      }
+      if (uri.hasScheme && (uri.hasAuthority || uri.host.isNotEmpty)) {
+        return url;
+      }
+    } catch (e) {
+      return null;
+    }
+    return null;
   }
 }

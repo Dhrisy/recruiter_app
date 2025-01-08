@@ -35,8 +35,7 @@ class JobPostRepository {
   }
 
 
-  int retryCount = 0;
-  int maxRetries = 3;
+  
   Future<List<JobPostModel>?> fetchPostedJobs({int retryCount = 0, int maxRetries = 3}) async {
   try {
     // Attempt to fetch posted jobs

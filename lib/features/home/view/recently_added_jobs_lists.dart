@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/viewmodels/job_viewmodel.dart';
 import 'package:recruiter_app/widgets/common_empty_list.dart';
+import 'package:recruiter_app/widgets/common_error_widget.dart';
 import 'package:recruiter_app/widgets/job_card_widget.dart';
 import 'package:recruiter_app/widgets/shimmer_list_loading.dart';
 
@@ -71,11 +72,13 @@ class _RecentlyAddedJobsListsState extends State<RecentlyAddedJobsLists> {
                           height: 10,
                         );
                       },
-                      itemCount: 3),
+                      itemCount: state.jobs.length),
                 );
               } else {
                 return Column(
-                  children: [Text("aaaaaaaaaaaa")],
+                  children: [
+                    CommonErrorWidget()
+                  ],
                 );
               }
             }),
