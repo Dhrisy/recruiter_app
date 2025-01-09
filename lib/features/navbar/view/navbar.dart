@@ -112,6 +112,7 @@ import 'package:recruiter_app/features/job_post/data/job_post_repository.dart';
 import 'package:recruiter_app/features/job_post/view/job_post_form.dart';
 import 'package:recruiter_app/features/job_post/view/preview_job.dart';
 import 'package:recruiter_app/features/resdex/resedex.dart';
+import 'package:recruiter_app/features/resdex/widgets/widget.dart';
 
 class Navbar extends StatefulWidget {
   const Navbar({Key? key}) : super(key: key);
@@ -122,7 +123,7 @@ class Navbar extends StatefulWidget {
 
 class _NavbarState extends State<Navbar> with SingleTickerProviderStateMixin {
   late TabController tabController;
-  List<Widget> screens = [HomeScreen(), Resedex(), Account(), Account()];
+  List<Widget> screens = [HomeScreen(), Resedex(), CustomWidget(), Account()];
   int currentIndex = 0;
 
   @override

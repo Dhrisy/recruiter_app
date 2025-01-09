@@ -8,21 +8,21 @@ class SearchSeekerProvider extends ChangeNotifier {
   SeekerPersonalModel? seekerPersonalData;
   SeekerQualificationModel? seekerQualificationData;
   String error = '';
-    bool isLoading = true;
+  bool isLoading = true;
 
+  // experience options
+  
 
   Future<void> fetchAllSeekersLists() async {
-    
     try {
       final result = await SeekerRepository().fetchAllSeekers();
       if (result != null) {
         seekersLists = result;
         isLoading = false;
         notifyListeners();
-      }else{
+      } else {
         error = "error";
       }
-      
     } catch (e) {
       error = "error";
       isLoading = false;
