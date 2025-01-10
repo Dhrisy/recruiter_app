@@ -8,6 +8,7 @@ import 'package:recruiter_app/core/theme.dart';
 import 'package:recruiter_app/core/utils/country_lists.dart';
 import 'package:recruiter_app/core/utils/nationalities.dart';
 import 'package:recruiter_app/features/resdex/email_template_widget.dart';
+import 'package:recruiter_app/features/resdex/saved_searches.dart';
 import 'package:recruiter_app/features/resdex/widgets/search_cv_form_widget.dart';
 import 'package:recruiter_app/widgets/custom_fab_btn_widget.dart';
 import 'package:recruiter_app/widgets/reusable_textfield.dart';
@@ -255,6 +256,9 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
                     currentScreenIndex == 0
                         ? SearchCvFormWidget()
                         : SizedBox.shrink(),
+
+                    currentScreenIndex == 4
+                    ? SavedSearches(): const SizedBox.shrink()
                   ],
                 ),
               ),

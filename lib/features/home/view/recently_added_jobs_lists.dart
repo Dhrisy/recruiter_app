@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:recruiter_app/core/constants.dart';
+import 'package:recruiter_app/core/utils/navigation_animation.dart';
+import 'package:recruiter_app/features/job_post/view/all_job_posts.dart';
 import 'package:recruiter_app/viewmodels/job_viewmodel.dart';
 import 'package:recruiter_app/widgets/common_empty_list.dart';
 import 'package:recruiter_app/widgets/common_error_widget.dart';
@@ -16,14 +18,11 @@ class RecentlyAddedJobsLists extends StatefulWidget {
 }
 
 class _RecentlyAddedJobsListsState extends State<RecentlyAddedJobsLists> {
-
   @override
   void initState() {
     super.initState();
     context.read<JobBloc>().add(JobFetchEvent());
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -47,9 +46,28 @@ class _RecentlyAddedJobsListsState extends State<RecentlyAddedJobsLists> {
             )
           ],
         ),
-        const SizedBox(
-          height: 15,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            InkWell(
+                onTap: () {
+                  final state = context.read<JobBloc>().state;
+                  if (state is JobFetchSuccess) {
+                    Navigator.push(
+                        context,
+                        AnimatedNavigation().slideAnimation(AllJobPosts(
+                          jobLists: state.jobs,
+                        )));
+                  }
+                },
+                child: Text(
+                  "View All",
+                  style: theme.textTheme.bodyMedium!.copyWith(
+                      color: buttonColor, fontWeight: FontWeight.bold),
+                ))
+          ],
         ),
+        // CommonErrorWidget(),
         BlocConsumer<JobBloc, JobsState>(
             listener: (context, state) {},
             builder: (context, state) {
@@ -63,22 +81,24 @@ class _RecentlyAddedJobsListsState extends State<RecentlyAddedJobsLists> {
                   child: ListView.separated(
                       physics: const NeverScrollableScrollPhysics(),
                       itemBuilder: (context, index) {
-
                         final job = state.jobs[index];
-                        return JobCardWidget(job: job,);
+                        final borderColor = index.isEven ? buttonColor : secondaryColor;
+                        return JobCardWidget(
+                          job: job,
+                          borderColor: borderColor,
+                        );
                       },
                       separatorBuilder: (context, index) {
                         return const SizedBox(
                           height: 10,
                         );
                       },
-                      itemCount: state.jobs.length),
+                      itemCount:
+                          state.jobs.length >= 3 ? 3 : state.jobs.length),
                 );
               } else {
                 return Column(
-                  children: [
-                    CommonErrorWidget()
-                  ],
+                  children: [CommonErrorWidget()],
                 );
               }
             }),

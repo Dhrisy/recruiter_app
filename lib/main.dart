@@ -11,6 +11,7 @@ import 'package:recruiter_app/features/auth/data/auth_repository.dart';
 import 'package:recruiter_app/features/auth/provider/login_provider.dart';
 import 'package:recruiter_app/features/job_post/data/job_post_repository.dart';
 import 'package:recruiter_app/features/job_post/viewmodel.dart/jobpost_provider.dart';
+import 'package:recruiter_app/features/job_post/viewmodel.dart/search_job_provider.dart';
 import 'package:recruiter_app/features/navbar/view_model/navbar_viewmodel.dart';
 import 'package:recruiter_app/features/questionaires/bloc/questionaire_bloc.dart';
 import 'package:recruiter_app/features/questionaires/data/questionaire_repository.dart';
@@ -82,7 +83,8 @@ class _MyAppState extends State<MyApp> {
         providers: [
           ChangeNotifierProvider(create: (context) => LoginProvider(authRepository: AuthRepository())),
           ChangeNotifierProvider(create: (context) => AccountProvider()),
-          ChangeNotifierProvider(create: (context) => SearchSeekerProvider())
+          ChangeNotifierProvider(create: (context) => SearchSeekerProvider()),
+          ChangeNotifierProvider(create: (context) => SearchJobProvider())
         ],
         child: MultiBlocProvider(
           providers: [
@@ -91,7 +93,8 @@ class _MyAppState extends State<MyApp> {
             BlocProvider(create: (context) => AuthBloc(AuthRepository())),
             BlocProvider(create: (context) => QuestionaireBloc(QuestionaireRepository())),
             BlocProvider(create: (context) => JobPostBloc(JobPostRepository())),
-            BlocProvider(create: (context) => JobBloc(JobPostRepository()))
+            BlocProvider(create: (context) => JobBloc(JobPostRepository())),
+
           ],
           child: BlocBuilder<AppThemeDataBloc, AppThemeDataState>(
             bloc: _themeBloc,

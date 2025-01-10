@@ -14,6 +14,7 @@ class JobCardWidget extends StatefulWidget {
   final String? timeAgo;
   final String? profilePictureUrl;
   final JobPostModel job;
+  final Color? borderColor;
 
   const JobCardWidget(
       {Key? key,
@@ -22,7 +23,8 @@ class JobCardWidget extends StatefulWidget {
       this.location,
       this.timeAgo,
       this.profilePictureUrl,
-      required this.job})
+      required this.job,
+      this.borderColor})
       : super(key: key);
 
   @override
@@ -56,7 +58,7 @@ class _JobCardWidgetState extends State<JobCardWidget> {
               borderRadius: BorderRadius.circular(20.0.r),
               border: _isSelected
                   ? Border.all(color: Colors.transparent, width: 1.0.w)
-                  : Border.all(color: buttonColor, width: 1.0.w),
+                  : Border.all(color: widget.borderColor ?? secondaryColor, width: 1.0.w),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.1),
@@ -67,17 +69,10 @@ class _JobCardWidgetState extends State<JobCardWidget> {
             ),
             child: Row(
               children: [
-                // Container(
-                //   height: double.infinity,
-                //   width: 70.w,
-                //  decoration: BoxDecoration(
-                //    color: secondaryColor,
-                //    borderRadius: BorderRadius.circular(15)
-                //  ),
-                // ),
+              
                 CircleAvatar(
                   radius: 40.0.r,
-                  backgroundColor: Colors.transparent,
+                  backgroundColor: Colors.white,
                   backgroundImage: widget.profilePictureUrl != null
                     ?  NetworkImage(widget.profilePictureUrl!) : AssetImage("assets/images/default_company_logo.png"),
                 ),

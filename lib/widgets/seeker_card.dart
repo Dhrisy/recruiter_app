@@ -60,19 +60,31 @@ class _SeekerCardState extends State<SeekerCard> {
                         spacing: 4,
                         children: [
                           Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                widget.seekerData.personalData!.user.name
-                                    .toString()
-                                    .toUpperCase(),
-                                style: theme.textTheme.titleLarge!.copyWith(
-                                  fontSize: 15.sp,
-                                  fontWeight: FontWeight.bold
+                              Expanded(
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        "widget.seekerData.personalData!.user.name"
+                                            .toString()
+                                            .toUpperCase(),
+                                            overflow: TextOverflow.ellipsis,
+                                        style: theme.textTheme.titleLarge!.copyWith(
+                                          fontSize: 15.sp,
+                                          fontWeight: FontWeight.bold
+                                        ),
+                                      ),
+                                    ),
+                                    
+                                    widget.seekerData.personalData!.employed == false
+                                    ? Text(" - Fresher") :  Text(" - ${CustomFunctions.toSentenceCase(widget.seekerData.personalData!.introduction.toString())}"),
+                                  ],
                                 ),
                               ),
 
-                              widget.seekerData.personalData!.employed == false
-                              ? Text(" - Fresher") :  Text(" - ${CustomFunctions.toSentenceCase(widget.seekerData.personalData!.introduction.toString())}")
+                              Icon(Icons.bookmark_outline)
                             ],
                           ),
                           const SizedBox(height: 4),
