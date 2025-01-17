@@ -124,14 +124,14 @@ class _ResponseState extends State<Response>
   final List<double> _itemVisibility = List.filled(30, 1.0);
   late Animation<Offset> _animation;
   late Animation<Offset> _searchBarAnimation;
-  late Animation<double> _listsAnimation;
+  late Animation<Offset> _listsAnimation;
   late Animation<Offset>  _listItemAnimation;
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 800),
       vsync: this,
     );
     _controller.forward();
@@ -158,9 +158,9 @@ class _ResponseState extends State<Response>
 
 
 
-          _listsAnimation = Tween<double>(
-            begin: 0.0,
-            end: 1.0
+          _listsAnimation = Tween<Offset>(
+            begin: const Offset(0, 0.2),
+            end: Offset.zero
           ).animate(CurvedAnimation(parent: _controller, 
           curve: Curves.easeInOut));
 
@@ -251,24 +251,27 @@ class _ResponseState extends State<Response>
                               _updateItemVisibility(notification);
                               return true;
                             },
-                            child: ListView.builder(
-                              controller: _scrollController,
-                              itemCount: 30,
-                              itemBuilder: (context, index) {
-                                final visibility = _itemVisibility[index];
-                                final scale = 0.85 + (0.15 * visibility);
-                                final opacity = 0.6 + (0.4 * visibility);
-                            
-                                return AnimatedScale(
-                                  scale: scale,
-                                  duration: const Duration(milliseconds: 200),
-                                  child: AnimatedOpacity(
-                                    opacity: opacity,
+                            child: SlideTransition(
+                              position: _listsAnimation,
+                              child: ListView.builder(
+                                controller: _scrollController,
+                                itemCount: 30,
+                                itemBuilder: (context, index) {
+                                  final visibility = _itemVisibility[index];
+                                  final scale = 0.85 + (0.15 * visibility);
+                                  final opacity = 0.6 + (0.4 * visibility);
+                              
+                                  return AnimatedScale(
+                                    scale: scale,
                                     duration: const Duration(milliseconds: 200),
-                                    child: sizeIt(context, index),
-                                  ),
-                                );
-                              },
+                                    child: AnimatedOpacity(
+                                      opacity: opacity,
+                                      duration: const Duration(milliseconds: 200),
+                                      child: sizeIt(context, index),
+                                    ),
+                                  );
+                                },
+                              ),
                             ),
                           ),
                         ),

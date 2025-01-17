@@ -7,7 +7,9 @@ import 'package:recruiter_app/core/utils/custom_functions.dart';
 import 'package:recruiter_app/core/utils/navigation_animation.dart';
 import 'package:recruiter_app/features/account/account_provider.dart';
 import 'package:recruiter_app/features/account/account_shimmer_widget.dart';
+import 'package:recruiter_app/features/faqs/faq.dart';
 import 'package:recruiter_app/features/questionaires/view/questionaire1.dart';
+import 'package:recruiter_app/widgets/common_appbar_widget.dart';
 import 'package:recruiter_app/widgets/common_error_widget.dart';
 import 'package:sliver_snap/widgets/sliver_snap.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -19,13 +21,67 @@ class Account extends StatefulWidget {
   State<Account> createState() => _AccountState();
 }
 
-class _AccountState extends State<Account> {
+class _AccountState extends State<Account> with SingleTickerProviderStateMixin{
+
+  late AnimationController _controller;
+  late Animation<Offset> _appbarAnimation;
+  late Animation<Offset> _containerAnimation;
+  late Animation<Offset> _companyAnimation;
+  late Animation<Offset> _locationAnimation;
+  late Animation<Offset> _infoAnimation;
+
+
+
   @override
   void initState() {
     super.initState();
+    _controller = AnimationController(vsync: this,
+    duration: Duration(milliseconds: 1000));
+
+    _controller.forward();
+
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<AccountProvider>(context, listen: false).fetchAccountData();
     });
+
+    _appbarAnimation = Tween<Offset>(
+      begin: const Offset(-0.5, 0),
+      end: Offset.zero
+    ).animate(CurvedAnimation(parent: _controller, 
+    curve: Curves.easeInOut));
+
+    _containerAnimation = Tween<Offset>(
+      begin: const Offset(-1, 0,),
+      end: Offset.zero
+    ).animate(CurvedAnimation(parent: _controller, 
+    curve: Curves.easeInOut));
+    _companyAnimation = Tween<Offset>(
+      begin: const Offset(0, 1.5,),
+      end: Offset.zero
+    ).animate(CurvedAnimation(parent: _controller, 
+    curve: Curves.easeInOut));
+
+    _locationAnimation = Tween<Offset>(
+      begin: const Offset(0, 1.5),
+      end: Offset.zero
+    ).animate(CurvedAnimation(parent: _controller, 
+    curve: Curves.easeInOut));
+
+    _infoAnimation = Tween<Offset>(
+      begin: const Offset(0, 2),
+      end: Offset.zero
+    ).animate(CurvedAnimation(parent: _controller, 
+    curve: Curves.easeInOut));
+
+
+  }
+
+
+  @override
+  void dispose() {
+    super.dispose();
+    _controller.dispose();
   }
 
   @override
@@ -93,23 +149,10 @@ class _AccountState extends State<Account> {
                 fit: BoxFit.cover,
               ),
             ),
-            // bottom: PreferredSize(
-            //     preferredSize: Size.fromHeight(20.h),
-            //     child: Row(
-            //       children: [
-            //         Text(
-            //           CustomFunctions.toSentenceCase(
-            //             "name",
-            //           ),
-            //           style: theme.textTheme.headlineLarge!
-            //               .copyWith(color: Colors.black),
-            //         )
-            //       ],
-            //     )),
             collapsedBarHeight: 50.h,
-            expandedContentHeight: 130.h,
+            expandedContentHeight: 140.h,
             expandedContent: Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                   border: Border(bottom: BorderSide(color: borderColor))),
               child: Padding(
                 padding:
@@ -117,80 +160,111 @@ class _AccountState extends State<Account> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Account",
-                          style: theme.textTheme.headlineMedium,
-                        ),
-                        InkWell(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                AnimatedNavigation()
-                                    .slideAnimation(Questionaire1(
-                                      index: 1,
-                                      accountData: provider.accountData,
-                                    )));
-                          },
-                          child: SizedBox(
-                            child: Icon(Icons.edit),
+
+                    
+                    SlideTransition(
+                      position: _appbarAnimation,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Account",
+                            style: theme.textTheme.headlineMedium,
                           ),
-                        ),
-                        SizedBox(
-                          child: Icon(Icons.settings),
-                        )
-                      ],
+                          InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  AnimatedNavigation()
+                                      .slideAnimation(Questionaire1(
+                                        index: 1,
+                                        accountData: provider.accountData,
+                                      )));
+                            },
+                            child: SizedBox(
+                              child: Icon(Icons.edit),
+                            ),
+                          ),
+                          InkWell(
+                            onTap: (){
+                              Navigator.push(context, AnimatedNavigation().slideAnimation(FAQScreen()));
+                            },
+                            child: SizedBox(
+                              child: Icon(Icons.settings),
+                            ),
+                          )
+                        ],
+                      ),
                     ),
                     const SizedBox(
                       height: 10,
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      spacing: 15,
-                      children: [
-                        CircleAvatar(
-                          radius: 45.r,
-                          backgroundColor: Colors.transparent,
-                          child: Image.asset(
-                            "assets/images/default_company_logo.png",
-                            fit: BoxFit.cover,
+                    SlideTransition(
+                      position: _containerAnimation,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(15),
+                          boxShadow: [
+                            BoxShadow(
+                              color: borderColor,
+                              blurRadius: 5.r,
+                              offset: const Offset(0, 2)
+                            )
+                          ]
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            spacing: 15,
+                            children: [
+                              CircleAvatar(
+                                radius: 45.r,
+                                backgroundColor: Colors.transparent,
+                                child: Image.asset(
+                                  "assets/images/default_company_logo.png",
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              Expanded(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  spacing: 5,
+                                  children: [
+                                    Text(
+                                      CustomFunctions.toSentenceCase("name"),
+                                      style: theme.textTheme.titleLarge!
+                                          .copyWith(fontWeight: FontWeight.bold),
+                                    ),
+                                    // Text(CustomFunctions.toSentenceCase(provider.accountData!.name.toString())),
+                                    Row(
+                                      children: [
+                                        Text("Website: ",
+                                            style: theme.textTheme.bodyMedium),
+                                        InkWell(
+                                            onTap: () {
+                                              // _launchURL("www.youtube.com");
+                                              _launchWebsiteUrl("www.youtube.com");
+                                            },
+                                            child: Text(
+                                              provider.accountData!.website.toString(),
+                                              style: theme.textTheme.bodyMedium!
+                                                  .copyWith(color: Colors.blue),
+                                            )),
+                                      ],
+                                    ),
+                                    Text(
+                                        "Funtional area: ${provider.accountData!.functionalArea}")
+                                  ],
+                                ),
+                              )
+                            ],
                           ),
                         ),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          spacing: 5,
-                          children: [
-                            Text(
-                              CustomFunctions.toSentenceCase("name"),
-                              style: theme.textTheme.titleLarge!
-                                  .copyWith(fontWeight: FontWeight.bold),
-                            ),
-                            // Text(CustomFunctions.toSentenceCase(provider.accountData!.name.toString())),
-                            Row(
-                              children: [
-                                Text("Website: ",
-                                    style: theme.textTheme.bodyMedium),
-                                InkWell(
-                                    onTap: () {
-                                      // _launchURL("www.youtube.com");
-                                      _launchWebsiteUrl("www.youtube.com");
-                                    },
-                                    child: Text(
-                                      provider.accountData!.website.toString(),
-                                      style: theme.textTheme.bodyMedium!
-                                          .copyWith(color: Colors.blue),
-                                    )),
-                              ],
-                            ),
-                            Text(
-                                "Funtional area: ${provider.accountData!.functionalArea}")
-                          ],
-                        )
-                      ],
+                      ),
                     ),
                   ],
                 ),
@@ -217,12 +291,20 @@ class _AccountState extends State<Account> {
                   spacing: 20,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildAboutCompanyWidget(
-                        theme: theme,
-                        description: provider.accountData!.about ?? "N/A"),
-                    _buildLocationDetailsWidget(
-                        theme: theme, provider: provider),
-                    _buildAdditionalInfoWidget(theme: theme, provider: provider)
+                    SlideTransition(
+                      position: _companyAnimation,
+                      child: _buildAboutCompanyWidget(
+                          theme: theme,
+                          description: provider.accountData!.about ?? "N/A"),
+                    ),
+                    SlideTransition(
+                      position: _locationAnimation,
+                      child: _buildLocationDetailsWidget(
+                          theme: theme, provider: provider),
+                    ),
+                    SlideTransition(
+                      position: _infoAnimation,
+                      child: _buildAdditionalInfoWidget(theme: theme, provider: provider))
                   ],
                 ),
               ),
