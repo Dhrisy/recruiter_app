@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:recruiter_app/core/constants.dart';
 
 class CommonEmptyList extends StatelessWidget {
-  const CommonEmptyList({Key? key}) : super(key: key);
+  final String? text;
+  const CommonEmptyList({Key? key, this.text}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +19,7 @@ class CommonEmptyList extends StatelessWidget {
           const SizedBox(
             height: 15,
           ),
-          Text("No data available",
+          Text(text ?? "No data available",
           style: theme.textTheme.bodyMedium!.copyWith(
             color: greyTextColor
           ),

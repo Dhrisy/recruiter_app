@@ -16,6 +16,7 @@ class AccountData {
   final String ? contactMobileNumber;
   final String ? designation;
   final String? functionalArea;
+  final String? industry;
 
 
 
@@ -33,7 +34,8 @@ class AccountData {
     this.name,
     this.postalCode,
     this.website,
-    this.functionalArea
+    this.functionalArea,
+    this.industry
   });
 
 
@@ -53,7 +55,9 @@ class AccountData {
       name: json["name"] ?? "n/a",
       postalCode: json["postal_code"] ?? "n/a",
       website: json["website"] ?? "n/a",
-      functionalArea: json["functional_area"] ?? "n/a"
+      functionalArea: json["functional_area"] ?? "n/a",
+      industry: json["industry"] ?? "n/a"
+      
 
     );
   }

@@ -29,62 +29,66 @@ class SeekerModel {
 class SeekerPersonalModel {
   // final String? id;
   final User user;
-  final String? introduction;
-  final bool? employed;
-  final String? city;
-  final String? state;
-  final String? nationality;
-  final String? gender;
-  final String? cv;
-  final String? profileImage;
-  final Map<String, dynamic>? skills;
-  final Map<String, dynamic>? languages;
-  final Map<String, dynamic>? certificates;
-  final Map<String, dynamic>? projects;
-  final String? preferedSalaryPackage;
-  final Map<String, dynamic>? preferedWorkLocations;
-  final String? totalExperienceYears;
-  final String? totalExperienceMonths;
+  final Personal personal;
+  // final String? introduction;
+  // final bool? employed;
+  // final String? city;
+  // final String? state;
+  // final String? nationality;
+  // final String? gender;
+  // final String? cv;
+  // final String? profileImage;
+  // final Map<String, dynamic>? skills;
+  // final Map<String, dynamic>? languages;
+  // final Map<String, dynamic>? certificates;
+  // final Map<String, dynamic>? projects;
+  // final String? preferedSalaryPackage;
+  // final Map<String, dynamic>? preferedWorkLocations;
+  // final String? totalExperienceYears;
+  // final String? totalExperienceMonths;
 
   SeekerPersonalModel({
-    this.certificates,
-    this.city,
-    this.cv,
-    this.employed,
-    this.gender,
+    // this.certificates,
+    // this.city,
+    // this.cv,
+    // this.employed,
+    // this.gender,
     required this.user,
-    this.introduction,
-    this.languages,
-    this.nationality,
-    this.preferedSalaryPackage,
-    this.preferedWorkLocations,
-    this.profileImage,
-    this.projects,
-    this.skills,
-    this.state,
-    this.totalExperienceMonths,
-    this.totalExperienceYears,
+    required this.personal,
+    // this.introduction,
+    // this.languages,
+    // this.nationality,
+    // this.preferedSalaryPackage,
+    // this.preferedWorkLocations,
+    // this.profileImage,
+    // this.projects,
+    // this.skills,
+    // this.state,
+    // this.totalExperienceMonths,
+    // this.totalExperienceYears,
   });
 
   factory SeekerPersonalModel.fromJson(Map<String, dynamic> json) {
     return SeekerPersonalModel(
-        certificates: json["certificates"] ?? {},
-        city: json["city"] ?? "N/A",
-        cv: json["cv"],
-        employed: json["employed"] ?? false,
-        gender: json["gender"] ?? "N/A",
+        // certificates: json["certificates"] ?? {},
+        // city: json["city"] ?? "N/A",
+        // cv: json["cv"],
+        // employed: json["employed"] ?? false,
+        // gender: json["gender"] ?? "N/A",
         user: User.fromJson(json["user"]),
-        introduction: json["intro"] ?? "N/A",
-        languages: json["languages"] ?? {},
-        nationality: json["nationality"] ?? "N/A",
-        preferedSalaryPackage: json["prefered_salary_pa"].toString(),
-        preferedWorkLocations: json["prefered_work_loc"] ?? {},
-        profileImage: CustomFunctions.validateUrl(json["profile_image"] ?? ""),
-        projects: json["projects"] ?? {},
-        skills: json["skills"] ?? {},
-        state: json["state"] ?? "N/A",
-        totalExperienceMonths: json["total_experience_years"].toString(),
-        totalExperienceYears: json["total_experience_months"].toString());
+        personal: Personal.fromJson(json["personal"]),
+        // introduction: json["intro"] ?? "N/A",
+        // languages: json["languages"] ?? {},
+        // nationality: json["nationality"] ?? "N/A",
+        // preferedSalaryPackage: json["prefered_salary_pa"].toString(),
+        // preferedWorkLocations: json["prefered_work_loc"] ?? {},
+        // profileImage: CustomFunctions.validateUrl(json["profile_image"] ?? ""),
+        // projects: json["projects"] ?? {},
+        // skills: json["skills"] ?? {},
+        // state: json["state"] ?? "N/A",
+        // totalExperienceMonths: json["total_experience_years"].toString(),
+        // totalExperienceYears: json["total_experience_months"].toString()
+        );
   }
 }
 
@@ -100,6 +104,66 @@ class User {
         email: json["email"] ?? "N/A",
         id: json["id"].toString(),
         name: json["name"] ?? "N/A");
+  }
+}
+
+class Personal {
+  final String? id;
+  final String? introduction;
+  final bool? employed;
+  final String? city;
+  final String? state;
+  final String? nationality;
+  final String? gender;
+  final String? cv;
+  final String? profileImage;
+  final List<dynamic>? skills;
+  final List<dynamic>? languages;
+  final List<dynamic>? certificates;
+  final List<dynamic>? projects;
+  final String? preferedSalaryPackage;
+  final List<dynamic>? preferedWorkLocations;
+  final String? totalExperienceYears;
+  final String? totalExperienceMonths;
+
+  Personal({
+    this.id,
+    this.certificates,
+    this.city,
+    this.cv,
+    this.employed,
+    this.gender,
+    this.introduction,
+    this.languages,
+    this.nationality,
+    this.preferedSalaryPackage,
+    this.preferedWorkLocations,
+    this.profileImage,
+    this.projects,
+    this.skills,
+    this.state,
+    this.totalExperienceMonths,
+    this.totalExperienceYears,
+  });
+  factory Personal.fromJson(Map<String, dynamic> json) {
+    return Personal(
+      id: json["id"].toString(),
+        certificates: json["certificates"] ?? [],
+        city: json["city"] ?? "N/A",
+        cv: json["cv"],
+        employed: json["employed"] ?? false,
+        gender: json["gender"] ?? "N/A",
+        introduction: json["intro"] ?? "N/A",
+        languages: json["languages"] ?? [],
+        nationality: json["nationality"] ?? "N/A",
+        preferedSalaryPackage: json["prefered_salary_pa"].toString(),
+        preferedWorkLocations: json["prefered_work_loc"] ?? [],
+        profileImage: CustomFunctions.validateUrl(json["profile_image"] ?? ""),
+        projects: json["projects"] ?? [],
+        skills: json["skills"] ?? [],
+        state: json["state"] ?? "N/A",
+        totalExperienceMonths: json["total_experience_years"].toString(),
+        totalExperienceYears: json["total_experience_months"].toString());
   }
 }
 

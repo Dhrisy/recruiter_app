@@ -18,23 +18,36 @@ class AllJobPosts extends StatefulWidget {
   _AllJobPostsState createState() => _AllJobPostsState();
 }
 
-class _AllJobPostsState extends State<AllJobPosts> {
+class _AllJobPostsState extends State<AllJobPosts>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<Offset> _titleAnimation;
 
-
-@override
+  @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_){
-Provider.of<SearchJobProvider>(context, listen: false).setJobList(widget.jobLists);
-    });
-  }
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+    _controller.forward();
 
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<SearchJobProvider>(context, listen: false)
+          .setJobList(widget.jobLists);
+    });
+
+    _titleAnimation = Tween<Offset>(
+            begin: const Offset(-1.0, 0), end: Offset.zero)
+        .animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+
+          _controller.forward();
+  }
 
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height.h;
     final theme = Theme.of(context);
-    
     return Material(
       child: Scaffold(
         body: Stack(
@@ -47,18 +60,22 @@ Provider.of<SearchJobProvider>(context, listen: false).setJobList(widget.jobList
                 fit: BoxFit.cover,
               ),
             ),
-            Consumer<SearchJobProvider>(
-              builder: (context, provider, child) {
+            SafeArea(
+              child: Consumer<SearchJobProvider>(builder: (context, provider, child) {
                 return Column(
                   children: [
-                    CommonAppbarWidget(
-                      title: "Posted Jobs",
-                      isBackArrow: true,
+                    SlideTransition(
+                      position: _titleAnimation,
+                      child: CommonAppbarWidget(
+                        title: "Posted Jobs",
+                        isBackArrow: true,
+                      ),
                     ),
+                    
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 15),
                       child: CommonSearchWidget(
-                        onChanged: (query){
+                        onChanged: (query) {
                           provider.searchJobs(query);
                         },
                       ),
@@ -72,19 +89,23 @@ Provider.of<SearchJobProvider>(context, listen: false).setJobList(widget.jobList
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           spacing: 15,
-                          children:
-                              List.generate(provider.filteredJobs.length, (index) {
-                                // final job = widget.jobLists[index];
-                                final job = provider.filteredJobs[index];
-                                final borderColor = index.isEven ? buttonColor : secondaryColor;
-                            return JobCardWidget(job: job, borderColor: borderColor,);
+                          children: List.generate(provider.filteredJobs.length,
+                              (index) {
+                            // final job = widget.jobLists[index];
+                            final job = provider.filteredJobs[index];
+                            final borderColor =
+                                index.isEven ? buttonColor : secondaryColor;
+                            return JobCardWidget(
+                              job: job,
+                              borderColor: borderColor,
+                            );
                           }),
                         ),
                       ),
                     )
                   ],
                 );
-              }
+              }),
             )
           ],
         ),

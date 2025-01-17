@@ -4,8 +4,10 @@ import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/core/utils/custom_functions.dart';
+import 'package:recruiter_app/core/utils/navigation_animation.dart';
 import 'package:recruiter_app/features/account/account_provider.dart';
 import 'package:recruiter_app/features/account/account_shimmer_widget.dart';
+import 'package:recruiter_app/features/questionaires/view/questionaire1.dart';
 import 'package:recruiter_app/widgets/common_error_widget.dart';
 import 'package:sliver_snap/widgets/sliver_snap.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -86,8 +88,10 @@ class _AccountState extends State<Account> {
             expandedBackgroundColor: Colors.transparent,
             backdropWidget: Container(
               width: double.infinity,
-              child: SvgPicture.asset("assets/svgs/group_circle.svg",
-              fit: BoxFit.cover,),
+              child: SvgPicture.asset(
+                "assets/svgs/group_circle.svg",
+                fit: BoxFit.cover,
+              ),
             ),
             // bottom: PreferredSize(
             //     preferredSize: Size.fromHeight(20.h),
@@ -120,6 +124,20 @@ class _AccountState extends State<Account> {
                           "Account",
                           style: theme.textTheme.headlineMedium,
                         ),
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                AnimatedNavigation()
+                                    .slideAnimation(Questionaire1(
+                                      index: 1,
+                                      accountData: provider.accountData,
+                                    )));
+                          },
+                          child: SizedBox(
+                            child: Icon(Icons.edit),
+                          ),
+                        ),
                         SizedBox(
                           child: Icon(Icons.settings),
                         )
@@ -136,8 +154,9 @@ class _AccountState extends State<Account> {
                         CircleAvatar(
                           radius: 45.r,
                           backgroundColor: Colors.transparent,
-                          child: Image.asset("assets/images/default_company_logo.png",
-                          fit: BoxFit.cover,
+                          child: Image.asset(
+                            "assets/images/default_company_logo.png",
+                            fit: BoxFit.cover,
                           ),
                         ),
                         Column(
@@ -177,18 +196,16 @@ class _AccountState extends State<Account> {
                 ),
               ),
             ),
-            
+
             collapsedContent: Container(
               width: double.infinity,
-              decoration: BoxDecoration(
-              ),
+              decoration: BoxDecoration(),
               child: Row(
                 children: [
                   Text(
                     CustomFunctions.toSentenceCase("name"),
-                    style: theme.textTheme.titleLarge!
-                        .copyWith(fontWeight: FontWeight.bold,
-                        color: Colors.white),
+                    style: theme.textTheme.titleLarge!.copyWith(
+                        fontWeight: FontWeight.bold, color: Colors.white),
                   )
                 ],
               ),
@@ -203,8 +220,9 @@ class _AccountState extends State<Account> {
                     _buildAboutCompanyWidget(
                         theme: theme,
                         description: provider.accountData!.about ?? "N/A"),
-                        _buildLocationDetailsWidget(theme: theme, provider: provider),
-                        _buildAdditionalInfoWidget(theme: theme, provider: provider)
+                    _buildLocationDetailsWidget(
+                        theme: theme, provider: provider),
+                    _buildAdditionalInfoWidget(theme: theme, provider: provider)
                   ],
                 ),
               ),
@@ -220,16 +238,14 @@ class _AccountState extends State<Account> {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-          color: Colors.white, 
+          color: Colors.white,
           borderRadius: BorderRadius.circular(15.r),
           boxShadow: [
             BoxShadow(
-              blurRadius: 4.r,
-              color: const Color.fromARGB(255, 202, 199, 199),
-              offset: const Offset(1, 1)
-            )
-          ]
-          ),
+                blurRadius: 4.r,
+                color: const Color.fromARGB(255, 202, 199, 199),
+                offset: const Offset(1, 1))
+          ]),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -244,17 +260,18 @@ class _AccountState extends State<Account> {
     );
   }
 
-  Widget _buildLocationDetailsWidget({required ThemeData theme, required AccountProvider provider}){
+  Widget _buildLocationDetailsWidget(
+      {required ThemeData theme, required AccountProvider provider}) {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-          color: Colors.white, borderRadius: BorderRadius.circular(15.r),
-           boxShadow: [
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(15.r),
+          boxShadow: [
             BoxShadow(
-              blurRadius: 4.r,
-              color: const Color.fromARGB(255, 202, 199, 199),
-              offset: const Offset(1, 1)
-            )
+                blurRadius: 4.r,
+                color: const Color.fromARGB(255, 202, 199, 199),
+                offset: const Offset(1, 1))
           ]),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -265,74 +282,86 @@ class _AccountState extends State<Account> {
             const SizedBox(
               height: 10,
             ),
-            Text("Address",
-             style: theme.textTheme.bodyMedium!.copyWith(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.bold,
-                    ),),
+            Text(
+              "Address",
+              style: theme.textTheme.bodyMedium!.copyWith(
+                fontSize: 14.sp,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             provider.accountData!.address != null
-          ?  Row(
-              children: List.generate(provider.accountData!.address!.length, (index){
-                final address = provider.accountData!.address![index];
-                return Text("${CustomFunctions.toSentenceCase(address)}, ",
-                style: theme.textTheme.bodyMedium!.copyWith(
-                  color: greyTextColor
-                ),);
-              }),
-            ) : Text("N/A",
-             style: theme.textTheme.bodyMedium!.copyWith(
-                  color: greyTextColor
-                ),),
-
+                ? Row(
+                    children: List.generate(
+                        provider.accountData!.address!.length, (index) {
+                      final address = provider.accountData!.address![index];
+                      return Text(
+                        "${CustomFunctions.toSentenceCase(address)}, ",
+                        style: theme.textTheme.bodyMedium!
+                            .copyWith(color: greyTextColor),
+                      );
+                    }),
+                  )
+                : Text(
+                    "N/A",
+                    style: theme.textTheme.bodyMedium!
+                        .copyWith(color: greyTextColor),
+                  ),
             const SizedBox(
               height: 10,
             ),
-
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildItemWidget(theme: theme, title: "City", subTitle: provider.accountData!.city ?? "N/A"),
-                _buildItemWidget(theme: theme, title: "Country", subTitle: provider.accountData!.country ?? "N/A")
+                _buildItemWidget(
+                    theme: theme,
+                    title: "City",
+                    subTitle: provider.accountData!.city ?? "N/A"),
+                _buildItemWidget(
+                    theme: theme,
+                    title: "Country",
+                    subTitle: provider.accountData!.country ?? "N/A")
               ],
             ),
             const SizedBox(
               height: 10,
             ),
             Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Postal code",
-                    style: theme.textTheme.bodyMedium!.copyWith(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    ),
-                    Text(CustomFunctions.toSentenceCase(provider.accountData!.postalCode ?? "N/A"),
-                     style: theme.textTheme.bodyMedium!.copyWith(
-                  color: greyTextColor
-                ),)
-                  ],
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Postal code",
+                  style: theme.textTheme.bodyMedium!.copyWith(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  CustomFunctions.toSentenceCase(
+                      provider.accountData!.postalCode ?? "N/A"),
+                  style: theme.textTheme.bodyMedium!
+                      .copyWith(color: greyTextColor),
                 )
+              ],
+            )
           ],
         ),
       ),
     );
   }
 
-  Widget _buildAdditionalInfoWidget({required ThemeData theme, required AccountProvider provider}){
-     return Container(
+  Widget _buildAdditionalInfoWidget(
+      {required ThemeData theme, required AccountProvider provider}) {
+    return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-          color: Colors.white, 
+          color: Colors.white,
           borderRadius: BorderRadius.circular(15.r),
           boxShadow: [
             BoxShadow(
-              blurRadius: 4.r,
-              color: const Color.fromARGB(255, 202, 199, 199),
-              offset: const Offset(1, 1)
-            )
-          ]
-          ),
+                blurRadius: 4.r,
+                color: const Color.fromARGB(255, 202, 199, 199),
+                offset: const Offset(1, 1))
+          ]),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -340,38 +369,53 @@ class _AccountState extends State<Account> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildTitleWidget(theme: theme, text: "Additional Information"),
-           _buildItemWidget(theme: theme, title: "Contact Person", subTitle: provider.accountData!.contactName ?? "N/A"),
-           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-             children: [
-               _buildItemWidget(theme: theme, title: "Contact Number", subTitle: provider.accountData!.contactLandNumber ?? "N/A"),
-               _buildItemWidget(theme: theme, title: "Landline Number", subTitle: provider.accountData!.contactLandNumber ?? "N/A")
-             ],
-           ),
-           _buildItemWidget(theme: theme, title: "Designation", subTitle: provider.accountData!.designation ?? "N/A")
-                
+            _buildItemWidget(
+                theme: theme,
+                title: "Contact Person",
+                subTitle: provider.accountData!.contactName ?? "N/A"),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildItemWidget(
+                    theme: theme,
+                    title: "Contact Number",
+                    subTitle: provider.accountData!.contactLandNumber ?? "N/A"),
+                _buildItemWidget(
+                    theme: theme,
+                    title: "Landline Number",
+                    subTitle: provider.accountData!.contactLandNumber ?? "N/A")
+              ],
+            ),
+            _buildItemWidget(
+                theme: theme,
+                title: "Designation",
+                subTitle: provider.accountData!.designation ?? "N/A")
           ],
         ),
       ),
     );
   }
 
-  Widget _buildItemWidget({required ThemeData theme, required String title, required String subTitle}){
+  Widget _buildItemWidget(
+      {required ThemeData theme,
+      required String title,
+      required String subTitle}) {
     return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title,
-                    style: theme.textTheme.bodyMedium!.copyWith(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    ),
-                    Text(CustomFunctions.toSentenceCase(subTitle),
-                    style: theme.textTheme.bodyMedium!.copyWith(
-                      color: greyTextColor
-                    ),)
-                  ],
-                );
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: theme.textTheme.bodyMedium!.copyWith(
+            fontSize: 14.sp,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Text(
+          CustomFunctions.toSentenceCase(subTitle),
+          style: theme.textTheme.bodyMedium!.copyWith(color: greyTextColor),
+        )
+      ],
+    );
   }
 
   Widget _buildTitleWidget({required ThemeData theme, required String text}) {
@@ -385,10 +429,8 @@ class _AccountState extends State<Account> {
       {required ThemeData theme, required String description}) {
     return Text(
       description,
-      style: theme.textTheme.bodyMedium!.copyWith(
-        fontSize: 14.sp,
-        color: greyTextColor
-      ),
+      style: theme.textTheme.bodyMedium!
+          .copyWith(fontSize: 14.sp, color: greyTextColor),
     );
   }
 }

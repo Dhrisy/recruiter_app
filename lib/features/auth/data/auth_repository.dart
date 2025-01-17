@@ -5,6 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:recruiter_app/core/utils/custom_functions.dart';
 import 'package:recruiter_app/services/auth_services/forgot_pw_service.dart';
 import 'package:recruiter_app/services/auth_services/login_service.dart';
+import 'package:recruiter_app/services/auth_services/otp_service.dart';
 import 'package:recruiter_app/services/auth_services/register_service.dart';
 
 class AuthRepository {
@@ -141,29 +142,63 @@ class AuthRepository {
     }
   }
 
+  Future<String?> forgotPw({required String phone}) async {
+    try {
+      final response = await ForgotPwService().forgotPw(phone: phone);
 
+      print("Response of forgot pw ${response.statusCode}, ${response.body}");
+      Map<String, dynamic> responseData = jsonDecode(response.body);
+      // Handle the success response
+      if (response.statusCode == 200) {
+        return responseData["message"];
+      } else {
+        return responseData["message"];
+      }
+    } catch (e) {
+      print("Unexpected error in forgot password $e");
+      return null;
+    }
+  }
 
-  // Future<String?>  forgotPw({required String phone}) async{
-  //   try {
-  //     final response = await ForgotPwService().forgotPw(phone: phone);
-      
-  //   // Handle the success response
-  //   if (response.statusCode == 200) {
-      
-  //   }
+// email sent otp
+  Future<String?> emailSentOtp({required String email}) async {
+    try {
+      final response = await OtpService().emailSentOtp(email: email);
+      print(
+          "Response of email erify ${response.statusCode},  ${response.body}");
+      final Map<String, dynamic> responseData = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        await CustomFunctions()
+            .storeCredentials("access_token", responseData["access"]);
+        await CustomFunctions()
+            .storeCredentials("refresh_token", responseData["refresh"]);
+        return "success";
+      } else {
+        return responseData["message"];
+      }
+    } catch (e) {
+      print("unepecte error $e");
+      return null;
+    }
+  }
 
-  //   // Handle unauthorized error and retry only for 401
-  //   if (response.statusCode == 401 && retryCount < maxRetries) {
-  //     print("Unauthorized (401). Refreshing token and retrying...");
-  //     await RefreshTokenService.refreshToken();
-  //     return fetchPostedJobs(retryCount: retryCount + 1, maxRetries: maxRetries); // Recursive call for 401
-  //   }
-
-  //   // Handle other failure cases
-  //   print("Failed to fetch jobs. Status: ${response.statusCode}");
-  //   return null;
-  //   } catch (e) {
-      
-  //   }
-  // }
+// email verify
+  Future<String?> emailOtpVerify(
+      {required String otp, required String email}) async {
+    try {
+      final response =
+          await OtpService().emailOtpVerify(otp: otp, email: email);
+      print(
+          "Response of email erify ${response.statusCode},  ${response.body}");
+      final Map<String, dynamic> responseData = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        return "success";
+      } else {
+        return responseData["message"];
+      }
+    } catch (e) {
+      print("unepecte error $e");
+      return null;
+    }
+  }
 }

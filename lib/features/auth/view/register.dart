@@ -79,6 +79,7 @@ class _RegisterState extends State<Register> {
                     children: [
                       _buildRegisterModule(context, theme),
                       OtpScreen(
+                        isRegistering: true,
                         phone: _phnCont.text,
                         controller: _pageController,
                       ),
@@ -109,13 +110,9 @@ class _RegisterState extends State<Register> {
   Widget _buildRegisterModule(BuildContext context, ThemeData theme) {
     return SingleChildScrollView(
         child: BlocConsumer<AuthBloc, AuthState>(listener: (context, state) {
-      if (state is AuthSuccess) {
-        _pageController.nextPage(duration: Duration(
-                            milliseconds: 300
-                          ), curve: Curves.easeInOut);
-        // Navigator.pushAndRemoveUntil(context, 
-        // AnimatedNavigation().slideAnimation(Questionaire1()), (Route<dynamic> route) => false);
-        // CommonSnackbar.show(context, message: "Successfully logged in");
+      if (state is RegisterAuthSuccess) {
+        _pageController.nextPage(
+            duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
       } else if (state is AuthExists) {
         CommonSnackbar.show(context, message: "User already exists");
       } else if (state is AuthFailure) {
@@ -228,8 +225,10 @@ class _RegisterState extends State<Register> {
                       ),
                       Text(
                         "Password must contain alphabets, numerics, and special characters",
-                        style: theme.textTheme.bodySmall!
-                            .copyWith(color: pwError == true ? Colors.red.shade900 : greyTextColor),
+                        style: theme.textTheme.bodySmall!.copyWith(
+                            color: pwError == true
+                                ? Colors.red.shade900
+                                : greyTextColor),
                       ),
                       const SizedBox(
                         height: 20,
@@ -237,7 +236,7 @@ class _RegisterState extends State<Register> {
                       ReusableTextfield(
                         controller: _confirmPwCont,
                         validation: (_) {
-                          if(_confirmPwCont.text.trim().isEmpty){
+                          if (_confirmPwCont.text.trim().isEmpty) {
                             return "This field is required";
                           }
 
@@ -257,19 +256,19 @@ class _RegisterState extends State<Register> {
                           }
                         },
                       ),
-                       const SizedBox(
+                      const SizedBox(
                         height: 5,
                       ),
                       isEqual == false
                           ? Row(
-                            children: [
-                              Text(
+                              children: [
+                                Text(
                                   "Password doesn't match",
                                   style: theme.textTheme.bodySmall!
                                       .copyWith(color: Colors.red.shade900),
                                 ),
-                            ],
-                          )
+                              ],
+                            )
                           : const SizedBox.shrink(),
                       const SizedBox(
                         height: 10,
@@ -301,7 +300,8 @@ class _RegisterState extends State<Register> {
                           //     duration: Duration(milliseconds: 550),
                           //     curve: Curves.easeInOut);
 
-                          if (_registerFormKey.currentState!.validate() && isEqual == true) {
+                          if (_registerFormKey.currentState!.validate() &&
+                              isEqual == true) {
                             context.read<AuthBloc>().add(RegisterEvent(
                                 companyName: _nameCont.text,
                                 contactNumber: _phnCont.text,
@@ -310,11 +310,8 @@ class _RegisterState extends State<Register> {
                                 role: "recruiter",
                                 whatsappUpdations: _whatsapp_updations));
 
-
-
+                            print("rrrrrrrrrrrrrrrrrrrrrrr");
                           }
-
-                          
 
                           FocusScope.of(context).unfocus();
                         },
@@ -365,13 +362,9 @@ class _RegisterState extends State<Register> {
     }));
   }
 
-
-Widget _buildOtpScreen({required String phn}){
-  return Column(
-    children: [
-      Text("aaaaaaaaaaa")
-    ],
-  );
-}
-
+  Widget _buildOtpScreen({required String phn}) {
+    return Column(
+      children: [Text("aaaaaaaaaaa")],
+    );
+  }
 }

@@ -14,7 +14,7 @@ class CommonAppbarWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Container(
-      height: MediaQuery.of(context).size.height * 0.09.h,
+      // height: MediaQuery.of(context).size.height * 0.09.h,
       decoration: BoxDecoration(
         color: Colors.transparent,
       ),

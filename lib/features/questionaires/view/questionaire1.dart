@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:linear_progress_bar/linear_progress_bar.dart';
 import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/core/utils/city_lists.dart';
@@ -10,6 +13,7 @@ import 'package:recruiter_app/core/utils/country_lists.dart';
 import 'package:recruiter_app/core/utils/functional_area_lists.dart';
 import 'package:recruiter_app/core/utils/industry_lists.dart';
 import 'package:recruiter_app/core/utils/navigation_animation.dart';
+import 'package:recruiter_app/features/account/account_data.dart';
 import 'package:recruiter_app/features/questionaires/bloc/questionaire_bloc.dart';
 import 'package:recruiter_app/features/questionaires/bloc/questionaire_event.dart';
 import 'package:recruiter_app/features/questionaires/bloc/questionaire_state.dart';
@@ -22,7 +26,11 @@ import 'package:recruiter_app/widgets/reusable_textfield.dart';
 
 class Questionaire1 extends StatefulWidget {
   final bool? isFromHome;
-  const Questionaire1({super.key, this.isFromHome});
+  final bool? isEdit;
+  final AccountData? accountData;
+  final int? index;
+  const Questionaire1(
+      {super.key, this.isFromHome, this.isEdit, this.accountData, this.index});
 
   @override
   State<Questionaire1> createState() => _Questionaire1State();
@@ -53,6 +61,60 @@ class _Questionaire1State extends State<Questionaire1> {
   final _comapnyFormKey = GlobalKey<FormState>();
   final _locationFormKey = GlobalKey<FormState>();
   final _contactFormKey = GlobalKey<FormState>();
+  File? _selectedImage;
+
+  // Pick image from gallery or camera
+  Future<void> _pickImage(ImageSource source) async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: source);
+
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImage = File(pickedFile.path);
+      });
+    } else {
+      print("No image selected.");
+    }
+  }
+
+  // Navigate to a specific index
+  void _navigateToPage(int index) {
+    _pageController.animateToPage(
+      index,
+      duration: Duration(milliseconds: 300), // Adjust duration as needed
+      curve: Curves.easeInOut, // Smooth animation
+    );
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _navigateToPage(widget.index ?? 0);
+
+      if (widget.accountData != null) {
+        _designationCont.text = widget.accountData!.designation.toString();
+        _landlineNumberCont.text =
+            widget.accountData!.contactLandNumber.toString();
+        _mobileNumberCont.text =
+            widget.accountData!.contactMobileNumber.toString();
+        _personNameCont.text = widget.accountData!.name.toString();
+        _postalCodeCont.text = widget.accountData!.postalCode.toString();
+        _addressCont.text = widget.accountData!.address.toString();
+        _aboutCont.text = widget.accountData!.about.toString();
+        _companyWesiteCont.text = widget.accountData!.website.toString();
+
+        _selectedCountry = widget.accountData!.country.toString();
+        _selectedCity = widget.accountData!.city.toString();
+        _selectedFunctionalArea = widget.accountData!.functionalArea.toString();
+        _selectedIndustry = widget.accountData!.industry.toString();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,9 +122,7 @@ class _Questionaire1State extends State<Questionaire1> {
     return Material(
       child: SafeArea(
           child: Scaffold(
-            appBar: AppBar(
-              
-            ),
+        appBar: AppBar(),
         body: Stack(
           children: [
             Positioned(
@@ -93,11 +153,9 @@ class _Questionaire1State extends State<Questionaire1> {
                     minHeight: 11,
                     borderRadius: BorderRadius.circular(25.r),
                   ),
-
                   const SizedBox(
                     height: 15,
                   ),
-
                   Expanded(
                       child: BlocConsumer<QuestionaireBloc, QuestionaireState>(
                           listener: (context, state) {
@@ -130,297 +188,6 @@ class _Questionaire1State extends State<Questionaire1> {
                       ],
                     );
                   }))
-                  /*             Text("Company details", style: theme.textTheme.headlineMedium),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  SizedBox(
-                    height: 140.h,
-                    child: Column(
-                      children: [
-                        CircleAvatar(
-                          radius: 60.r,
-                          backgroundColor: Colors.red,
-                          backgroundImage:
-                              const AssetImage("assets/images/default_logo.webp"),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.delete)
-                            // Text("Edit"), const SizedBox(
-                            //   width: 10,
-                            // ),
-                            // SvgPicture.asset("assets/svgs/edit_pen.svg")
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                
-                  ReusableTextfield(
-                    controller: TextEditingController(),
-                    labelText: "Company website",
-                    isRequired: true,
-                    validation: (_) {
-                      return null;
-                    },
-                  ),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  ReusableTextfield(
-                    controller: TextEditingController(),
-                    labelText: "About your company",
-                    // maxLines: 4,
-                    isRequired: true,
-                    validation: (_) {
-                      return null;
-                    },
-                  ),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  Container(
-                    height: 45.h,
-                    // color: Colors.green,
-                    child: DropdownSearch<String>(
-                      decoratorProps: DropDownDecoratorProps(
-                        expands: true,
-                        decoration: InputDecoration(
-                          labelText: 'Industry',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(color: borderColor),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(color: borderColor),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(color: borderColor),
-                          ),
-                        ),
-                      ),
-                      items: (filter, infiniteScrollProps) => industryLists,
-                      selectedItem:
-                          _selectedIndustry.isEmpty ? null : _selectedIndustry,
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          _selectedIndustry = newValue ?? "";
-                        });
-                      },
-                      popupProps: PopupProps.menu(
-                        showSearchBox: true,
-                        searchFieldProps: TextFieldProps(
-                          decoration: InputDecoration(
-                            hintText: 'Search industry...',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: const BorderSide(color: borderColor),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: const BorderSide(color: borderColor),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-              
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  Container(
-                    height: 45.h,
-                    // color: Colors.green,
-                    child: DropdownSearch<String>(
-                      decoratorProps: DropDownDecoratorProps(
-                        expands: true,
-                        decoration: InputDecoration(
-                          labelText: 'Functional area',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(color: borderColor),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(color: borderColor),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(color: borderColor),
-                          ),
-                        ),
-                      ),
-                      items: (filter, infiniteScrollProps) => functionalAreaLists,
-                      selectedItem: _selectedFunctionalArea.isEmpty
-                          ? null
-                          : _selectedFunctionalArea,
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          _selectedFunctionalArea = newValue ?? "";
-                        });
-                      },
-                      popupProps: PopupProps.menu(
-                        showSearchBox: true,
-                        searchFieldProps: TextFieldProps(
-                          decoration: InputDecoration(
-                            hintText: 'Search area...',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: const BorderSide(color: borderColor),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: const BorderSide(color: borderColor),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  ReusableTextfield(
-                    controller: _addressCont,
-                    isRequired: true,
-                    labelText: "Address",
-                    maxLines: 2,
-                    validation: (_) {
-                      if (_addressCont.text.trim().isEmpty) {
-                        return "This field is required";
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                          child: Container(
-                        height: 45.h,
-                        // color: Colors.green,
-                        child: DropdownSearch<String>(
-                          decoratorProps: DropDownDecoratorProps(
-                            expands: true,
-                            decoration: InputDecoration(
-                              labelText: 'City',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: const BorderSide(color: borderColor),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: const BorderSide(color: borderColor),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: const BorderSide(color: borderColor),
-                              ),
-                            ),
-                          ),
-                          items: (filter, infiniteScrollProps) => cities,
-                          selectedItem:
-                              _selectedCity.isEmpty ? null : _selectedCity,
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              _selectedCity = newValue ?? "";
-                            });
-                          },
-                          popupProps: PopupProps.menu(
-                            showSearchBox: true,
-                            searchFieldProps: TextFieldProps(
-                              decoration: InputDecoration(
-                                hintText: 'Search city...',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  borderSide:
-                                      const BorderSide(color: borderColor),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  borderSide:
-                                      const BorderSide(color: borderColor),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      )),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      Expanded(
-                          child: Container(
-                        height: 45.h,
-                        // color: Colors.green,
-                        child: DropdownSearch<String>(
-                          decoratorProps: DropDownDecoratorProps(
-                            expands: true,
-                            decoration: InputDecoration(
-                              labelText: 'Country',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: const BorderSide(color: borderColor),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: const BorderSide(color: borderColor),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: const BorderSide(color: borderColor),
-                              ),
-                            ),
-                          ),
-                          items: (filter, infiniteScrollProps) => countryLists,
-                          selectedItem:
-                              _selectedCountry.isEmpty ? null : _selectedCountry,
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              _selectedCountry = newValue ?? "";
-                            });
-                          },
-                          popupProps: PopupProps.menu(
-                            showSearchBox: true,
-                            searchFieldProps: TextFieldProps(
-                              decoration: InputDecoration(
-                                hintText: 'Search country...',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  borderSide:
-                                      const BorderSide(color: borderColor),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  borderSide:
-                                      const BorderSide(color: borderColor),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ))
-                    ],
-                  ),
-              
-                  const SizedBox(
-                  height: 15,
-                ),
-              */
-                  // ReusableTextfield(controller: controller)
                 ],
               ),
             ),
@@ -462,11 +229,17 @@ class _Questionaire1State extends State<Questionaire1> {
               height: 140.h,
               child: Column(
                 children: [
-                  CircleAvatar(
-                    radius: 60.r,
-                    backgroundColor: Colors.red,
-                    backgroundImage:
-                        const AssetImage("assets/images/default_logo.webp"),
+                  InkWell(
+                    onTap: () {
+                      _pickImage(ImageSource.camera);
+                    },
+                    child: CircleAvatar(
+                      radius: 60.r,
+                      backgroundColor: Colors.transparent,
+                      backgroundImage: _selectedImage != null
+                          ? FileImage(_selectedImage!)
+                          : const AssetImage("assets/images/default_logo.webp"),
+                    ),
                   ),
                   const SizedBox(
                     height: 10,
@@ -474,7 +247,13 @@ class _Questionaire1State extends State<Questionaire1> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.delete)
+                      InkWell(
+                          onTap: () {
+                            setState(() {
+                              _selectedImage = null;
+                            });
+                          },
+                          child: Icon(Icons.delete))
                       // Text("Edit"), const SizedBox(
                       //   width: 10,
                       // ),
@@ -1022,7 +801,6 @@ class _Questionaire1State extends State<Questionaire1> {
                 const SizedBox(
                   height: 55,
                 ),
-
                 BlocConsumer<QuestionaireBloc, QuestionaireState>(
                     listener: (context, state) {
                   if (widget.isFromHome == true) {
@@ -1039,46 +817,34 @@ class _Questionaire1State extends State<Questionaire1> {
                 }, builder: (context, state) {
                   return ReusableButton(
                       action: () async {
-                        if (_contactFormKey.currentState!.validate()) {
-                          context.read<QuestionaireBloc>().add(
-                              QuestionaireSubmitEvent(
-                                  aboutCompany: _aboutCont.text,
-                                  address: _addressCont.text,
-                                  city: _selectedCity,
-                                  contactPersonName: _personNameCont.text,
-                                  country: _selectedCountry,
-                                  designation: _designationCont.text,
-                                  functionalArea: _selectedFunctionalArea,
-                                  industry: _selectedIndustry,
-                                  mobilePhn: _mobileNumberCont.text,
-                                  postalCode: _postalCodeCont.text,
-                                  website: _companyWesiteCont.text));
-
-                          // final questionaire = QuestionaireModel(
-                          //     landlineNumber: _landlineNumberCont.text,
-                          //     about: _aboutCont.text,
-                          //     industry: _selectedIndustry,
-                          //     functionalArea: _selectedFunctionalArea,
-                          //     address: _addressCont.text,
-                          //     city: _selectedCity,
-                          //     country: _selectedCountry,
-                          //     postalCode: _postalCodeCont.text,
-                          //     mobileNumber: _mobileNumberCont.text,
-                          //     designation: _designationCont.text,
-                          //     website: _companyWesiteCont.text,
-                          //     contactPersonName: _personNameCont.text);
-
-                          // _submitQuestionaire(questionaire: questionaire);
+                        if (widget.isEdit == true) {
+                        } else {
+                          if (_contactFormKey.currentState!.validate()) {
+                            context.read<QuestionaireBloc>().add(
+                                QuestionaireSubmitEvent(
+                                    aboutCompany: _aboutCont.text,
+                                    address: _addressCont.text,
+                                    city: _selectedCity,
+                                    contactPersonName: _personNameCont.text,
+                                    country: _selectedCountry,
+                                    designation: _designationCont.text,
+                                    functionalArea: _selectedFunctionalArea,
+                                    industry: _selectedIndustry,
+                                    mobilePhn: _mobileNumberCont.text,
+                                    postalCode: _postalCodeCont.text,
+                                    website: _companyWesiteCont.text));
+                          }
                         }
-                        // Navigator.pushAndRemoveUntil(
-                        //     context,
-                        //     AnimatedNavigation()
-                        //         .scaleAnimation(SuccessfullyRegisteredScreen()),
-                        //     (Route<dynamic> route) => false);
+
+                        Navigator.pushAndRemoveUntil(
+                            context,
+                            AnimatedNavigation()
+                                .scaleAnimation(SuccessfullyRegisteredScreen()),
+                            (Route<dynamic> route) => false);
                       },
                       textSize: 18.sp,
                       height: 40.h,
-                      text: "Save",
+                      text: widget.isEdit == true ? "Save changes" : "Save",
                       textColor: Colors.white,
                       buttonColor: buttonColor);
                 })

@@ -15,6 +15,12 @@ class JobPostModel {
   String? education;
   int? minimumSalary;
   int? maximumSalary;
+   String? requirements;
+   String? benefits;
+   List<dynamic>? skills;
+   List<dynamic>? customQuestions;
+   String? currency;
+
 
 
   
@@ -39,7 +45,13 @@ class JobPostModel {
       this.minimumSalary,
       this.nationality,
       this.title,
-      this.vaccancy});
+      this.vaccancy,
+      this.benefits,
+      this.customQuestions,
+      this.requirements,
+      this.skills,
+      this.currency
+      });
 
     //    {
     //     "id": 2,
@@ -80,7 +92,11 @@ class JobPostModel {
       minimumSalary: json["salary_min"] ,
       nationality: json["nationality"] ,
       title: json["title"] ,
-      vaccancy: json["vacancy"] ,
+      vaccancy: json["vacancy"],
+      benefits: json["benefits"],
+      skills: json["skills"],
+      customQuestions: json["custon_qns"],
+      currency: json["currency"]
     );
   }
 
@@ -100,7 +116,11 @@ class JobPostModel {
       "salary_max": maximumSalary,
       "title": title,
       "nationality": nationality,
-      "vacancy": vaccancy
+      "vacancy": vaccancy,
+      "requirements": requirements,
+      "benefits": benefits,
+      "custom_qns": customQuestions,
+      "currency": currency
     };
   }
 }

@@ -46,6 +46,7 @@ class RegisterService {
           "email": email,
           "phone": contactNumber,
           "role": role,
+          "onesignal_id": "f57460e6-1f9e-418a-ab47-c499dce28870",
           "whatsapp_updations": whatsappUpdations.toString()
         }),
         headers: {

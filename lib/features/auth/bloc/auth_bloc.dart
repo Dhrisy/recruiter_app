@@ -21,7 +21,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             whatsappUpdations: event.whatsappUpdations);
 
         if (success == "success") {
-          emit(AuthSuccess());
+          emit(RegisterAuthSuccess());
         } else if (success == "User already exists") {
           emit(AuthExists());
         } else {
@@ -43,7 +43,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
           emit(AuthSuccess());
         } else {
-          emit(AuthFailure(success.toString()));
+          print("ssssssssssssss  $success");
+          if (success == "Email not verified for login") {
+            emit(EmailVerifyNeeded());
+          } else {
+            emit(AuthFailure(success.toString()));
+          }
         }
       } catch (e) {
         print("Auth repository error  $e");
@@ -57,8 +62,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
       try {
         final response = await authRepository.getPhoneOtp(phone: event.phone);
-
-        
 
         if (response != null && response == "success") {
           emit(GetOtpSuccess());
@@ -74,13 +77,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(GetOtpInitial());
       try {
         final response = await authRepository.phoneLogin(phone: event.phone);
-        if(response == "success"){
+        if (response == "success") {
           emit(GetOtpSuccess());
-        }else{
+        } else {
           emit(GetOtpFailure(error: response.toString()));
         }
       } catch (e) {
-         emit(GetOtpFailure(error: e.toString()));
+        emit(GetOtpFailure(error: e.toString()));
       }
     });
 
@@ -89,6 +92,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       try {
         final response = await authRepository.mobileOtpVerify(
             phone: event.phone, otp: event.otp);
+
         if (response == "success") {
           emit(OtpVerified());
         } else {
@@ -101,6 +105,63 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     on<ClearEvent>((event, emit) {
       emit(AuthInitial());
+    });
+
+    on<OTPEvent>((event, emit) {
+      emit(AuthLoading());
+    });
+
+// get email otp
+    on<EmailSentOtpEvent>((event, emit) async {
+      emit(AuthLoading());
+      try {
+        final result = await AuthRepository().emailSentOtp(email: event.email);
+        if (result == "success") {
+          emit(GetOtpSuccess());
+        } else {
+          emit(GetOtpFailure(error: result.toString()));
+        }
+      } catch (e) {
+        emit(GetOtpFailure(error: e.toString()));
+      }
+    });
+
+    // email otp verify
+    on<EmailOtpVerifyEVent>((event, emit) async {
+      emit(AuthLoading());
+
+      try {
+        final result = await AuthRepository()
+            .emailOtpVerify(otp: event.otp, email: event.email);
+
+        if (result == "success") {
+          emit(OtpVerified());
+        } else {
+          emit(OtpVerifiedFailed(result.toString()));
+        }
+      } catch (e) {
+        print(e);
+
+        emit(OtpVerifiedFailed(e.toString()));
+      }
+    });
+
+// forgot password
+    on<ForgotPasswordEvent>((event, emit) async {
+      emit(ForgotpasswordLoading());
+
+      try {
+        final result = await AuthRepository().forgotPw(phone: event.phone);
+        if (result == "OTP sent to mobile") {
+          emit(ForgotPasswordSuccess());
+        } else {
+          emit(ForgotPasswordFailure(
+              error: "Failed to send OTP. Please try again later"));
+        }
+      } catch (e) {
+        print(e);
+        emit(ForgotPasswordFailure(error: e.toString()));
+      }
     });
   }
 }

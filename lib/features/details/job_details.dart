@@ -34,13 +34,17 @@ class JobDetails extends StatelessWidget {
                     _buildSection(
                       'Job Overview',
                       Column(
+                        spacing: 15,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                         //   _buildInfoRow(Icons.business, 'Company', jobData.title ?? 'N/A'),
                         //  _buildInfoRow(Icons.location_on, 'Location', jobData.title ?? 'N/A'),
                         //   _buildInfoRow(Icons.work, 'Experience', '${jobData.title}-${jobData.title} years'),
                         //   _buildInfoRow(Icons.attach_money, 'Salary', '${jobData.title}-${jobData.title}'),
-                          _basicDetails(theme: theme)
+                          _basicDetails(theme: theme),
+                          proffesionalDetails(),
+                          aboutCompany()
+
                           
                           
                         ],
@@ -123,7 +127,7 @@ class JobDetails extends StatelessWidget {
                 ),
                 Text(experience ?? "No Data",
                     style: AppTheme.mediumTitleText(
-                      darkTextColor,
+                      lightTextColor,
                     ).copyWith(fontWeight: FontWeight.w500)),
               ],
             ),
@@ -137,7 +141,7 @@ class JobDetails extends StatelessWidget {
                 ),
                 Text(location ?? "No Data",
                     style: AppTheme.mediumTitleText(
-                      darkTextColor,
+                      lightTextColor,
                     ).copyWith(fontWeight: FontWeight.w500)),
               ],
             ),
@@ -151,7 +155,7 @@ class JobDetails extends StatelessWidget {
                 ),
                 Text(salary ?? "No Data",
                     style: AppTheme.mediumTitleText(
-                      darkTextColor,
+                      lightTextColor,
                     ).copyWith(fontWeight: FontWeight.w500)),
               ],
             ),
@@ -213,6 +217,162 @@ class JobDetails extends StatelessWidget {
       ),
     );
   }
+
+Widget aboutCompany() {
+    return Container(
+      
+      decoration: BoxDecoration(
+        color: Colors.white,
+          borderRadius: BorderRadius.circular(16.0),
+          border: Border.all(color: borderColor),
+          boxShadow: [
+            // BoxShadow(
+            //   color: Colors.grey.withOpacity(0.2),
+            //   spreadRadius: 2,
+            //   blurRadius: 2,
+            //   offset: Offset(0, 3),
+            // ),
+          ]),
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text( "No Data",
+                style: AppTheme.smallText(
+                  lightTextColor,
+                ).copyWith()),
+            SizedBox(
+              height: 15.h,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: 20.h,
+                  // child: Image(image: AssetImage("assets/SuitcaseImage.png")),
+                ),
+                SizedBox(
+                  width: 20.w,
+                ),
+                Text( "No Data",
+                    style: AppTheme.mediumTitleText(
+                      lightTextColor,
+                    ).copyWith(fontWeight: FontWeight.w500)),
+              ],
+            ),
+            SizedBox(
+              height: 10.h,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: 20.h,
+                  // child: Image(image: AssetImage("assets/locationImage.png")),
+                ),
+                SizedBox(
+                  width: 20.w,
+                ),
+                Text( "No Data",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTheme.mediumTitleText(
+                      lightTextColor,
+                    ).copyWith(fontWeight: FontWeight.w500)),
+              ],
+            ),
+            SizedBox(
+              height: 10.h,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget proffesionalDetails() {
+   return Container(
+    width: double.infinity,
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16.0),
+                border: Border.all(color: buttonColor),
+               ),
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('What you\'ll do',
+                      style: AppTheme.mediumTitleText(
+                        lightTextColor,
+                      ).copyWith()),
+                  SizedBox(
+                    height: 5.h,
+                  ),
+                  Text(
+                  "N/A",
+                    style: AppTheme.smallText(
+                      lightTextColor,
+                    ).copyWith(),
+                  ),
+                  SizedBox(
+                    height: 15.h,
+                  ),
+                  Text('Requirements',
+                      style: AppTheme.mediumTitleText(
+                        lightTextColor,
+                      ).copyWith()),
+                  SizedBox(
+                    height: 5.h,
+                  ),
+                  Text(
+                      "N/A",
+                      style: AppTheme.smallText(
+                        lightTextColor,
+                      ).copyWith()),
+                  SizedBox(
+                    height: 15.h,
+                  ),
+                  Text('Roles and Responsibilities',
+                      style: AppTheme.mediumTitleText(
+                        lightTextColor,
+                      ).copyWith()),
+                  SizedBox(
+                    height: 5.h,
+                  ),
+                  Text(
+                     "N/A",
+                      style: AppTheme.smallText(
+                        lightTextColor,
+                      ).copyWith()),
+                  SizedBox(
+                    height: 15.h,
+                  ),
+                  Text('Benefits',
+                      style: AppTheme.mediumTitleText(
+                        lightTextColor,
+                      ).copyWith()),
+                  SizedBox(
+                    height: 5.h,
+                  ),
+                  Text(
+                     "N/A",
+                      style: AppTheme.smallText(
+                        lightTextColor,
+                      ).copyWith()),
+                  SizedBox(
+                    height: 15.h,
+                  ),
+                ],
+              ),
+            ),
+          );
+  }
+
 }
 
 // Keep your existing AnimatedHeader and _SliverAppBarDelegate classes as they are

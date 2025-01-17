@@ -1,287 +1,294 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/core/utils/custom_functions.dart';
 import 'package:recruiter_app/core/utils/navigation_animation.dart';
+import 'package:recruiter_app/core/utils/skills.dart';
 import 'package:recruiter_app/features/details/job_details.dart';
 import 'package:recruiter_app/features/resdex/model/seeker_model.dart';
+import 'package:recruiter_app/features/resdex/provider/search_seeker_provider.dart';
+import 'package:recruiter_app/features/responses/provider/seeker_provider.dart';
 import 'package:recruiter_app/features/seeker_details/seeker_details.dart';
+import 'package:recruiter_app/widgets/common_snackbar.dart';
+import 'package:recruiter_app/widgets/shimmer_widget.dart';
 
 class SeekerCard extends StatefulWidget {
   final SeekerModel seekerData;
-  const SeekerCard({Key? key, required this.seekerData}) : super(key: key);
+  final Color? borderColor;
+  const SeekerCard({Key? key, required this.seekerData, this.borderColor})
+      : super(key: key);
 
   @override
   _SeekerCardState createState() => _SeekerCardState();
 }
 
-class _SeekerCardState extends State<SeekerCard> {
+class _SeekerCardState extends State<SeekerCard>
+    with SingleTickerProviderStateMixin {
+  bool isSaved = false;
+  late AnimationController _controller;
+  late Animation<double> _iconAnimation;
+  late Animation<Offset> _itemAnimation;
 
+  @override
+  void initState() {
+    super.initState();
 
-  
+    _controller =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 500));
 
+    _controller.forward();
 
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      checkBookmarked();
+    });
+
+    _iconAnimation = Tween<double>(begin: 0.0, end: 1.0)
+        .animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+
+    _itemAnimation = Tween<Offset>(
+            begin: const Offset(0, 0.05), end: Offset.zero)
+        .animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose(); // Dispose the AnimationController before super.dispose()
+    super.dispose();
+  }
+
+  void checkBookmarked() async {
+    if (widget.seekerData.personalData != null) {
+      final res =
+          await Provider.of<SearchSeekerProvider>(context, listen: false)
+              .isSeekerSaved(
+                  widget.seekerData.personalData!.personal.id.toString());
+
+      setState(() {
+        isSaved = res;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     if (widget.seekerData.personalData != null) {
-      return Card(
-        elevation: 2,
-        color: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15.r),
-          // side: BorderSide(color: borderColor),
-        ),
-        margin: const EdgeInsets.only(bottom: 16),
-        child: InkWell(
-          onTap: (){
-            Navigator.push(context, 
-            AnimatedNavigation().fadeAnimation(SeekerDetails()));
-          },
-          borderRadius: BorderRadius.circular(8),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Profile Image
-                    CircleAvatar(
-                      radius: 24,
-                    ),
-                    const SizedBox(width: 16),
-                    // Details Section
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        spacing: 4,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        "widget.seekerData.personalData!.user.name"
-                                            .toString()
-                                            .toUpperCase(),
-                                            overflow: TextOverflow.ellipsis,
-                                        style: theme.textTheme.titleLarge!.copyWith(
-                                          fontSize: 15.sp,
-                                          fontWeight: FontWeight.bold
+      return SlideTransition(
+        position: _itemAnimation,
+        child: Container(
+          decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(15.r),
+              boxShadow: [
+                BoxShadow(
+                    blurRadius: 5,
+                    color: borderColor,
+                    offset: const Offset(-2, 1))
+              ]
+              ),
+          child: InkWell(
+            onTap: () {
+              Navigator.push(
+                  context, AnimatedNavigation().fadeAnimation(SeekerDetails()));
+            },
+            borderRadius: BorderRadius.circular(8),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Profile Image
+                      CircleAvatar(
+                        radius: 24,
+                        backgroundImage:
+                            AssetImage("assets/images/profile_picture.jpg"),
+                      ),
+                      const SizedBox(width: 16),
+                      // Details Section
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          spacing: 4,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          widget.seekerData.personalData!.user
+                                              .name
+                                              .toString()
+                                              .toUpperCase(),
+                                          overflow: TextOverflow.ellipsis,
+                                          style: theme.textTheme.titleLarge!
+                                              .copyWith(
+                                                  fontSize: 15.sp,
+                                                  fontWeight: FontWeight.w700),
                                         ),
                                       ),
-                                    ),
-                                    
-                                    widget.seekerData.personalData!.employed == false
-                                    ? Text(" - Fresher") :  Text(" - ${CustomFunctions.toSentenceCase(widget.seekerData.personalData!.introduction.toString())}"),
-                                  ],
+                                      widget.seekerData.personalData!.personal
+                                                  .employed ==
+                                              false
+                                          ? Text(" - Fresher")
+                                          : Text(
+                                              " - ${CustomFunctions.toSentenceCase(widget.seekerData.personalData!.personal.introduction.toString())}",
+                                              style: theme.textTheme.bodyMedium!.copyWith(
+                    color: greyTextColor,
+                  ),),
+                                    ],
+                                  ),
                                 ),
-                              ),
+                                Consumer<SearchSeekerProvider>(
+                                    builder: (context, provider, child) {
+                                  return InkWell(
+                                      onTap: () async {
+                                        if (widget.seekerData.personalData !=
+                                            null) {
+                                          final _isSaved = await provider
+                                              .toggleSaveCandidate(
+                                                  id: widget.seekerData
+                                                      .personalData!.personal.id
+                                                      .toString());
 
-                              Icon(Icons.bookmark_outline)
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                          Row(
-                            children: [
-                              const Text('🏢 '),
-                              Expanded(
-                                child: Text(
-                                  '${widget.seekerData.personalData!.totalExperienceYears}yr ${widget.seekerData.personalData!.totalExperienceMonths}m',
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.grey.shade600,
+                                          final seekerSaved = await provider
+                                              .isSeekerSaved(widget.seekerData
+                                                  .personalData!.personal.id
+                                                  .toString());
+
+                                          if (seekerSaved == true) {
+                                            setState(() {
+                                              isSaved = true;
+                                            });
+                                            CommonSnackbar.show(context,
+                                                message: "Saved ");
+                                          } else if (seekerSaved == false) {
+                                            setState(() {
+                                              isSaved = false;
+                                            });
+                                            CommonSnackbar.show(context,
+                                                message: "Removed");
+                                          } else {
+                                            CommonSnackbar.show(context,
+                                                message:
+                                                    "Something went wrong!");
+                                          }
+                                        }
+                                      },
+                                      child: isSaved == true
+                                          ? ScaleTransition(
+                                              scale: _iconAnimation,
+                                              child: Icon(Icons.bookmark))
+                                          : ScaleTransition(
+                                              scale: _iconAnimation,
+                                              child: Icon(
+                                                  Icons.bookmark_outline)));
+                                })
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                const Text('🏢 '),
+                                Expanded(
+                                  child: Text(
+                                    widget.seekerData.personalData!.personal
+                                                .employed ==
+                                            false
+                                        ? "No experience"
+                                        : '${widget.seekerData.personalData!.personal.totalExperienceYears}yr ${widget.seekerData.personalData!.personal.totalExperienceMonths}m',
+                                    // '${widget.seekerData.personalData!.totalExperienceYears}yr ${widget.seekerData.personalData!.totalExperienceMonths}m',
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey.shade600,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              const SizedBox(width: 16),
-                              const Text('📍 '),
-                              Expanded(
-                                child: Text(
-                                  "${CustomFunctions.toSentenceCase(widget.seekerData.personalData!.city.toString())}, ${CustomFunctions.toSentenceCase(widget.seekerData.personalData!.state.toString())}",
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.grey.shade600,
+                                const SizedBox(width: 16),
+                                const Text('📍 '),
+                                Expanded(
+                                  child: Text(
+                                    "${CustomFunctions.toSentenceCase(widget.seekerData.personalData!.personal.city.toString())}, ${CustomFunctions.toSentenceCase(widget.seekerData.personalData!.personal.state.toString())}",
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey.shade600,
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          widget.seekerData.personalData!.employed == true && widget.seekerData.employmentData != null
-                              ? Row(
-                                  children: [
-                                    _buildItemWidget(
-                                        theme: theme,
-                                        title: "Current company",
-                                        subTitle: widget
-                                            .seekerData.employmentData!.first.companyName
-                                            .toString()),
-                                  ],
-                                )
-                              : const SizedBox.shrink(),
-                          // Row(
-                          //   children: [
-                          //     _buildItemWidget(
-                          //         theme: theme,
-                          //         title: "Company name",
-                          //         subTitle: widget
-                          //             .seekerData.personalData!.user.name
-                          //             .toString()),
-                          //     const SizedBox(
-                          //       width: 15,
-                          //     ),
-                          //     _buildItemWidget(
-                          //         theme: theme,
-                          //         title: "Current company",
-                          //         subTitle: widget
-                          //             .seekerData.personalData!.user.name
-                          //             .toString()),
-                          //   ],
-                          // ),
-                        ],
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                // Skills
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: (widget.seekerData.personalData?.skills != null)
-                      ? widget.seekerData.personalData!.skills!.entries
-                          .map((entry) {
-                          return Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.blue.shade50,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              "${entry.key}: ${entry.value}",
-                              style: TextStyle(
-                                color: Colors.blue.shade700,
-                                fontSize: 12,
-                              ),
-                            ),
-                          );
-                        }).toList()
-                      : [],
-                )
-              ],
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  widget.seekerData.personalData!.personal.skills!.isEmpty
+                      ? Text(
+                          "No skills found",
+                          style: theme.textTheme.bodyMedium!.copyWith(
+                              color: greyTextColor,
+                              fontWeight: FontWeight.bold),
+                        )
+                      : Wrap(
+                          spacing: 8.w,
+                          runSpacing: 8.h,
+                          children: List.generate(
+                              widget.seekerData.personalData!.personal.skills!
+                                  .length, (index) {
+                            return Row(
+                              children: [
+                                Text(
+                                  "Skills : ",
+                                  style: theme.textTheme.bodyMedium!.copyWith(
+                                      color: greyTextColor,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                Expanded(
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 8.w,
+                                      vertical: 4.h,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: buttonColor.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(4.r),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Flexible(
+                                          child: Text(
+                                            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          }),
+                        )
+                ],
+              ),
             ),
           ),
         ),
       );
     } else {
-      return Text("aaaaaaaaaaa");
+      return Text("Error seeker data is null");
     }
-
-    // return Container(
-    //   width: double.infinity,
-    //   decoration: BoxDecoration(
-    //       // color: Colors.green,
-    //       borderRadius: BorderRadius.circular(15.r),
-    //       border: Border.all(color: borderColor)),
-    //   child: Padding(
-    //     padding: const EdgeInsets.all(8.0),
-    //     child: Row(
-    //       spacing: 15,
-    //       children: [
-    //         CircleAvatar(
-    //           radius: 40.r,
-    //         ),
-    //         Expanded(child: Column(
-    //           crossAxisAlignment: CrossAxisAlignment.start,
-    //           children: [
-    //             Text("Name"),
-    //             Text("Name"),
-    //             Row(
-    //               children: [
-    //                 Text("Name"),
-    //                 Text("Name"),
-    //               ],
-    //             ),
-
-    //           ],
-    //         ))
-    //         // Expanded(
-    //         //   child: Column(
-    //         //     crossAxisAlignment: CrossAxisAlignment.start,
-    //         //     spacing: 2,
-    //         //     children: [
-    //         //       // if (widget.seekerData.personalData != null &&
-    //         //       //     widget.seekerData.personalData!.employed == true)
-    //         //       Text("${widget.seekerData.personalData != null &&
-    //         //               widget.seekerData.personalData!.employed == true}"),
-    //         //       // Text(widget.seekerData.personalData != null &&
-    //         //       //         widget.seekerData.personalData!.employed == true
-    //         //       //     ? "Experienced"
-    //         //       //     : "Fresher"),
-    //         //       Row(
-    //         //         children: [
-    //         //           Text(widget.seekerData.personalData!.user.name.toString().toUpperCase()),
-    //         //           Text(" - Fresher"),
-    //         //         ],
-    //         //       ),
-    //         //       if (widget.seekerData.personalData != null &&
-    //         //           widget.seekerData.personalData!.employed == true)
-    //         //         Text(
-    //         //             "${widget.seekerData.personalData!.totalExperienceYears}yr ${widget.seekerData.personalData!.totalExperienceMonths}m of ${widget.seekerData.employmentData != null ? widget.seekerData.employmentData!.first.jobRole : "N/A"}"),
-    //         //       Row(
-    //         //         children: [
-    //         //           _buildItemWidget(
-    //         //               theme: theme,
-    //         //               title: "Current company",
-    //         //               subTitle: widget.seekerData.personalData!.user.name.toString()),
-    //         //         ],
-    //         //       ),
-    //         //       Row(
-    //         //         children: [
-    //         //           _buildItemWidget(
-    //         //               theme: theme,
-    //         //               title: "Current company",
-    //         //               subTitle: "name"),
-    //         //           _buildItemWidget(
-    //         //               theme: theme,
-    //         //               title: "Current company",
-    //         //               subTitle: "name")
-    //         //         ],
-    //         //       ),
-    //         //       // if (widget.seekerData.personalData != null &&
-    //         //       //     widget.seekerData.personalData!.employed == true)
-    //         //         Column(
-    //         //           crossAxisAlignment: CrossAxisAlignment.start,
-    //         //           children: [
-    //         //             Text(
-    //         //               "Skills",
-    //         //               overflow: TextOverflow.ellipsis,
-    //         //             ),
-    //         //             ...?widget.seekerData.personalData?.skills?.entries
-    //         //                 .map((entry) {
-    //         //               return Text("${entry.key}: ${entry.value}");
-    //         //             }).toList(),
-    //         //           ],
-    //         //         )
-    //         //     ],
-    //         //   ),
-    //         // )
-
-    //       ],
-    //     ),
-    //   ),
-    // );
   }
 
   Widget _buildItemWidget(

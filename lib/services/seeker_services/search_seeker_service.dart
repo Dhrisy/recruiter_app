@@ -6,12 +6,12 @@ import 'package:recruiter_app/services/api_lists.dart';
 class SearchSeekerService {
   Future<http.Response> searchSeeker({
     required List<String> keyWords,
-    int experienceYear = 0,
-    int experienceMonth = 0,
+    String experienceYear = "0",
+    String experienceMonth = "0",
     String location = '',
     String nationality = '',
-    int miniSalary = 0,
-    int maxiSalary = 0,
+    String miniSalary = "0",
+    String maxiSalary = "0",
     String gender = '',
     String education = '',
   }) async {
@@ -33,6 +33,8 @@ class SearchSeekerService {
     final response = await http.get(url, headers: {
       'Authorization': 'Bearer ${token.toString()}',
     });
+    print(response.statusCode);
+    print(response.body);
 
     return response;
   }

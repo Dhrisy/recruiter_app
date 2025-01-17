@@ -50,7 +50,6 @@ class JobPostBloc extends Bloc<JobPostEvent, JobPostState> {
   JobPostBloc(this.jobRepository) : super(JobSubmitInitial()) {
     on<JobPostFormEvent>((event, emit) async {
       emit(JobPostLoading());
-
       final result = await jobRepository.jobPostRepository(job: event.job);
       if (result == "success") {
         emit(JobSubmitSuccess());

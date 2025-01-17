@@ -14,4 +14,12 @@ class ApiLists {
  static String forgotPwEndPoint = "$baseUrl/user/forgot_password";
  static String allSeekersEndPoint = "$baseUrl/recruiter_actions/all_seekers";
  static String resdexSeekersEndPoint = "$baseUrl/recruiter_actions/resdex";
+ static String respondedSeekerEndPoint = "$baseUrl/job-actions/job_applications";
+ static String emailOtpVerifyEndPoint = "$baseUrl/user/email_verify";
+ static String emailSentOtpEndPoint = "$baseUrl/user/send_email_otp";
+ static String saveCandidateEndPoint = "$baseUrl/recruiter_actions/save_candidates";
+ static String fetchSaveCandidateEndPoint = "$baseUrl/recruiter_actions/saved_candidates";
+
+
+
 }

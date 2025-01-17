@@ -99,11 +99,11 @@ class _JobCardWidgetState extends State<JobCardWidget> {
                                       : lightTextColor),
                             ),
                           ),
-                          Icon(
-                            Icons.bookmark_outline,
-                            size: 20.sp,
-                            color: _isSelected ? buttonColor : secondaryColor,
-                          )
+                          // Icon(
+                          //   Icons.bookmark_outline,
+                          //   size: 20.sp,
+                          //   color: _isSelected ? buttonColor : secondaryColor,
+                          // )
                         ],
                       ),
                       Row(

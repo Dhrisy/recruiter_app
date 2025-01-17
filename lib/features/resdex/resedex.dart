@@ -3,13 +3,16 @@ import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/core/theme.dart';
 import 'package:recruiter_app/core/utils/country_lists.dart';
 import 'package:recruiter_app/core/utils/nationalities.dart';
 import 'package:recruiter_app/features/resdex/email_template_widget.dart';
+import 'package:recruiter_app/features/resdex/provider/search_seeker_provider.dart';
 import 'package:recruiter_app/features/resdex/saved_searches.dart';
 import 'package:recruiter_app/features/resdex/widgets/search_cv_form_widget.dart';
+import 'package:recruiter_app/widgets/common_snackbar.dart';
 import 'package:recruiter_app/widgets/custom_fab_btn_widget.dart';
 import 'package:recruiter_app/widgets/reusable_textfield.dart';
 
@@ -31,15 +34,20 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
 
   bool viewMore = true;
   String _selectedGender = '';
-  final String minExp = '';
-  final String maxExp = '';
-  final String minSalary = '';
-  final String maxSalary = '';
+  String minExp = '';
+  String maxExp = '';
+  String minSalary = '';
+  String maxSalary = '';
   bool addMoreFilter = false;
   bool isApplyFilter = false;
 
   final TextEditingController _keywordCont = TextEditingController();
   final TextEditingController _noticePeriodCont = TextEditingController();
+  final TextEditingController _expYear = TextEditingController();
+  final TextEditingController _expMonth = TextEditingController();
+
+  // bottomsheet form key
+  final _bottomSHeetFormKey = GlobalKey<FormState>();
 
   final List<Map<String, dynamic>> experienceOptions = [
     {'label': '0 - 1 Years', 'count': 162381, 'isChecked': false},
@@ -98,34 +106,81 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
   }
 
   // Method to update min and max experience based on selected checkboxes
-  void _updateExperienceRange(
-      {required String minCont,
-      required String maxiCont,
-      required List<Map<String, dynamic>> lists}) {
+  void _updateSalaryRange({
+    required String minCont,
+    required String maxiCont,
+    required List<Map<String, dynamic>> lists,
+  }) {
     List<Map<String, dynamic>> selectedOptions =
         lists.where((option) => option['isChecked'] == true).toList();
 
     if (selectedOptions.isEmpty) {
       minCont = '';
       maxiCont = '';
+      setState(() {
+        minExp = '';
+        maxExp = '';
+      });
       return;
     }
 
-    int minYears = selectedOptions.map((option) {
+    // Extract min and max years for all selected options
+    List<int> minSalaryList = selectedOptions.map((option) {
       final (min, _) = _extractYearRange(option['label']);
       return min;
-    }).reduce((min, current) => min < current ? min : current);
+    }).toList();
 
-    int maxYears = selectedOptions.map((option) {
+    List<int> maxSalaryList = selectedOptions.map((option) {
       final (_, max) = _extractYearRange(option['label']);
       return max;
-    }).reduce((max, current) => max > current ? max : current);
+    }).toList();
+
+    // Handle cases with a single selection or multiple selections
+    int minYears =
+        minSalaryList.reduce((min, current) => min < current ? min : current);
+    int maxYears =
+        maxSalaryList.reduce((max, current) => max > current ? max : current);
 
     setState(() {
-      minCont = minYears.toString();
-      maxiCont = maxYears.toString();
+      minExp = minYears.toString();
+      maxExp = maxYears.toString();
+      minSalary = minYears.toString();
+      maxSalary = maxYears.toString();
     });
+
+    print(minYears);
+    print(maxYears);
   }
+
+  // void _updateExperienceRange(
+  //     {required String minCont,
+  //     required String maxiCont,
+  //     required List<Map<String, dynamic>> lists}) {
+  //   List<Map<String, dynamic>> selectedOptions =
+  //       lists.where((option) => option['isChecked'] == true).toList();
+
+  //   if (selectedOptions.isEmpty) {
+  //     minCont = '';
+  //     maxiCont = '';
+  //     return;
+  //   }
+  //   print("bbbbbbbb $minCont,  $maxiCont");
+
+  //   int minYears = selectedOptions.map((option) {
+  //     final (min, _) = _extractYearRange(option['label']);
+  //     return min;
+  //   }).reduce((min, current) => min < current ? min : current);
+
+  //   int maxYears = selectedOptions.map((option) {
+  //     final (_, max) = _extractYearRange(option['label']);
+  //     return max;
+  //   }).reduce((max, current) => max > current ? max : current);
+
+  //   setState(() {
+  //     minExp = minYears.toString();
+  //     maxExp = maxYears.toString();
+  //   });
+  // }
 
   // Method to handle checkbox state changes
   void updateCheckboxState(
@@ -143,19 +198,18 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
       child: Scaffold(
         floatingActionButton: currentScreenIndex == 0
             ? CustomFabBtnWidget(
-              icon: Icons.filter_alt,
-               onPressed: () {
+                icon: Icons.filter_alt,
+                onPressed: () {
                   _showAnimatedBottomSheet(theme: theme);
+                  // Provider.of<SearchSeekerProvider>(context, listen: false).searchSeeker(keyWords:[ "flutter"]);
                 },
-            )
+              )
             : currentScreenIndex == 5
                 ? OpenContainer(
-
                     transitionType: ContainerTransitionType.fade,
                     transitionDuration: const Duration(milliseconds: 500),
                     closedShape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50)
-                    ),
+                        borderRadius: BorderRadius.circular(50)),
                     closedBuilder:
                         (BuildContext context, VoidCallback openContainer) {
                       return CustomFabBtnWidget(onPressed: () {
@@ -201,10 +255,6 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
                     ),
                     Row(
                       children: [
-                        Icon(Icons.arrow_back_ios),
-                        const SizedBox(
-                          width: 40,
-                        ),
                         Text(
                           "Resdex",
                           style: theme.textTheme.titleLarge!.copyWith(
@@ -245,8 +295,14 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
                                 child: _buildOptionContainer(
                                     title: "Email templates", index: 5))
                           ],
-                        )
+                        ),
                       ],
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Divider(
+                      height: 1,
                     ),
 
                     const SizedBox(
@@ -258,7 +314,8 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
                         : SizedBox.shrink(),
 
                     currentScreenIndex == 4
-                    ? SavedSearches(): const SizedBox.shrink()
+                        ? SavedSearches()
+                        : const SizedBox.shrink()
                   ],
                 ),
               ),
@@ -302,476 +359,459 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
               borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
             ),
             child: SingleChildScrollView(
-              child: Column(
-                // crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Drag Handle
-                  Container(
-                    width: 40,
-                    height: 4,
-                    margin: const EdgeInsets.symmetric(vertical: 12),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(2),
+              child: Form(
+                key: _bottomSHeetFormKey,
+                child: Column(
+                  // crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Drag Handle
+                    Container(
+                      width: 40,
+                      height: 4,
+                      margin: const EdgeInsets.symmetric(vertical: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(2),
+                      ),
                     ),
-                  ),
 
-                  // Title
-                  Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Filter candidates',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        InkWell(
-                            onTap: () {
-                              Navigator.pop(context);
-                            },
-                            child: Icon(Icons.close))
-                      ],
-                    ),
-                  ),
-                  Divider(
-                    endIndent: 15,
-                    indent: 15,
-                  ),
-
-                  Container(
-                    width: double.infinity,
-                    child: Padding(
-                      padding: const EdgeInsets.all(15),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        spacing: 15,
+                    // Title
+                    Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          _buildBottomsheetItem(
-                              theme: theme,
-                              text: "Search with keywords",
-                              validation: (_) {},
-                              controller: TextEditingController(),
-                              onSubmit: (value) {
-                                setState(() {
-                                  selectedKeywords.add(value);
-                                  _keywordCont.clear();
-                                });
-                              }),
-                          if (selectedKeywords.isNotEmpty)
-                            Container(
-                              padding: EdgeInsets.symmetric(vertical: 8.h),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Selected skills:",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16.sp,
-                                    ),
-                                  ),
-                                  SizedBox(height: 8.h),
-                                  Wrap(
-                                    spacing: 8.w,
-                                    runSpacing: 8.h,
-                                    children: selectedKeywords.map((location) {
-                                      return Container(
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: 8.w,
-                                          vertical: 4.h,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: buttonColor.withOpacity(0.1),
-                                          borderRadius:
-                                              BorderRadius.circular(4.r),
-                                        ),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Text(
-                                              location,
-                                              style: AppTheme.mediumTitleText(
-                                                  lightTextColor),
-                                            ),
-                                            SizedBox(width: 4.w),
-                                            GestureDetector(
-                                              onTap: () {
-                                                setState(() {
-                                                  selectedKeywords
-                                                      .remove(location);
-                                                });
-                                              },
-                                              child: Icon(
-                                                Icons.close,
-                                                size: 16.sp,
-                                                color: greyTextColor,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    }).toList(),
-                                  ),
-                                ],
-                              ),
+                          Text(
+                            'Filter candidates',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
                             ),
-                          _buildBottomsheetTitle(
-                              theme: theme, text: "Experience"),
-                          Column(
-                            children: List.generate(experienceOptions.length,
-                                (index) {
-                              final option = experienceOptions[index];
-                              return Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Checkbox(
-                                        activeColor: secondaryColor,
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(3.r)),
-                                        value: option['isChecked'],
-                                        onChanged: (value) {
-                                          setModalState(() {
-                                            updateCheckboxState(index, value,
-                                                experienceOptions);
-                                          });
-
-                                          _updateExperienceRange(
-                                              maxiCont: minExp,
-                                              minCont: maxExp,
-                                              lists: experienceOptions);
-                                        },
-                                      ),
-                                      Text(option['label']),
-                                    ],
-                                  ),
-                                ],
-                              );
-                            }),
                           ),
                           InkWell(
                               onTap: () {
-                                if (viewMore) {
-                                  setModalState(() {
-                                    experienceOptions.addAll([
-                                      {
-                                        'label': '12 - 15 Years',
-                                        'count': 500000,
-                                        'isChecked': false
-                                      },
-                                      {
-                                        'label': '15 - 20 Years',
-                                        'count': 350000,
-                                        'isChecked': false
-                                      },
-                                      {
-                                        'label': '20 - 25 Years',
-                                        'count': 350000,
-                                        'isChecked': false
-                                      },
-                                      {
-                                        'label': '25 - 30 Years',
-                                        'count': 350000,
-                                        'isChecked': false
-                                      },
-                                      {
-                                        'label': '30+ Years',
-                                        'count': 350000,
-                                        'isChecked': false
-                                      },
-                                    ]);
-
-                                    viewMore = !viewMore;
-                                  });
-                                } else {
-                                  setModalState(() {
-                                    // Remove the last 5 items from the list
-                                    experienceOptions.removeRange(
-                                        experienceOptions.length - 5,
-                                        experienceOptions.length);
-                                    viewMore = !viewMore;
-                                  });
-                                }
+                                Navigator.pop(context);
                               },
-                              child: Text(
-                                viewMore ? "View more" : "View less",
-                                style: theme.textTheme.bodyMedium!.copyWith(
-                                    color: buttonColor,
-                                    fontWeight: FontWeight.bold),
-                              )),
+                              child: Icon(Icons.close))
+                        ],
+                      ),
+                    ),
+                    Divider(
+                      endIndent: 15,
+                      indent: 15,
+                    ),
 
-                          Divider(),
-
-// salary
-                          _buildBottomsheetTitle(theme: theme, text: "Salary"),
-                          Column(
-                            children:
-                                List.generate(salaryOptions.length, (index) {
-                              final option = salaryOptions[index];
-                              return Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Checkbox(
-                                        activeColor: secondaryColor,
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(3.r)),
-                                        value: option['isChecked'],
-                                        onChanged: (value) {
-                                          setModalState(() {
-                                            updateCheckboxState(
-                                                index, value, salaryOptions);
-                                          });
-
-                                          _updateExperienceRange(
-                                              maxiCont: maxSalary,
-                                              minCont: minSalary,
-                                              lists: salaryOptions);
-                                        },
+                    Container(
+                      width: double.infinity,
+                      child: Padding(
+                        padding: const EdgeInsets.all(15),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          spacing: 15,
+                          children: [
+                            _buildBottomsheetItem(
+                                theme: theme,
+                                text: "Search with keywords",
+                                validation: (_) {},
+                                controller: TextEditingController(),
+                                onSubmit: (value) {
+                                  if (value != "") {
+                                    setState(() {
+                                      selectedKeywords.add(value);
+                                      _keywordCont.clear();
+                                    });
+                                  }
+                                }),
+                            if (selectedKeywords.isNotEmpty)
+                              Container(
+                                padding: EdgeInsets.symmetric(vertical: 8.h),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Selected skills:",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16.sp,
                                       ),
-                                      Text(option['label']),
+                                    ),
+                                    SizedBox(height: 8.h),
+                                    Wrap(
+                                      spacing: 8.w,
+                                      runSpacing: 8.h,
+                                      children:
+                                          selectedKeywords.map((location) {
+                                        return Container(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 8.w,
+                                            vertical: 4.h,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: buttonColor.withOpacity(0.1),
+                                            borderRadius:
+                                                BorderRadius.circular(4.r),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text(
+                                                location,
+                                                style: AppTheme.mediumTitleText(
+                                                    lightTextColor),
+                                              ),
+                                              SizedBox(width: 4.w),
+                                              GestureDetector(
+                                                onTap: () {
+                                                  setModalState(() {
+                                                    selectedKeywords
+                                                        .remove(location);
+                                                  });
+                                                  print(selectedKeywords);
+                                                },
+                                                child: Icon(
+                                                  Icons.close,
+                                                  size: 16.sp,
+                                                  color: greyTextColor,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                            _buildBottomsheetTitle(
+                                theme: theme, text: "Experience"),
+
+                            Row(
+                              spacing: 15,
+                              children: [
+                                Expanded(
+                                    child: ReusableTextfield(
+                                  controller: _expYear,
+                                  labelText: "Years",
+                                  hintText: "0",
+                                  keyBoardType: TextInputType.number,
+                                )),
+                                Expanded(
+                                    child: ReusableTextfield(
+                                  controller: _expMonth,
+                                  labelText: "Months",
+                                  hintText: "0",
+                                  keyBoardType: TextInputType.number,
+                                ))
+                              ],
+                            ),
+
+                            // salary
+                            _buildBottomsheetTitle(
+                                theme: theme, text: "Salary"),
+                            Column(
+                              children:
+                                  List.generate(salaryOptions.length, (index) {
+                                final option = salaryOptions[index];
+                                return Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Checkbox(
+                                          activeColor: secondaryColor,
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(3.r)),
+                                          value: option['isChecked'],
+                                          onChanged: (value) {
+                                            setModalState(() {
+                                              updateCheckboxState(
+                                                  index, value, salaryOptions);
+                                            });
+
+                                            _updateSalaryRange(
+                                                maxiCont: maxSalary,
+                                                minCont: minSalary,
+                                                lists: salaryOptions);
+
+                                                print(minSalary);
+                                                print(maxSalary);
+                                          },
+                                        ),
+                                        Text(option['label']),
+                                      ],
+                                    ),
+                                  ],
+                                );
+                              }),
+                            ),
+
+                            Divider(),
+
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    spacing: 5,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      // _buildBottomsheetTitle(
+                                      //     theme: theme, text: "Country"),
+                                      _buildDropdownWidget(
+                                          theme: theme,
+                                          selectedVariable: _selectedCountry,
+                                          list: countryLists,
+                                          hintText: "Select country",
+                                          labelText: "Country",
+                                          onChanged: (value) {
+                                            if (value != null) {
+                                              setState(() {
+                                                _selectedCountry = value;
+                                              });
+                                            }
+                                          }),
                                     ],
                                   ),
-                                ],
-                              );
-                            }),
-                          ),
-
-                          Divider(),
-
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  spacing: 5,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    // _buildBottomsheetTitle(
-                                    //     theme: theme, text: "Country"),
-                                    _buildDropdownWidget(
-                                        theme: theme,
-                                        selectedVariable: _selectedCountry,
-                                        list: countryLists,
-                                        hintText: "Select country",
-                                        labelText: "Country",
-                                        onChanged: (value) {
-                                          if (value != null) {
-                                            setState(() {
-                                              _selectedCountry = value;
-                                            });
-                                          }
-                                        }),
-                                  ],
                                 ),
-                              ),
-                              const SizedBox(
-                                width: 10,
-                              ),
-                              Expanded(
-                                child: Column(
-                                  spacing: 5,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    // _buildBottomsheetTitle(
-                                    //     theme: theme, text: "Nationality"),
-                                    _buildDropdownWidget(
-                                        theme: theme,
-                                        selectedVariable: _selectedNationality,
-                                        list: nationalities,
-                                        hintText: "Select nationality",
-                                        labelText: "Nationality",
-                                        onChanged: (value) {
-                                          if (value != null) {
-                                            setState(() {
-                                              _selectedNationality = value;
-                                            });
-                                          }
-                                        }),
-                                  ],
+                                const SizedBox(
+                                  width: 10,
                                 ),
-                              ),
-                            ],
-                          ),
-
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            spacing: 5,
-                            children: [
-                              // _buildBottomsheetTitle(
-                              //     theme: theme, text: "Gender"),
-                              Container(
-                                height: 45.h,
-                                decoration: BoxDecoration(
-                                    color: Colors.transparent,
-                                    border: Border.all(color: borderColor),
-                                    borderRadius:
-                                        BorderRadius.circular(borderRadius)),
-                                child: Padding(
-                                  padding: const EdgeInsets.only(top: 5),
-                                  child: DropdownButton<String>(
-                                    value: _selectedGender.isEmpty
-                                        ? null
-                                        : _selectedGender,
-                                    isExpanded: true,
-                                    hint: const Text("Select gender"),
-                                    underline: const SizedBox(),
-                                    borderRadius: BorderRadius.circular(15.r),
-                                    style:
-                                        Theme.of(context).textTheme.bodyLarge,
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 10),
-                                    items: [
-                                      "Male",
-                                      "Female",
-                                      "Other",
-                                    ]
-                                        .map((String value) =>
-                                            DropdownMenuItem<String>(
-                                              value: value,
-                                              child: Text(value),
-                                            ))
-                                        .toList(),
-                                    onChanged: (String? newValue) {
-                                      setState(() {
-                                        _selectedGender = newValue ?? '';
-                                      });
-                                    },
+                                Expanded(
+                                  child: Column(
+                                    spacing: 5,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      // _buildBottomsheetTitle(
+                                      //     theme: theme, text: "Nationality"),
+                                      _buildDropdownWidget(
+                                          theme: theme,
+                                          selectedVariable:
+                                              _selectedNationality,
+                                          list: nationalities,
+                                          hintText: "Select nationality",
+                                          labelText: "Nationality",
+                                          onChanged: (value) {
+                                            if (value != null) {
+                                              setState(() {
+                                                _selectedNationality = value;
+                                              });
+                                            }
+                                          }),
+                                    ],
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
+
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              spacing: 5,
+                              children: [
+                                // _buildBottomsheetTitle(
+                                //     theme: theme, text: "Gender"),
+                                Container(
+                                  height: 45.h,
+                                  decoration: BoxDecoration(
+                                      color: Colors.transparent,
+                                      border: Border.all(color: borderColor),
+                                      borderRadius:
+                                          BorderRadius.circular(borderRadius)),
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(top: 5),
+                                    child: DropdownButton<String>(
+                                      value: _selectedGender.isEmpty
+                                          ? null
+                                          : _selectedGender,
+                                      isExpanded: true,
+                                      hint: const Text("Select gender"),
+                                      underline: const SizedBox(),
+                                      borderRadius: BorderRadius.circular(15.r),
+                                      style:
+                                          Theme.of(context).textTheme.bodyLarge,
+                                      padding:
+                                          EdgeInsets.symmetric(horizontal: 10),
+                                      items: [
+                                        "Male",
+                                        "Female",
+                                        "Other",
+                                      ]
+                                          .map((String value) =>
+                                              DropdownMenuItem<String>(
+                                                value: value,
+                                                child: Text(value),
+                                              ))
+                                          .toList(),
+                                      onChanged: (String? newValue) {
+                                        setState(() {
+                                          _selectedGender = newValue ?? '';
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    // additional filters
+                    addMoreFilter
+                        ? Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 15, vertical: 15),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              spacing: 10,
+                              children: [
+                                Text(
+                                  "Additional filters",
+                                  style: theme.textTheme.bodyLarge!
+                                      .copyWith(color: greyTextColor),
+                                ),
+                                _buildDropdownWidget(
+                                    theme: theme,
+                                    selectedVariable: _selectedEducation,
+                                    list: [
+                                      "Primary education",
+                                      "Secondary education or high school",
+                                      "Graduation",
+                                      "Vocational qualification",
+                                      "Bachelor's degree",
+                                      "Master's degree",
+                                      "Doctorate or higher"
+                                    ],
+                                    hintText: "Select education",
+                                    labelText: "Education",
+                                    onChanged: (value) {
+                                      setModalState(() {
+                                        _selectedEducation = value ?? '';
+                                      });
+                                    }),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    _buildBottomsheetTitle(
+                                        theme: theme, text: "Notice period"),
+                                    ReusableTextfield(
+                                      controller: _noticePeriodCont,
+                                      hintText: "Enter the notice period",
+                                      keyBoardType: TextInputType.number,
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ),
+                          )
+                        : const SizedBox.shrink(),
+
+                    InkWell(
+                        onTap: () {
+                          setModalState(() {
+                            addMoreFilter = !addMoreFilter;
+                          });
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: buttonColor.withValues(alpha: 0.3),
+                              borderRadius:
+                                  BorderRadiusDirectional.circular(8.r)),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              addMoreFilter
+                                  ? "Remove additional filter"
+                                  : "Click here to add more filter",
+                              style: theme.textTheme.bodyMedium!.copyWith(
+                                  color: buttonColor,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        )),
+
+                    const SizedBox(
+                      height: 20,
+                    ),
+
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Row(
+                        spacing: 15,
+                        children: [
+                          Expanded(
+                            child: _buildBottomsheetBtn(
+                              text: "Apply filter",
+                              theme: theme,
+                              color: buttonColor,
+                              action: () {
+                                print(maxSalary);
+                                print(minSalary);
+
+                                if (selectedKeywords.isEmpty &&
+                                    _selectedCountry == "" &&
+                                    _selectedEducation == "" &&
+                                    maxSalary == "" &&
+                                    minSalary == "" &&
+                                    _expYear.text == "" &&
+                                    _expMonth.text == "" &&
+                                    _selectedGender == "" &&
+                                    _selectedNationality == "") {
+                                  Navigator.pop(context);
+                                  CommonSnackbar.show(context,
+                                      message: "Select any filter");
+                                } else {
+                                  print(maxSalary);
+                                  print(minSalary);
+                                  Provider.of<SearchSeekerProvider>(context,
+                                          listen: false)
+                                      .searchSeeker(
+                                          keyWords: selectedKeywords,
+                                          education: _selectedEducation,
+                                          experienceMonth: _expMonth.text,
+                                          experienceYear: _expYear.text,
+                                          gender: _selectedGender,
+                                          location: _selectedCountry,
+                                          maxiSalary: maxSalary,
+                                          miniSalary: minSalary,
+                                          nationality: _selectedNationality);
+                                  setModalState(() {
+                                    isApplyFilter = true;
+                                  });
+                                  Navigator.pop(context);
+                                }
+                              },
+                            ),
+                          ),
+                          Expanded(
+                            child: _buildBottomsheetBtn(
+                              text: "Remove filter",
+                              theme: theme,
+                              action: () {
+                                Provider.of<SearchSeekerProvider>(context,
+                                        listen: false)
+                                    .fetchAllSeekersLists();
+                                Navigator.pop(context);
+                                setModalState(() {
+                                  isApplyFilter = false;
+                                });
+                              },
+                              color: secondaryColor,
+                            ),
                           ),
                         ],
                       ),
                     ),
-                  ),
 
-                  // additional filters
-                  addMoreFilter
-                      ? Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 15, vertical: 15),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            spacing: 10,
-                            children: [
-                              Text(
-                                "Additional filters",
-                                style: theme.textTheme.bodyLarge!
-                                    .copyWith(color: greyTextColor),
-                              ),
-                              _buildDropdownWidget(
-                                  theme: theme,
-                                  selectedVariable: _selectedEducation,
-                                  list: [
-                                    "Primary education",
-                                    "Secondary education or high school",
-                                    "Graduation",
-                                    "Vocational qualification",
-                                    "Bachelor's degree",
-                                    "Master's degree",
-                                    "Doctorate or higher"
-                                  ],
-                                  hintText: "Select education",
-                                  labelText: "Education",
-                                  onChanged: (value) {
-                                    setModalState(() {
-                                      _selectedEducation = value ?? '';
-                                    });
-                                  }),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  _buildBottomsheetTitle(
-                                      theme: theme, text: "Notice period"),
-                                  ReusableTextfield(
-                                    controller: _noticePeriodCont,
-                                    hintText: "Enter the notice period",
-                                    keyBoardType: TextInputType.number,
-                                  ),
-                                ],
-                              )
-                            ],
-                          ),
-                        )
-                      : const SizedBox.shrink(),
-
-                  InkWell(
-                      onTap: () {
-                        setModalState(() {
-                          addMoreFilter = !addMoreFilter;
-                        });
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                            color: buttonColor.withValues(alpha: 0.3),
-                            borderRadius:
-                                BorderRadiusDirectional.circular(8.r)),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            addMoreFilter
-                                ? "Remove additional filter"
-                                : "Click here to add more filter",
-                            style: theme.textTheme.bodyMedium!.copyWith(
-                                color: buttonColor,
-                                fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                      )),
-
-                  const SizedBox(
-                    height: 20,
-                  ),
-
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Row(
-                      children: [
-                        isApplyFilter == false
-                            ? Expanded(
-                                child: _buildBottomsheetBtn(
-                                  text: "Apply filter",
-                                  theme: theme,
-                                  color: buttonColor.withValues(alpha: 0.3),
-                                  action: () {
-                                    setModalState(() {
-                                      isApplyFilter = true;
-                                    });
-                                    Navigator.pop(context);
-                                  },
-                                ),
-                              )
-                            : Expanded(
-                                child: _buildBottomsheetBtn(
-                                  text: "Remove filter",
-                                  theme: theme,
-                                  action: () {
-                                    setModalState(() {
-                                      isApplyFilter = false;
-                                    });
-                                  },
-                                  color: buttonColor,
-                                ),
-                              ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(
-                    height: 15,
-                  )
-                ],
+                    const SizedBox(
+                      height: 15,
+                    )
+                  ],
+                ),
               ),
             ),
           ),
@@ -797,7 +837,7 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
         child: Container(
           width: double.infinity,
           decoration: BoxDecoration(
-              color: buttonColor,
+              color: color,
               borderRadius: BorderRadiusDirectional.circular(8.r)),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -961,9 +1001,12 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
                 title,
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                  color: currentScreenIndex == index ? Colors.white : lightTextColor,
-                  fontWeight: currentScreenIndex == index ? FontWeight.bold : FontWeight.normal
-                ),
+                    color: currentScreenIndex == index
+                        ? Colors.white
+                        : lightTextColor,
+                    fontWeight: currentScreenIndex == index
+                        ? FontWeight.bold
+                        : FontWeight.normal),
               ))
             ],
           ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/core/theme.dart';
 import 'package:recruiter_app/core/utils/city_lists.dart';
@@ -14,11 +15,14 @@ import 'package:recruiter_app/core/utils/nationalities.dart';
 import 'package:recruiter_app/core/utils/navigation_animation.dart';
 import 'package:recruiter_app/core/utils/skills.dart';
 import 'package:recruiter_app/core/utils/states.dart';
+import 'package:recruiter_app/features/auth/bloc/auth_bloc.dart';
+import 'package:recruiter_app/features/auth/data/auth_repository.dart';
 import 'package:recruiter_app/features/job_post/data/job_post_repository.dart';
 import 'package:recruiter_app/features/job_post/model/job_post_model.dart';
 import 'package:recruiter_app/features/job_post/view/preview_job.dart';
 import 'package:recruiter_app/features/job_post/viewmodel.dart/jobpost_provider.dart';
 import 'package:recruiter_app/features/navbar/view/navbar.dart';
+import 'package:recruiter_app/viewmodels/job_viewmodel.dart';
 import 'package:recruiter_app/widgets/common_snackbar.dart';
 import 'package:recruiter_app/widgets/reusable_button.dart';
 import 'package:recruiter_app/widgets/reusable_textfield.dart';
@@ -110,27 +114,35 @@ class _JobPostFormState extends State<JobPostForm> {
   }
 
   void submitForm() {
-    final job = JobPostModel(
-      candidateLocation: [_selectedLocation],
-      city: _selectedCity,
-      country: _selectedCountry,
-      description: 
-          "Roles and responsibilities:${_roleDescriptionCont.text}\nCandidate's desired profile:\n${_descriptionCont.text}",
-      education: _selectedEducation,
-      functionalArea: _selectedFunctionalArea,
-      gender: _selectedGender,
-      industry: _selectedIndustry,
-      jobType: _selectedType,
-      maximumExperience: int.parse(_minExpCont.text),
-      maximumSalary: int.parse(_maxSalaryCont.text),
-      minimumExperience: int.parse(_minExpCont.text),
-      minimumSalary: int.parse(_minSalaryCont.text),
-      nationality: _selectedNationality,
-      title: _titleCont.text,
-      vaccancy: int.parse(_vaccancyCont.text),
-    );
+    final _bloc = AuthBloc(AuthRepository());
+    try {
+      final job = JobPostModel(
+          candidateLocation: [_selectedLocation],
+          city: _selectedCity,
+          country: _selectedCountry,
+          description:
+              "Roles and responsibilities:${_roleDescriptionCont.text}\nCandidate's desired profile:\n${_descriptionCont.text}",
+          education: _selectedEducation,
+          functionalArea: _selectedFunctionalArea,
+          gender: _selectedGender,
+          industry: _selectedIndustry,
+          jobType: _selectedType,
+          maximumExperience: int.parse(_minExpCont.text),
+          maximumSalary: int.parse(_maxSalaryCont.text),
+          minimumExperience: int.parse(_minExpCont.text),
+          minimumSalary: int.parse(_minSalaryCont.text),
+          nationality: _selectedNationality,
+          title: _titleCont.text,
+          vaccancy: int.parse(_vaccancyCont.text),
+          requirements: "nnnnnnnnn",
+          benefits: "benefits",
+          customQuestions: ["jsdkadd", "sdfghjk"],
+          currency: _selectedCurrency);
 
-    context.read<JobPostBloc>().add(JobPostFormEvent(job: job));
+      context.read<JobPostBloc>().add(JobPostFormEvent(job: job));
+    } catch (e) {
+      print(e);
+    }
   }
 
   List<Step> getSteps(ThemeData theme) {
@@ -234,136 +246,74 @@ class _JobPostFormState extends State<JobPostForm> {
                     Column(
                       children: [
                         getSteps(theme)[_currentStep].content,
-                        Container(
-                          margin: const EdgeInsets.symmetric(vertical: 20),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              if (_currentStep > 0)
+                        BlocConsumer<JobPostBloc, JobPostState>(
+                            listener: (context, state) {
+                          if (state is JobSubmitSuccess) {
+                            Navigator.pop(context);
+
+                            CommonSnackbar.show(context,
+                                message: "Job added successfully");
+                                context.read<JobBloc>().add(JobFetchEvent());
+                          } else if (state is JobSubmitFailure) {
+                            CommonSnackbar.show(context,
+                                message: "Failed to post job");
+                          }
+                        }, builder: (context, state) {
+                          return Container(
+                            margin: const EdgeInsets.symmetric(vertical: 20),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                if (_currentStep > 0)
+                                  Expanded(
+                                    child: ReusableButton(
+                                        action: () {
+                                          setState(() {
+                                            if (_currentStep > 0) {
+                                              _currentStep--;
+                                            }
+                                          });
+                                        },
+                                        text: "BACK",
+                                        buttonColor: buttonColor),
+                                  ),
+                                if (_currentStep > 0) const SizedBox(width: 16),
+
                                 Expanded(
                                   child: ReusableButton(
-                                      action: () {
-                                        setState(() {
-                                          if (_currentStep > 0) {
-                                            _currentStep--;
-                                          }
-                                        });
+                                      // isLoading: ,
+                                      action: () async {
+                                        handleNext(theme);
                                       },
-                                      text: "BACK",
+                                      text: _currentStep <
+                                              getSteps(theme).length - 1
+                                          ? 'NEXT'
+                                          : 'FINISH',
                                       buttonColor: buttonColor),
                                 ),
-                              if (_currentStep > 0) const SizedBox(width: 16),
 
-                              Expanded(
-                                child: ReusableButton(
-                                    action: () async {
-                                      handleNext(theme);
-                                    },
-                                    text: _currentStep <
-                                            getSteps(theme).length - 1
-                                        ? 'NEXT'
-                                        : 'FINISH',
-                                    buttonColor: buttonColor),
-                              ),
-
-                              // ElevatedButton(
-                              //   onPressed: () {
-                              //     setState(() {
-                              //       if (_currentStep < getSteps(theme).length - 1) {
-                              //         _currentStep++;
-                              //       }
-                              //     });
-                              //   },
-                              //   child: Text(
-                              //     _currentStep < getSteps(theme).length - 1
-                              //         ? 'NEXT'
-                              //         : 'FINISH',
-                              //   ),
-                              // ),
-                            ],
-                          ),
-                        ),
+                                // ElevatedButton(
+                                //   onPressed: () {
+                                //     setState(() {
+                                //       if (_currentStep < getSteps(theme).length - 1) {
+                                //         _currentStep++;
+                                //       }
+                                //     });
+                                //   },
+                                //   child: Text(
+                                //     _currentStep < getSteps(theme).length - 1
+                                //         ? 'NEXT'
+                                //         : 'FINISH',
+                                //   ),
+                                // ),
+                              ],
+                            ),
+                          );
+                        }),
                       ],
                     ),
                   ],
                 ),
-
-                // child: Column(
-                //   crossAxisAlignment: CrossAxisAlignment.start,
-                //   children: [
-                //     // job details input
-                //     _buildJobDetailsForm(theme: theme),
-
-                //     const SizedBox(
-                //       height: 20,
-                //     ),
-                //     // candidate profile
-                //     _buildCandidateProfile(theme: theme),
-                //     const SizedBox(
-                //       height: 20,
-                //     ),
-                //     //  salary details of job
-                //     _buildSalaryDetailsForm(theme: theme),
-                //     const SizedBox(
-                //       height: 20,
-                //     ),
-                //     _buildQuestionsWidget(theme: theme),
-
-                //     BlocConsumer<JobPostBloc, JobPostState>(
-                //         listener: (context, state) {
-                //       if (state is JobSubmitSuccess) {
-                //         CommonSnackbar.show(context,
-                //             message: "Job posted successfully");
-                //         Navigator.pushReplacement(context,
-                //             AnimatedNavigation().slideAnimation(Navbar()));
-                //       }
-
-                //       if (state is JobSubmitFailure) {
-                //         CommonSnackbar.show(context,
-                //             message:
-                //                 "Failed to create job. Please try again later");
-                //       }
-                //     }, builder: (context, state) {
-                //       return ReusableButton(
-                //           isLoading: state is JobPostLoading,
-                //           textColor: Colors.white,
-                //           action: () async {
-                //             if (_jobDetailsForm.currentState!.validate() &&
-                //                 _candidateDetailsForm.currentState!
-                //                     .validate() &&
-                //                 _salaryDetailsForm.currentState!.validate()) {
-                //               final job = JobPostModel(
-                //                 candidateLocation: _selectedLocation,
-                //                 city: _selectedCity,
-                //                 country: _selectedCountry,
-                //                 description:
-                //                     "Roles and responsibilities:\n${_roleDescriptionCont.text}\nCandidate's desired profile:\n${_descriptionCont.text}",
-                //                 education: _selectedEducation,
-                //                 functionalArea: _selectedFunctionalArea,
-                //                 gender: _selectedGender,
-                //                 industry: _selectedIndustry,
-                //                 jobType: _selectedType,
-                //                 maximumExperience: int.parse(_minExpCont.text),
-                //                 maximumSalary: int.parse(_maxSalaryCont.text),
-                //                 minimumExperience: int.parse(_minExpCont.text),
-                //                 minimumSalary: int.parse(_minSalaryCont.text),
-                //                 nationality: _selectedNationality,
-                //                 title: _titleCont.text,
-                //                 vaccancy: int.parse(_vaccancyCont.text),
-                //               );
-
-                //               // Navigator.push(context, AnimatedNavigation().slideAnimation(PreviewJob(jobData: job)));
-
-                //               // context
-                //               //     .read<JobPostBloc>()
-                //               //     .add(JobPostFormEvent(job: job));
-                //             }
-                //           },
-                //           text: "Post job",
-                //           buttonColor: buttonColor);
-                //     })
-                //   ],
-                // ),
               ),
             ),
           ),
@@ -776,7 +726,7 @@ class _JobPostFormState extends State<JobPostForm> {
                 selectedVariable: _selectedLocation,
                 list: _states,
                 hintText: "Select area...",
-                labelText: "Functional area",
+                labelText: "Select location",
                 onChanged: (String? newValue) {
                   setState(() {
                     _selectedLocation = newValue ?? "";
@@ -1111,6 +1061,4 @@ class _JobPostFormState extends State<JobPostForm> {
       ),
     );
   }
-
-
 }
