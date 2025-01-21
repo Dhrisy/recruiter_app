@@ -10,8 +10,7 @@ class CustomFunctions {
 
   Future<String?> retrieveCredentials(String key) async {
     final accessToken = await _secureStorage.read(
-        key: "access_token"); // Use await to read securely
-    print("isLoggedIn: ${accessToken != null},  $accessToken"); // Debugging log
+        key: key);
     return accessToken;
   }
 

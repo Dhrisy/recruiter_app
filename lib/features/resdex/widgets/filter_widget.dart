@@ -1,31 +1,24 @@
-import 'package:animations/animations.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/core/theme.dart';
 import 'package:recruiter_app/core/utils/country_lists.dart';
 import 'package:recruiter_app/core/utils/nationalities.dart';
-import 'package:recruiter_app/features/resdex/email_template_form.dart';
 import 'package:recruiter_app/features/resdex/provider/search_seeker_provider.dart';
-import 'package:recruiter_app/features/resdex/widgets/email_template_widget.dart';
-import 'package:recruiter_app/features/resdex/widgets/saved_searches.dart';
-import 'package:recruiter_app/features/resdex/widgets/search_cv_form_widget.dart';
 import 'package:recruiter_app/widgets/common_snackbar.dart';
-import 'package:recruiter_app/widgets/custom_fab_btn_widget.dart';
 import 'package:recruiter_app/widgets/reusable_textfield.dart';
 
-class Resedex extends StatefulWidget {
-  const Resedex({Key? key}) : super(key: key);
+class FilterWidget extends StatefulWidget {
+  const FilterWidget({ Key? key }) : super(key: key);
 
   @override
-  State<Resedex> createState() => _ResedexState();
+  _FilterWidgetState createState() => _FilterWidgetState();
 }
 
-class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
-  int currentScreenIndex = 0;
+class _FilterWidgetState extends State<FilterWidget> {
+  final _bottomSHeetFormKey = GlobalKey<FormState>();
   late AnimationController _controller;
   late Animation<double> _animation;
   List<String> selectedKeywords = [];
@@ -41,16 +34,11 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
   String maxSalary = '';
   bool addMoreFilter = false;
   bool isApplyFilter = false;
-
   final TextEditingController _keywordCont = TextEditingController();
   final TextEditingController _noticePeriodCont = TextEditingController();
   final TextEditingController _expYear = TextEditingController();
   final TextEditingController _expMonth = TextEditingController();
-
-  // bottomsheet form key
-  final _bottomSHeetFormKey = GlobalKey<FormState>();
-
-  final List<Map<String, dynamic>> experienceOptions = [
+   final List<Map<String, dynamic>> experienceOptions = [
     {'label': '0 - 1 Years', 'count': 162381, 'isChecked': false},
     {'label': '1 - 2 Years', 'count': 79676, 'isChecked': false},
     {'label': '2 - 5 Years', 'count': 292654, 'isChecked': false},
@@ -66,34 +54,7 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
     {'label': '150000 - 200000', 'isChecked': false},
     {'label': '200000+', 'isChecked': false},
   ];
-
-  void _addRows() {
-    setState(() {
-      experienceOptions.addAll([
-        {'label': '12 - 15 Years', 'count': 500000, 'isChecked': false},
-        {'label': '15 - 20 Years', 'count': 350000, 'isChecked': false},
-        {'label': '20 - 25 Years', 'count': 350000, 'isChecked': false},
-        {'label': '25 - 30 Years', 'count': 350000, 'isChecked': false},
-        {'label': '30+ Years', 'count': 350000, 'isChecked': false},
-      ]);
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 500),
-    );
-    _animation = CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeInOut,
-    );
-  }
-
-  // Helper method to extract min and max years from label
-  (int, int) _extractYearRange(String label) {
+   (int, int) _extractYearRange(String label) {
     if (label.contains('+')) {
       final number = int.parse(RegExp(r'\d+').firstMatch(label)!.group(0)!);
       return (number, number);
@@ -153,192 +114,18 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
     print(maxYears);
   }
 
-  // void _updateExperienceRange(
-  //     {required String minCont,
-  //     required String maxiCont,
-  //     required List<Map<String, dynamic>> lists}) {
-  //   List<Map<String, dynamic>> selectedOptions =
-  //       lists.where((option) => option['isChecked'] == true).toList();
-
-  //   if (selectedOptions.isEmpty) {
-  //     minCont = '';
-  //     maxiCont = '';
-  //     return;
-  //   }
-  //   print("bbbbbbbb $minCont,  $maxiCont");
-
-  //   int minYears = selectedOptions.map((option) {
-  //     final (min, _) = _extractYearRange(option['label']);
-  //     return min;
-  //   }).reduce((min, current) => min < current ? min : current);
-
-  //   int maxYears = selectedOptions.map((option) {
-  //     final (_, max) = _extractYearRange(option['label']);
-  //     return max;
-  //   }).reduce((max, current) => max > current ? max : current);
-
-  //   setState(() {
-  //     minExp = minYears.toString();
-  //     maxExp = maxYears.toString();
-  //   });
-  // }
-
-  // Method to handle checkbox state changes
-  void updateCheckboxState(
+    void updateCheckboxState(
       int index, bool? value, List<Map<String, dynamic>> lists) {
     setState(() {
       lists[index]['isChecked'] = value;
     });
   }
 
+
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height.h;
     final theme = Theme.of(context);
-    return Material(
-      child: Scaffold(
-        floatingActionButton: currentScreenIndex == 0
-            ? CustomFabBtnWidget(
-                heroTag: "filter_fab",
-                icon: Icons.filter_alt,
-                onPressed: () {
-                  _showAnimatedBottomSheet(theme: theme);
-                  // Provider.of<SearchSeekerProvider>(context, listen: false).searchSeeker(keyWords:[ "flutter"]);
-                },
-              )
-            : currentScreenIndex == 5
-                ? OpenContainer(
-                    transitionType: ContainerTransitionType.fade,
-                    transitionDuration: const Duration(milliseconds: 500),
-                    closedShape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50)),
-                    closedBuilder:
-                        (BuildContext context, VoidCallback openContainer) {
-                      return CustomFabBtnWidget(
-                          heroTag: "template_tab",
-                          onPressed: () {
-                            openContainer();
-                          });
-                    },
-                    openBuilder:
-                        (BuildContext context, VoidCallback closeContainer) {
-                      return EmailTemplateForm(
-                        isEdit: false,
-                      );
-                    },
-                  )
-                : const SizedBox.shrink(),
-        body: Stack(
-          children: [
-            SizedBox(
-              width: double.infinity,
-              height: screenHeight * 0.45,
-              child: SvgPicture.asset(
-                "assets/svgs/onboard_1.svg",
-                fit: BoxFit.cover,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    const SizedBox(
-                      height: 40,
-                    ),
-                    Row(
-                      children: [
-                        Text(
-                          "Resdex",
-                          style: theme.textTheme.titleLarge!.copyWith(
-                              fontWeight: FontWeight.bold, fontSize: 20.sp),
-                        )
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 25,
-                    ),
-                    Column(
-                      spacing: 15,
-                      children: [
-                        Row(
-                          spacing: 10.w,
-                          children: [
-                            Expanded(
-                                child: _buildOptionContainer(
-                                    title: "Search CV's", index: 0)),
-                            Expanded(
-                                child: _buildOptionContainer(
-                                    title: "Application Response", index: 1)),
-                            Expanded(
-                                child: _buildOptionContainer(
-                                    title: "Schedule Interview ", index: 2))
-                          ],
-                        ),
-                        Row(
-                          spacing: 10.w,
-                          children: [
-                            Expanded(
-                                child: _buildOptionContainer(
-                                    title: "Saved CV's", index: 3)),
-                            Expanded(
-                                child: _buildOptionContainer(
-                                    title: "Saved searches", index: 4)),
-                            Expanded(
-                                child: _buildOptionContainer(
-                                    title: "Email templates", index: 5))
-                          ],
-                        ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    Divider(
-                      height: 1,
-                    ),
-
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    //  serach cv form
-                    currentScreenIndex == 0
-                        ? SearchCvFormWidget()
-                        : SizedBox.shrink(),
-
-                    currentScreenIndex == 4
-                        ? SavedSearches()
-                        : const SizedBox.shrink(),
-
-                    currentScreenIndex == 5
-                        ? EmailTemplateWidget()
-                        : const SizedBox.shrink()
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  
-  void _showAnimatedBottomSheet({required ThemeData theme}) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      transitionAnimationController: _controller,
-      builder: (context) => StatefulBuilder(
-          builder: (BuildContext context, StateSetter setModalState) {
-        return SlideTransition(
-          transformHitTests: true,
-          position: Tween<Offset>(
-            begin: const Offset(0, 1),
-            end: Offset.zero,
-          ).animate(_animation),
-          child: Container(
+    return Container(
             // height: MediaQuery.of(context).size.height * 0.7,
             decoration: const BoxDecoration(
               color: Colors.white,
@@ -448,7 +235,7 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
                                               SizedBox(width: 4.w),
                                               GestureDetector(
                                                 onTap: () {
-                                                  setModalState(() {
+                                                  setState(() {
                                                     selectedKeywords
                                                         .remove(location);
                                                   });
@@ -512,7 +299,7 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
                                                   BorderRadius.circular(3.r)),
                                           value: option['isChecked'],
                                           onChanged: (value) {
-                                            setModalState(() {
+                                            setState(() {
                                               updateCheckboxState(
                                                   index, value, salaryOptions);
                                             });
@@ -675,7 +462,7 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
                                     hintText: "Select education",
                                     labelText: "Education",
                                     onChanged: (value) {
-                                      setModalState(() {
+                                      setState(() {
                                         _selectedEducation = value ?? '';
                                       });
                                     }),
@@ -698,7 +485,7 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
 
                     InkWell(
                         onTap: () {
-                          setModalState(() {
+                          setState(() {
                             addMoreFilter = !addMoreFilter;
                           });
                         },
@@ -765,7 +552,7 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
                                           maxiSalary: maxSalary,
                                           miniSalary: minSalary,
                                           nationality: _selectedNationality);
-                                  setModalState(() {
+                                  setState(() {
                                     isApplyFilter = true;
                                   });
                                   Navigator.pop(context);
@@ -782,7 +569,7 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
                                         listen: false)
                                     .fetchAllSeekersLists();
                                 Navigator.pop(context);
-                                setModalState(() {
+                                setState(() {
                                   isApplyFilter = false;
                                 });
                               },
@@ -800,18 +587,11 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
                 ),
               ),
             ),
-          ),
-        );
-      }),
-    ).then((_) {
-      // Reset the animation controller when bottom sheet is closed
-      _controller.reset();
-    });
-
-    // Start the animation
-    _controller.forward();
+          );
+      
   }
 
+  
   Widget _buildBottomsheetBtn({
     required String text,
     required ThemeData theme,
@@ -960,44 +740,4 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
     );
   }
 
-  Widget _buildOptionContainer({required String title, required int index}) {
-    return InkWell(
-      onTap: () {
-        setState(() {
-          currentScreenIndex = index;
-        });
-      },
-      child: Container(
-        height: 42.h,
-        decoration: BoxDecoration(
-            color: currentScreenIndex == index ? buttonColor : Colors.white,
-            border: Border.all(
-              color: currentScreenIndex == index
-                  ? Colors.transparent
-                  : secondaryColor,
-            ),
-            borderRadius: BorderRadius.circular(10.r)),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                  child: Text(
-                title,
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                    color: currentScreenIndex == index
-                        ? Colors.white
-                        : lightTextColor,
-                    fontWeight: currentScreenIndex == index
-                        ? FontWeight.bold
-                        : FontWeight.normal),
-              ))
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 }

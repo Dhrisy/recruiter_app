@@ -52,13 +52,6 @@ class _SeekerCardState extends State<SeekerCard>
         .animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
-  @override
-  void dispose() {
-    _controller
-        .dispose(); // Dispose the AnimationController before super.dispose()
-    super.dispose();
-  }
-
   void checkBookmarked() async {
     if (widget.seekerData.personalData != null) {
       Provider.of<SearchSeekerProvider>(context, listen: false).isSaved = false;
@@ -67,15 +60,14 @@ class _SeekerCardState extends State<SeekerCard>
           await Provider.of<SearchSeekerProvider>(context, listen: false)
               .isSeekerSaved(
                   widget.seekerData.personalData!.personal.id.toString());
-
-      // setState(() {
-      //   isSaved = res;
-      // });
       Provider.of<SearchSeekerProvider>(context, listen: false).isSaved = res;
     }
+  }
 
-
-    print("vvvvvvv ${Provider.of<SearchSeekerProvider>(context, listen: false).isSaved}");
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -88,7 +80,7 @@ class _SeekerCardState extends State<SeekerCard>
           decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(15.r),
-              boxShadow: [
+              boxShadow: const [
                 BoxShadow(
                     blurRadius: 5,
                     color: borderColor,

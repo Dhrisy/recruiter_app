@@ -19,6 +19,9 @@ class ApiLists {
  static String emailSentOtpEndPoint = "$baseUrl/user/send_email_otp";
  static String saveCandidateEndPoint = "$baseUrl/recruiter_actions/save_candidates";
  static String fetchSaveCandidateEndPoint = "$baseUrl/recruiter_actions/saved_candidates";
+ static String createEmailTemaplteEndPoint = "$baseUrl/recruiter_actions/create_template";
+ static String fetchEmailTemplated = "$baseUrl/recruiter_actions/email_templates";
+ static String updateEmailTemplated = "$baseUrl/recruiter_actions/update_template";
 
 
 

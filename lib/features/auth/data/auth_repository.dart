@@ -68,6 +68,7 @@ class AuthRepository {
 
       if (response.statusCode == 200) {
         if (responseData.containsKey("access")) {
+          CustomFunctions().storeCredentials("email", email);
           CustomFunctions()
               .storeCredentials("access_token", responseData["access"]);
           CustomFunctions()
@@ -201,4 +202,6 @@ class AuthRepository {
       return null;
     }
   }
+
+
 }

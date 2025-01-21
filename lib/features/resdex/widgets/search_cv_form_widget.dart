@@ -30,6 +30,9 @@ class _SearchCvFormWidgetState extends State<SearchCvFormWidget> {
       width: double.infinity,
       child:
           Consumer<SearchSeekerProvider>(builder: (context, provider, child) {
+        if (provider.error == "error") {
+          return const CommonErrorWidget();
+        }
         if (provider.isLoading == true) {
           return const ShimmerListLoading();
         } else if (provider.seekersLists != null &&

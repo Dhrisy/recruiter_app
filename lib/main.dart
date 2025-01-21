@@ -15,6 +15,7 @@ import 'package:recruiter_app/features/job_post/viewmodel.dart/search_job_provid
 import 'package:recruiter_app/features/navbar/view_model/navbar_viewmodel.dart';
 import 'package:recruiter_app/features/questionaires/bloc/questionaire_bloc.dart';
 import 'package:recruiter_app/features/questionaires/data/questionaire_repository.dart';
+import 'package:recruiter_app/features/resdex/provider/email_template_provider.dart';
 import 'package:recruiter_app/features/resdex/provider/search_seeker_provider.dart';
 import 'package:recruiter_app/features/responses/provider/seeker_provider.dart';
 import 'package:recruiter_app/features/splash_screen/splash_screen.dart';
@@ -86,7 +87,8 @@ class _MyAppState extends State<MyApp> {
           ChangeNotifierProvider(create: (context) => AccountProvider()),
           ChangeNotifierProvider(create: (context) => SearchSeekerProvider()),
           ChangeNotifierProvider(create: (context) => SearchJobProvider()),
-          ChangeNotifierProvider(create: (context) => SeekerProvider())
+          ChangeNotifierProvider(create: (context) => SeekerProvider()),
+          ChangeNotifierProvider(create: (context) => EmailTemplateProvider())
         ],
         child: MultiBlocProvider(
           providers: [

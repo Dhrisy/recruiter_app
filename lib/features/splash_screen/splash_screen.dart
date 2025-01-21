@@ -81,6 +81,10 @@ class _SplashScreenState extends State<SplashScreen>
   Future<bool> isLoggedIn() async {
  
     final token = await CustomFunctions().retrieveCredentials("access_token");
+    final _token = await CustomFunctions().retrieveCredentials("refresh_token");
+
+    print(token);
+    print("refresh $_token");
     
    if (token != null) {
       return true;

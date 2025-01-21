@@ -202,37 +202,12 @@ class _LoginScreenState extends State<LoginScreen> {
                               return null;
                             },
                           ),
-                          // ReusableTextfield(
-                          //   controller: _pwCont,
-                          //   labelText: "Password",
-                          //   validation: (_) {
-                          //     if (_pwCont.text.trim().isEmpty) {
-                          //       return "This field is required";
-                          //     } else if (_pwCont.text.length < 8) {
-                          //       return "Password must contain atleast 8 letters";
-                          //     }
-                          //     return null;
-                          //   },
-                          // ),
                           const SizedBox(
                             height: 15,
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              //  InkWell(
-                              //     onTap: () async {
-                              //     Navigator.push(context,
-                              //     AnimatedNavigation().slideAnimation(PhoneSignin()));
-                              //     },
-                              //     child: Text(
-                              //       "Use phone number",
-                              //       style: theme.textTheme.bodyMedium!
-                              //           .copyWith(color: buttonColor),
-                              //     )),
-                              //     const SizedBox(
-                              //       width: 15,
-                              //     ),
                               InkWell(
                                   onTap: () async {
                                     _pageController.nextPage(

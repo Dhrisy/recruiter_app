@@ -1,11 +1,24 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:recruiter_app/core/utils/custom_functions.dart';
+import 'package:recruiter_app/features/resdex/model/email_template_model.dart';
+import 'package:recruiter_app/features/resdex/provider/email_template_provider.dart';
+import 'package:recruiter_app/widgets/common_snackbar.dart';
+import 'package:recruiter_app/widgets/reusable_button.dart';
+import 'package:recruiter_app/widgets/reusable_textfield.dart';
 
 class EmailTemplateForm extends StatefulWidget {
   final Function(String, String, String, String)? onSubmit;
+  final EmailTemplateModel? emailTemplte;
+  final bool isEdit;
 
-  const EmailTemplateForm({Key? key, this.onSubmit}) : super(key: key);
+  const EmailTemplateForm(
+      {Key? key, this.onSubmit, this.emailTemplte, required this.isEdit})
+      : super(key: key);
 
   @override
   State<EmailTemplateForm> createState() => _EmailTemplateFormState();
@@ -31,52 +44,145 @@ class _EmailTemplateFormState extends State<EmailTemplateForm> {
   void initState() {
     super.initState();
     _quillController = QuillController.basic();
+    setEmail();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.emailTemplte != null) {
+        _templateNameController.text =
+            widget.emailTemplte!.templateName.toString();
+        _fromEmailController.text = widget.emailTemplte!.email.toString();
+        _subjectController.text = widget.emailTemplte!.subject.toString();
+        // final document = Document.fromJson(widget.emailTemplte!.body as List);
+        // _quillController = QuillController(
+        //   document: document,
+        //   selection: const TextSelection.collapsed(offset: 0),
+        // );
+         // Handle the body text
+          if (widget.emailTemplte!.body != null) {
+            try {
+              // First attempt: Try parsing as JSON string
+              final bodyData = jsonDecode(widget.emailTemplte!.body as String);
+              if (bodyData is List) {
+                final document = Document.fromJson(bodyData);
+                setState(() {
+                  _quillController = QuillController(
+                    document: document,
+                    selection: const TextSelection.collapsed(offset: 0),
+                  );
+                });
+              } else {
+                // If not a List, treat as plain text
+                _quillController.document.insert(0, widget.emailTemplte!.body as String);
+              }
+            } catch (e) {
+              // If JSON parsing fails, treat as plain text
+              _quillController.document.insert(0, widget.emailTemplte!.body as String);
+            }
+          }
+      }
+    });
+  }
+
+  void setEmail() async {
+    _fromEmailController.text =
+        await CustomFunctions().retrieveCredentials("email") ?? "N/A";
   }
 
   @override
   Widget build(BuildContext context) {
-    return Theme(
-      data: Theme.of(context).copyWith(
-        textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme),
-      ),
-      child: _buildBody(),
-    );
+    return _buildBody();
   }
 
   Widget _buildBody() {
     return Container(
-      color: const Color.fromARGB(255, 228, 228, 228),
+      color: Colors.white,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 25),
-        child: Form(
-          key: _formKey,
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(0),
-                  decoration: BoxDecoration(
-                    color: const Color.fromARGB(255, 228, 228, 228),
-                    borderRadius: const BorderRadius.only(
-                      bottomLeft: Radius.circular(20),
-                      bottomRight: Radius.circular(20),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
-                        spreadRadius: 1,
-                        blurRadius: 10,
-                        offset: const Offset(0, 1),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Form(
+              key: _formKey,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(0),
+                      decoration: BoxDecoration(
+                        // color: const Color.fromARGB(255, 228, 228, 228),
+                        borderRadius: const BorderRadius.only(
+                          bottomLeft: Radius.circular(20),
+                          bottomRight: Radius.circular(20),
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.1),
+                            spreadRadius: 1,
+                            blurRadius: 10,
+                            offset: const Offset(0, 1),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  child: _buildBasicFields(),
+                      child: _buildBasicFields(),
+                    ),
+                    const SizedBox(height: 20),
+                    _buildEditor(),
+                  ],
                 ),
-                const SizedBox(height: 20),
-                _buildEditor(),
-              ],
+              ),
             ),
-          ),
+            Consumer<EmailTemplateProvider>(
+                builder: (context, provider, child) {
+              return ReusableButton(
+                  isLoading: provider.isLoading,
+                  action: () async {
+                    if (_formKey.currentState!.validate()) {
+                      if (widget.isEdit == true && widget.emailTemplte != null) {
+                        final template = EmailTemplateModel(
+                            body: _quillController.document.toPlainText(),
+                            jobId: "28",
+                            subject: _subjectController.text,
+                            email: _fromEmailController.text,
+                            templateName: _templateNameController.text,
+                            id: widget.emailTemplte!.id
+                            );
+                        final result =
+                            await provider.updateTemaplte(template: template);
+
+                        if (result == "success") {
+                          Navigator.pop(context);
+                          CommonSnackbar.show(context,
+                              message: "Successfully saved the changes");
+                        } else {
+                          CommonSnackbar.show(context,
+                              message: result.toString());
+                        }
+                      } else {
+                        final template = EmailTemplateModel(
+                            body: _quillController.document.toPlainText(),
+                            jobId: "28",
+                            subject: _subjectController.text,
+                            email: _fromEmailController.text,
+                            templateName: _templateNameController.text);
+                        final result =
+                            await provider.createTemplate(template: template);
+
+                        if (result == "success") {
+                          Navigator.pop(context);
+                          CommonSnackbar.show(context,
+                              message: "Successfully created email template");
+                        } else {
+                          CommonSnackbar.show(context,
+                              message: result.toString());
+                        }
+                      }
+                    }
+                  },
+                  textColor: Colors.white,
+                  text: widget.isEdit ? "Save Template" : "Create Template",
+                  buttonColor: secondaryColor);
+            })
+          ],
         ),
       ),
     );
@@ -151,6 +257,7 @@ class _EmailTemplateFormState extends State<EmailTemplateForm> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Column(
+                      spacing: 16,
                       children: [
                         _buildInputField(
                           controller: _salaryController,
@@ -158,24 +265,15 @@ class _EmailTemplateFormState extends State<EmailTemplateForm> {
                           hint: 'Enter salary amount',
                           icon: Icons.attach_money,
                         ),
-                        const SizedBox(height: 16),
                         _buildInputField(
                           controller: _currencyController,
                           label: 'Currency',
                           hint: 'Enter currency (e.g., USD)',
                           icon: Icons.currency_exchange,
                         ),
-                        const SizedBox(height: 16),
-                        _buildInputField(
-                          controller: _periodicityController,
-                          label: 'Periodicity',
-                          hint: 'Enter periodicity (e.g., Annual)',
-                          icon: Icons.calendar_today,
-                        ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 16),
                 ],
               )
             : const SizedBox(),
@@ -185,6 +283,7 @@ class _EmailTemplateFormState extends State<EmailTemplateForm> {
 
   Widget _buildBasicFields() {
     return Column(
+      spacing: 16,
       children: [
         _buildInputField(
           controller: _templateNameController,
@@ -192,7 +291,6 @@ class _EmailTemplateFormState extends State<EmailTemplateForm> {
           hint: 'Enter template name',
           icon: Icons.description_outlined,
         ),
-        const SizedBox(height: 16),
         _buildInputField(
           controller: _fromEmailController,
           label: 'From Email',
@@ -200,16 +298,12 @@ class _EmailTemplateFormState extends State<EmailTemplateForm> {
           icon: Icons.email_outlined,
           isEmail: true,
         ),
-        const SizedBox(height: 16),
         _buildInputField(
           controller: _subjectController,
           label: 'Subject',
           hint: 'Enter email subject',
           icon: Icons.subject,
         ),
-        const SizedBox(height: 16),
-        _buildSalaryToggle(),
-        _buildSalaryFields(),
       ],
     );
   }
@@ -235,42 +329,20 @@ class _EmailTemplateFormState extends State<EmailTemplateForm> {
             ),
           ),
         ),
-        TextFormField(
+        ReusableTextfield(
+          float: FloatingLabelBehavior.never,
           controller: controller,
-          decoration: InputDecoration(
-            hintText: hint,
-            hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
-            prefixIcon:
-                Icon(icon, color: primaryColor.withOpacity(0.7), size: 20),
-            filled: true,
-            fillColor: backgroundColor,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: primaryColor, width: 1.5),
-            ),
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          ),
-          validator: (value) {
-            if (value?.isEmpty == true && !_showSalaryDetails) {
-              return '$label is required';
-            }
-            if (isEmail &&
-                value?.isNotEmpty == true &&
-                !_isValidEmail(value!)) {
-              return 'Please enter a valid email';
+          hintText: hint,
+          labelText: label,
+          validation: (_) {
+            if (controller.text.trim().isEmpty) {
+              return "This field is required";
             }
             return null;
           },
-        ),
+          keyBoardType:
+              isEmail ? TextInputType.emailAddress : TextInputType.text,
+        )
       ],
     );
   }
