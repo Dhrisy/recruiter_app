@@ -67,6 +67,7 @@ class RecruiterAppTheme {
       headlineMedium: AppTheme.headingText(lightTextColor),
       headlineLarge: AppTheme.headingLarge(lightTextColor),
       titleLarge: AppTheme.titleText(lightTextColor),
+      titleMedium: AppTheme.mediumTitleText(lightTextColor),
       bodyMedium: AppTheme.smallText(lightTextColor),
       bodyLarge: AppTheme.mediumTitleText(lightTextColor),
       bodySmall: AppTheme.smallText(lightTextColor)
@@ -87,6 +88,7 @@ class RecruiterAppTheme {
       headlineMedium: AppTheme.headingText(darkTextColor),
        headlineLarge: AppTheme.headingLarge(darkTextColor),
        titleLarge: AppTheme.titleText(darkTextColor),
+       titleMedium: AppTheme.mediumTitleText(darkTextColor),
       bodyMedium: AppTheme.smallText(darkTextColor),
       bodyLarge: AppTheme.mediumTitleText(darkTextColor),
       bodySmall: AppTheme.smallText(darkTextColor)

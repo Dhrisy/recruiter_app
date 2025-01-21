@@ -96,14 +96,20 @@ class User {
   final String? id;
   final String? name;
   final String? email;
+  final String? role;
+  final String? phoneNumber;
 
-  User({this.email, this.id, this.name});
+  User({this.email, this.id, this.name, this.phoneNumber, this.role});
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
         email: json["email"] ?? "N/A",
         id: json["id"].toString(),
-        name: json["name"] ?? "N/A");
+        name: json["name"] ?? "N/A",
+        role: json["role"] ?? "N/A",
+        phoneNumber: json["username"] ?? "N/A"
+        
+        );
   }
 }
 
@@ -125,6 +131,9 @@ class Personal {
   final List<dynamic>? preferedWorkLocations;
   final String? totalExperienceYears;
   final String? totalExperienceMonths;
+  final List<dynamic>? address;
+  final String? dob;
+  final bool? isDifferentlyAbled;
 
   Personal({
     this.id,
@@ -144,6 +153,9 @@ class Personal {
     this.state,
     this.totalExperienceMonths,
     this.totalExperienceYears,
+    this.address,
+    this.dob,
+    this.isDifferentlyAbled
   });
   factory Personal.fromJson(Map<String, dynamic> json) {
     return Personal(
@@ -151,6 +163,7 @@ class Personal {
         certificates: json["certificates"] ?? [],
         city: json["city"] ?? "N/A",
         cv: json["cv"],
+        dob: json["dob"] ?? "N/A",
         employed: json["employed"] ?? false,
         gender: json["gender"] ?? "N/A",
         introduction: json["intro"] ?? "N/A",
@@ -161,7 +174,9 @@ class Personal {
         profileImage: CustomFunctions.validateUrl(json["profile_image"] ?? ""),
         projects: json["projects"] ?? [],
         skills: json["skills"] ?? [],
+        address: json["address"] ?? [],
         state: json["state"] ?? "N/A",
+        isDifferentlyAbled: json["differently_abled"] ?? false,
         totalExperienceMonths: json["total_experience_years"].toString(),
         totalExperienceYears: json["total_experience_months"].toString());
   }

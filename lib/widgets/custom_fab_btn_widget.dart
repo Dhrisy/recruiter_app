@@ -4,8 +4,13 @@ import 'package:recruiter_app/core/constants.dart';
 class CustomFabBtnWidget extends StatefulWidget {
   final VoidCallback onPressed;
   final IconData? icon;
+  final String heroTag;
 
-  const CustomFabBtnWidget({Key? key, required this.onPressed, this.icon})
+  const CustomFabBtnWidget({Key? key, 
+  required this.onPressed, 
+  this.icon,
+  required this.heroTag
+  })
       : super(key: key);
 
   @override
@@ -39,6 +44,7 @@ class _CustomFabBtnWidgetState extends State<CustomFabBtnWidget> {
         ],
       ),
       child: FloatingActionButton(
+        heroTag: widget.heroTag,
         onPressed: widget.onPressed,
         backgroundColor: Colors.transparent,
         elevation: 0,

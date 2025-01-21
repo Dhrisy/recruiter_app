@@ -31,7 +31,7 @@ class AnimatedNavigation {
               return FadeTransition(opacity: fadeAnimation, child: child);
             },
             transitionDuration:
-                const Duration(milliseconds: 800), // Smoother transition
+                const Duration(milliseconds: 600), // Smoother transition
           );
   }
 

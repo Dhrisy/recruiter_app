@@ -9,7 +9,7 @@ class ReusableButton extends StatefulWidget {
   final double? height;
   final double? width;
   final String text;
-  final IconData? icon;
+  final Widget? iconWidget;
   final double? radius;
   final Color buttonColor;
   final Color? textColor;
@@ -20,7 +20,7 @@ class ReusableButton extends StatefulWidget {
       required this.action,
       this.height,
       required this.text,
-      this.icon,
+      this.iconWidget,
       this.width,
       this.radius,
       required this.buttonColor,
@@ -47,6 +47,7 @@ class _ReusableButtonState extends State<ReusableButton> {
             borderRadius: BorderRadius.circular(widget.radius ?? 15.r),
             gradient: LinearGradient(colors: [buttonColor, Color(0xffFF582B)])),
         child: Row(
+          spacing: 15,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             widget.isLoading == true
@@ -57,7 +58,10 @@ class _ReusableButtonState extends State<ReusableButton> {
                     widget.text,
                     style: AppTheme.bodyText(widget.textColor ?? lightTextColor)
                         .copyWith(fontSize: widget.textSize ?? mediumSmallFont),
-                  )
+                  ),
+
+                  widget.iconWidget != null
+                  ? widget.iconWidget! : const SizedBox.shrink()
           ],
         ),
       ),

@@ -10,7 +10,7 @@ import 'package:recruiter_app/core/utils/country_lists.dart';
 import 'package:recruiter_app/core/utils/nationalities.dart';
 import 'package:recruiter_app/features/resdex/email_template_widget.dart';
 import 'package:recruiter_app/features/resdex/provider/search_seeker_provider.dart';
-import 'package:recruiter_app/features/resdex/saved_searches.dart';
+import 'package:recruiter_app/features/resdex/widgets/saved_searches.dart';
 import 'package:recruiter_app/features/resdex/widgets/search_cv_form_widget.dart';
 import 'package:recruiter_app/widgets/common_snackbar.dart';
 import 'package:recruiter_app/widgets/custom_fab_btn_widget.dart';
@@ -198,6 +198,7 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
       child: Scaffold(
         floatingActionButton: currentScreenIndex == 0
             ? CustomFabBtnWidget(
+              heroTag: "filter_fab",
                 icon: Icons.filter_alt,
                 onPressed: () {
                   _showAnimatedBottomSheet(theme: theme);
@@ -212,7 +213,9 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
                         borderRadius: BorderRadius.circular(50)),
                     closedBuilder:
                         (BuildContext context, VoidCallback openContainer) {
-                      return CustomFabBtnWidget(onPressed: () {
+                      return CustomFabBtnWidget(
+                        heroTag: "template_tab",
+                        onPressed: () {
                         openContainer();
                       });
                     },

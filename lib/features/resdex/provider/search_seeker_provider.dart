@@ -14,6 +14,13 @@ class SearchSeekerProvider extends ChangeNotifier {
   bool isSerach = false;
   List<SeekerModel> bookmarkedSeekers = [];
 
+
+
+  void setSaved(bool val){
+    isSaved = val;
+    notifyListeners();
+  }
+
   // experience options
 
   Future<void> fetchAllSeekersLists() async {

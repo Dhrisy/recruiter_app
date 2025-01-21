@@ -54,21 +54,28 @@ class _SeekerCardState extends State<SeekerCard>
 
   @override
   void dispose() {
-    _controller.dispose(); // Dispose the AnimationController before super.dispose()
+    _controller
+        .dispose(); // Dispose the AnimationController before super.dispose()
     super.dispose();
   }
 
   void checkBookmarked() async {
     if (widget.seekerData.personalData != null) {
+      Provider.of<SearchSeekerProvider>(context, listen: false).isSaved = false;
+
       final res =
           await Provider.of<SearchSeekerProvider>(context, listen: false)
               .isSeekerSaved(
                   widget.seekerData.personalData!.personal.id.toString());
 
-      setState(() {
-        isSaved = res;
-      });
+      // setState(() {
+      //   isSaved = res;
+      // });
+      Provider.of<SearchSeekerProvider>(context, listen: false).isSaved = res;
     }
+
+
+    print("vvvvvvv ${Provider.of<SearchSeekerProvider>(context, listen: false).isSaved}");
   }
 
   @override
@@ -86,12 +93,14 @@ class _SeekerCardState extends State<SeekerCard>
                     blurRadius: 5,
                     color: borderColor,
                     offset: const Offset(-2, 1))
-              ]
-              ),
+              ]),
           child: InkWell(
             onTap: () {
               Navigator.push(
-                  context, AnimatedNavigation().fadeAnimation(SeekerDetails()));
+                  context,
+                  AnimatedNavigation().fadeAnimation(SeekerDetails(
+                    seekerData: widget.seekerData,
+                  )));
             },
             borderRadius: BorderRadius.circular(8),
             child: Padding(
@@ -140,9 +149,11 @@ class _SeekerCardState extends State<SeekerCard>
                                           ? Text(" - Fresher")
                                           : Text(
                                               " - ${CustomFunctions.toSentenceCase(widget.seekerData.personalData!.personal.introduction.toString())}",
-                                              style: theme.textTheme.bodyMedium!.copyWith(
-                    color: greyTextColor,
-                  ),),
+                                              style: theme.textTheme.bodyMedium!
+                                                  .copyWith(
+                                                color: greyTextColor,
+                                              ),
+                                            ),
                                     ],
                                   ),
                                 ),
@@ -164,15 +175,17 @@ class _SeekerCardState extends State<SeekerCard>
                                                   .toString());
 
                                           if (seekerSaved == true) {
-                                            setState(() {
-                                              isSaved = true;
-                                            });
+                                            provider.setSaved(true);
+                                            // setState(() {
+                                            //   isSaved = true;
+                                            // });
                                             CommonSnackbar.show(context,
                                                 message: "Saved ");
                                           } else if (seekerSaved == false) {
-                                            setState(() {
-                                              isSaved = false;
-                                            });
+                                            // setState(() {
+                                            //   isSaved = false;
+                                            // });
+                                            provider.setSaved(false);
                                             CommonSnackbar.show(context,
                                                 message: "Removed");
                                           } else {
@@ -182,7 +195,7 @@ class _SeekerCardState extends State<SeekerCard>
                                           }
                                         }
                                       },
-                                      child: isSaved == true
+                                      child: provider.isSaved == true
                                           ? ScaleTransition(
                                               scale: _iconAnimation,
                                               child: Icon(Icons.bookmark))
