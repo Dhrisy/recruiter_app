@@ -263,7 +263,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           }
                         },
                         text: "Sign in",
-                        buttonColor: buttonColor,
                         height: 40.h,
                         textColor: Colors.white,
                       ),
@@ -472,7 +471,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             text: state is ForgotPasswordSuccess
                                 ? "Confirm"
                                 : "Send OTP",
-                            buttonColor: buttonColor,
                             height: 40.h,
                             textColor: Colors.white,
                           ),
@@ -587,7 +585,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       }
                     },
                     text: "Done",
-                    buttonColor: buttonColor,
                     height: 40.h,
                     textColor: Colors.white,
                     isLoading: _isLoading,

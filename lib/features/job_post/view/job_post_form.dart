@@ -275,7 +275,7 @@ class _JobPostFormState extends State<JobPostForm> {
                                           });
                                         },
                                         text: "BACK",
-                                        buttonColor: buttonColor),
+                                      ),
                                   ),
                                 if (_currentStep > 0) const SizedBox(width: 16),
 
@@ -289,7 +289,7 @@ class _JobPostFormState extends State<JobPostForm> {
                                               getSteps(theme).length - 1
                                           ? 'NEXT'
                                           : 'FINISH',
-                                      buttonColor: buttonColor),
+                                    ),
                                 ),
 
                                 // ElevatedButton(

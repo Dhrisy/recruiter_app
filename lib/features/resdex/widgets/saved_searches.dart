@@ -39,10 +39,12 @@ Provider.of<SearchSeekerProvider>(context, listen: false).fetchSavedCandidatesLi
           }
 
           return Column(
-            children: List.generate(provider.bookmarkedSeekers.length, (index){
-              final seekerData = provider.bookmarkedSeekers[index];
-              return SeekerCard(seekerData: seekerData);
-            }),
+            // children: List.generate(provider.bookmarkedSeekers.length, (index){
+            //   final seekerData = provider.bookmarkedSeekers[index];
+            //   return SeekerCard(seekerData: seekerData,
+            //   isBookmarked:  false,
+            //   );
+            // }),
           );
         }
       ),

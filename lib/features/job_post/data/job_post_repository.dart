@@ -44,7 +44,7 @@ class JobPostRepository {
     try {
       // Attempt to fetch posted jobs
       var response = await JobsService.fetchPostedJobs();
-      log("Response of added jobs: ${response.statusCode}, ${response.body}");
+      print("Response of added jobs: ${response.statusCode}, ${response.body}");
 
       // Handle the success response
       if (response.statusCode == 200) {

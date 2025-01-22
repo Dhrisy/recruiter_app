@@ -62,7 +62,7 @@ class PlanCardWidget extends StatelessWidget {
                   text: "Buy now",
                   textColor: Colors.white,
                   textSize: 20.sp,
-                  buttonColor: buttonColor)
+              )
             ],
           ),
         ),

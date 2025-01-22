@@ -2,7 +2,7 @@ class EmailTemplateModel {
   final String? templateName;
   final String? subject;
   final String? body;
-  final String? jobId;
+  final int? jobId;
   final int? id;
   final String? createdOn;
   final String? email;
@@ -22,7 +22,7 @@ class EmailTemplateModel {
     return EmailTemplateModel(
       body: json["body"] ?? "N/A",
       subject: json["subject"] ?? "N/A",
-      jobId: json["job_id"] ?? "N/A",
+      jobId: json["job_id"],
       templateName: json["name"] ?? "N/A",
       createdOn: json["created_on"] ?? "",
       email: json["email"] ?? "N/A",

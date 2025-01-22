@@ -11,10 +11,11 @@ class ReusableButton extends StatefulWidget {
   final String text;
   final Widget? iconWidget;
   final double? radius;
-  final Color buttonColor;
+  final Color? buttonColor;
   final Color? textColor;
   final double? textSize;
   final bool? isLoading;
+  final Color? borderColor;
   const ReusableButton(
       {Key? key,
       required this.action,
@@ -23,9 +24,10 @@ class ReusableButton extends StatefulWidget {
       this.iconWidget,
       this.width,
       this.radius,
-      required this.buttonColor,
+       this.buttonColor,
       this.textSize,
       this.textColor,
+      this.borderColor,
       this.isLoading})
       : super(key: key);
 
@@ -43,9 +45,16 @@ class _ReusableButtonState extends State<ReusableButton> {
         height: widget.height ?? 45.h,
         width: widget.width ?? double.infinity,
         decoration: BoxDecoration(
-            color: widget.buttonColor,
+            color: widget.buttonColor ?? buttonColor,
+            border: Border.all(
+              color: widget.borderColor ?? Colors.transparent
+            ),
             borderRadius: BorderRadius.circular(widget.radius ?? 15.r),
-            gradient: LinearGradient(colors: [buttonColor, Color(0xffFF582B)])),
+
+            gradient: widget.buttonColor != null 
+            ? null
+            :   LinearGradient(colors: [buttonColor, Color(0xffFF582B)])
+            ),
         child: Row(
           spacing: 15,
           mainAxisAlignment: MainAxisAlignment.center,

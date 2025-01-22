@@ -310,7 +310,6 @@ class _RegisterState extends State<Register> {
                                 role: "recruiter",
                                 whatsappUpdations: _whatsapp_updations));
 
-                            print("rrrrrrrrrrrrrrrrrrrrrrr");
                           }
 
                           FocusScope.of(context).unfocus();
@@ -320,7 +319,6 @@ class _RegisterState extends State<Register> {
                         width: MediaQuery.of(context).size.width * 0.5.w,
                         height: 40.h,
                         textColor: Colors.white,
-                        buttonColor: buttonColor,
                         radius: 30.r,
                       ),
                       const SizedBox(

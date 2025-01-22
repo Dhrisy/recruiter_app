@@ -22,6 +22,7 @@ class ApiLists {
  static String createEmailTemaplteEndPoint = "$baseUrl/recruiter_actions/create_template";
  static String fetchEmailTemplated = "$baseUrl/recruiter_actions/email_templates";
  static String updateEmailTemplated = "$baseUrl/recruiter_actions/update_template";
+ static String deleteEmailTemplated = "$baseUrl/recruiter_actions/delete_template";
 
 
 

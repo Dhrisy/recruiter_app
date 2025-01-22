@@ -44,38 +44,42 @@ class EmailTemplateService {
   }
 
   static Future<http.Response> editEmailTemplate(
-    {required EmailTemplateModel template}) async {
-  final url = Uri.parse("${ApiLists.updateEmailTemplated}?id=${template.id}");
-  final accessToken =
-      await CustomFunctions().retrieveCredentials("access_token");
+      {required EmailTemplateModel template}) async {
+    final url = Uri.parse("${ApiLists.updateEmailTemplated}?id=${template.id}");
+    final accessToken =
+        await CustomFunctions().retrieveCredentials("access_token");
 
-  // Debug prints
-  print(template.templateName);
-  print(template.email);
-  print(template.id);
+    final response = await http.patch(
+      url,
+      body: jsonEncode({
+        "name": template.templateName,
+        "email": template.email,
+        "job": "22",
+        "subject": template.subject,
+        "body": template.body,
+      }),
+      headers: {
+        'Authorization': 'Bearer ${accessToken.toString()}',
+        'Content-Type': 'application/json',
+      },
+    );
 
-  
-  print(template.jobId);
-  print(template.body);
-  print(template.subject);
+    return response;
+  }
 
-  // Send the PATCH request
-  final response = await http.patch(
-    url,
-    body: jsonEncode({
-      "name": template.templateName,
-      "email": template.email,
-      "job": "22",
-      "subject": template.subject,
-      "body": template.body,
-    }),
-    headers: {
-      'Authorization': 'Bearer ${accessToken.toString()}',
-      'Content-Type': 'application/json',
-    },
-  );
+  static Future<http.Response> deleteEmailTemplate({required int id}) async {
+    final url = Uri.parse("${ApiLists.deleteEmailTemplated}?id=$id");
+    final accessToken =
+        await CustomFunctions().retrieveCredentials("access_token");
 
-  return response;
-}
+    final response = await http.delete(
+      url,
+      headers: {
+        'Authorization': 'Bearer ${accessToken.toString()}',
+        'Content-Type': 'application/json',
+      },
+    );
 
+    return response;
+  }
 }

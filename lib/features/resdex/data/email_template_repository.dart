@@ -12,6 +12,7 @@ class EmailTemplateRepository {
     try {
       final response =
           await EmailTemplateService.createEmailTemplate(template: template);
+          print("wwwwwwwwwwwwwwww ${response.statusCode},  ${response.body}");
 
       if (response.statusCode == 200) {
         return "success";
@@ -86,6 +87,32 @@ class EmailTemplateRepository {
     } catch (e) {
       print(e);
       return null;
+    }
+  }
+
+
+  Future<String?>  deleteEmailTemplate({
+    required int id,
+      int retryCount = 0,
+      int maxRetries = 3
+  }) async{
+    try {
+      final response = await EmailTemplateService.deleteEmailTemplate(id: id);
+      print("Response of delet template ${response.statusCode}, ${response.body}");
+      final Map<String, dynamic> responseData = jsonDecode(response.body);
+
+      if(response.statusCode == 200){
+        return "success";
+      }else if(response.statusCode == 401){
+        return deleteEmailTemplate(
+            id: id,
+            retryCount: retryCount + 1,
+            maxRetries: maxRetries);
+      }else{
+        return responseData["message"];
+      }
+    } catch (e) {
+      throw Exception(e);
     }
   }
 }

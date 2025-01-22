@@ -469,7 +469,7 @@ class _Questionaire1State extends State<Questionaire1> {
                 textSize: 16.sp,
                 textColor: Colors.white,
                 height: 40.h,
-                buttonColor: buttonColor),
+              ),
             const SizedBox(
               height: 35,
             ),
@@ -704,7 +704,7 @@ class _Questionaire1State extends State<Questionaire1> {
                     height: 40.h,
                     text: "Next",
                     textColor: Colors.white,
-                    buttonColor: buttonColor)
+                    )
               ],
             ),
           ),
@@ -846,7 +846,7 @@ class _Questionaire1State extends State<Questionaire1> {
                       height: 40.h,
                       text: widget.isEdit == true ? "Save changes" : "Save",
                       textColor: Colors.white,
-                      buttonColor: buttonColor);
+                      );
                 })
               ],
             ),

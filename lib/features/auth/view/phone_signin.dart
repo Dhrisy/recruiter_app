@@ -223,7 +223,6 @@ class _PhoneSigninState extends State<PhoneSignin> {
                             }
                           },
                           text: isPhn ? "Verify OTP" : "Send OTP",
-                          buttonColor: buttonColor,
                           height: 40.h,
                           textColor: Colors.white,
                         ),

@@ -1,12 +1,18 @@
 import 'dart:convert';
 
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_quill/flutter_quill.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/core/utils/custom_functions.dart';
+import 'package:recruiter_app/features/job_post/model/job_post_model.dart';
 import 'package:recruiter_app/features/resdex/model/email_template_model.dart';
 import 'package:recruiter_app/features/resdex/provider/email_template_provider.dart';
+import 'package:recruiter_app/viewmodels/job_viewmodel.dart';
 import 'package:recruiter_app/widgets/common_snackbar.dart';
 import 'package:recruiter_app/widgets/reusable_button.dart';
 import 'package:recruiter_app/widgets/reusable_textfield.dart';
@@ -34,6 +40,8 @@ class _EmailTemplateFormState extends State<EmailTemplateForm> {
   final _periodicityController = TextEditingController();
   late QuillController _quillController;
   bool _showSalaryDetails = false;
+  String selectedJob = '';
+  int? selectedJobId;
 
   /// const colors aayt replace
   final primaryColor = const Color(0xFFFF5722);
@@ -57,28 +65,30 @@ class _EmailTemplateFormState extends State<EmailTemplateForm> {
         //   document: document,
         //   selection: const TextSelection.collapsed(offset: 0),
         // );
-         // Handle the body text
-          if (widget.emailTemplte!.body != null) {
-            try {
-              // First attempt: Try parsing as JSON string
-              final bodyData = jsonDecode(widget.emailTemplte!.body as String);
-              if (bodyData is List) {
-                final document = Document.fromJson(bodyData);
-                setState(() {
-                  _quillController = QuillController(
-                    document: document,
-                    selection: const TextSelection.collapsed(offset: 0),
-                  );
-                });
-              } else {
-                // If not a List, treat as plain text
-                _quillController.document.insert(0, widget.emailTemplte!.body as String);
-              }
-            } catch (e) {
-              // If JSON parsing fails, treat as plain text
-              _quillController.document.insert(0, widget.emailTemplte!.body as String);
+        // Handle the body text
+        if (widget.emailTemplte!.body != null) {
+          try {
+            // First attempt: Try parsing as JSON string
+            final bodyData = jsonDecode(widget.emailTemplte!.body as String);
+            if (bodyData is List) {
+              final document = Document.fromJson(bodyData);
+              setState(() {
+                _quillController = QuillController(
+                  document: document,
+                  selection: const TextSelection.collapsed(offset: 0),
+                );
+              });
+            } else {
+              // If not a List, treat as plain text
+              _quillController.document
+                  .insert(0, widget.emailTemplte!.body as String);
             }
+          } catch (e) {
+            // If JSON parsing fails, treat as plain text
+            _quillController.document
+                .insert(0, widget.emailTemplte!.body as String);
           }
+        }
       }
     });
   }
@@ -90,26 +100,29 @@ class _EmailTemplateFormState extends State<EmailTemplateForm> {
 
   @override
   Widget build(BuildContext context) {
-    return _buildBody();
+    return Scaffold(
+      body: _buildBody(context),
+    );
   }
 
-  Widget _buildBody() {
+  Widget _buildBody(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
     return Container(
       color: Colors.white,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 25),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Form(
-              key: _formKey,
-              child: SingleChildScrollView(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            // spacing: screenSize.height * 0.05.h,
+            children: [
+              Form(
+                key: _formKey,
                 child: Column(
                   children: [
                     Container(
                       padding: const EdgeInsets.all(0),
                       decoration: BoxDecoration(
-                        // color: const Color.fromARGB(255, 228, 228, 228),
                         borderRadius: const BorderRadius.only(
                           bottomLeft: Radius.circular(20),
                           bottomRight: Radius.circular(20),
@@ -126,66 +139,166 @@ class _EmailTemplateFormState extends State<EmailTemplateForm> {
                       child: _buildBasicFields(),
                     ),
                     const SizedBox(height: 20),
+                    _buildSelectJob(),
+                    const SizedBox(height: 20),
                     _buildEditor(),
                   ],
                 ),
               ),
-            ),
-            Consumer<EmailTemplateProvider>(
-                builder: (context, provider, child) {
-              return ReusableButton(
-                  isLoading: provider.isLoading,
-                  action: () async {
-                    if (_formKey.currentState!.validate()) {
-                      if (widget.isEdit == true && widget.emailTemplte != null) {
-                        final template = EmailTemplateModel(
-                            body: _quillController.document.toPlainText(),
-                            jobId: "28",
-                            subject: _subjectController.text,
-                            email: _fromEmailController.text,
-                            templateName: _templateNameController.text,
-                            id: widget.emailTemplte!.id
-                            );
-                        final result =
-                            await provider.updateTemaplte(template: template);
+              Consumer<EmailTemplateProvider>(
+                  builder: (context, provider, child) {
+                return ReusableButton(
+                    isLoading: provider.isLoading,
+                    action: () async {
+                      if (_formKey.currentState!.validate()) {
+                        if (widget.isEdit == true &&
+                            widget.emailTemplte != null) {
+                          final template = EmailTemplateModel(
+                              body: _quillController.document.toPlainText(),
+                              jobId: widget.emailTemplte!.jobId,
+                              subject: _subjectController.text,
+                              email: _fromEmailController.text,
+                              templateName: _templateNameController.text,
+                              id: widget.emailTemplte!.id);
+                          final result =
+                              await provider.updateTemaplte(template: template);
 
-                        if (result == "success") {
-                          Navigator.pop(context);
-                          CommonSnackbar.show(context,
-                              message: "Successfully saved the changes");
+                          if (result == "success") {
+                            Navigator.pop(context);
+                            CommonSnackbar.show(context,
+                                message: "Successfully saved the changes");
+                          } else {
+                            CommonSnackbar.show(context,
+                                message: result.toString());
+                          }
                         } else {
-                          CommonSnackbar.show(context,
-                              message: result.toString());
-                        }
-                      } else {
-                        final template = EmailTemplateModel(
-                            body: _quillController.document.toPlainText(),
-                            jobId: "28",
-                            subject: _subjectController.text,
-                            email: _fromEmailController.text,
-                            templateName: _templateNameController.text);
-                        final result =
-                            await provider.createTemplate(template: template);
+                          final template = EmailTemplateModel(
+                              body: _quillController.document.toPlainText(),
+                              jobId: selectedJobId,
+                              subject: _subjectController.text,
+                              email: _fromEmailController.text,
+                              templateName: _templateNameController.text);
+                          final result =
+                              await provider.createTemplate(template: template);
 
-                        if (result == "success") {
-                          Navigator.pop(context);
-                          CommonSnackbar.show(context,
-                              message: "Successfully created email template");
-                        } else {
-                          CommonSnackbar.show(context,
-                              message: result.toString());
+                          if (result == "success") {
+                            Navigator.pop(context);
+                            CommonSnackbar.show(context,
+                                message: "Successfully created email template");
+                          } else {
+                            CommonSnackbar.show(context,
+                                message: result.toString());
+                          }
                         }
                       }
-                    }
-                  },
-                  textColor: Colors.white,
-                  text: widget.isEdit ? "Save Template" : "Create Template",
-                  buttonColor: secondaryColor);
-            })
-          ],
+                    },
+                    textColor: Colors.white,
+                    text: widget.isEdit ? "Save Template" : "Create Template",
+                    buttonColor: buttonColor);
+              })
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  Widget _buildSelectJob() {
+    return BlocConsumer<JobBloc, JobsState>(
+        listener: (context, state) {},
+        builder: (context, state) {
+          if (state is JobFetchFailure) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 15),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Failed to fetch jobs",
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyMedium!
+                        .copyWith(color: Colors.red),
+                  ),
+                ],
+              ),
+            );
+          }
+          if (state is JobFetchSuccess) {
+            List<String> _jobTitleLists =
+                state.jobs.map((job) => job.title ?? '').toList();
+
+            return Container(
+              constraints: BoxConstraints(
+                maxHeight: 55.h,
+              ),
+              child: DropdownSearch<String>(
+                validator: (_) {
+                  if (selectedJob == '') {
+                    return "This field is required";
+                  }
+                  return null;
+                },
+                decoratorProps: DropDownDecoratorProps(
+                  expands: false,
+                  decoration: InputDecoration(
+                    labelText: "Select job",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(color: borderColor),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(color: borderColor),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(color: borderColor),
+                    ),
+                  ),
+                ),
+                items: (filter, infiniteScrollProps) => _jobTitleLists,
+                selectedItem: selectedJob.isEmpty ? null : selectedJob,
+                onChanged: (selectedTitle) {
+                  if (selectedTitle != null) {
+                    final selectedJobModel = state.jobs.firstWhere(
+                      (job) => job.title == selectedTitle,
+                      orElse: () => JobPostModel(),
+                    );
+
+                    if (selectedJobModel.id != null) {
+                      setState(() {
+                        selectedJob = selectedTitle;
+                        // Store the job ID
+                        selectedJobId = selectedJobModel.id!;
+                      });
+
+                      print('Selected Job ID: $selectedJobId');
+                      print('Selected Job Title: $selectedTitle');
+                    }
+                  }
+                },
+                popupProps: PopupProps.menu(
+                  showSearchBox: true,
+                  searchFieldProps: TextFieldProps(
+                    decoration: InputDecoration(
+                      hintText: "Search job",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(color: borderColor),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(color: borderColor),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }
+          return Container(); // Return an empty container for other states
+        });
   }
 
   Widget _buildSalaryToggle() {

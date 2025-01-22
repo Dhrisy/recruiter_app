@@ -223,7 +223,6 @@ class _OtpScreenState extends State<OtpScreen> {
                           // });
                         },
                         text: "Confirm",
-                        buttonColor: buttonColor,
                         width: 200.w,
                         radius: 30.r,
                         textColor: Colors.white,

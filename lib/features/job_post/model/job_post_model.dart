@@ -20,6 +20,7 @@ class JobPostModel {
    List<dynamic>? skills;
    List<dynamic>? customQuestions;
    String? currency;
+   int? id;
 
 
 
@@ -50,7 +51,8 @@ class JobPostModel {
       this.customQuestions,
       this.requirements,
       this.skills,
-      this.currency
+      this.currency,
+      this.id
       });
 
     //    {
@@ -96,7 +98,8 @@ class JobPostModel {
       benefits: json["benefits"],
       skills: json["skills"],
       customQuestions: json["custon_qns"],
-      currency: json["currency"]
+      currency: json["currency"],
+      id: json["id"]
     );
   }
 

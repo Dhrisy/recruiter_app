@@ -3,10 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/core/utils/custom_functions.dart';
 import 'package:recruiter_app/features/resdex/email_template_form.dart';
 import 'package:recruiter_app/features/resdex/model/email_template_model.dart';
+import 'package:recruiter_app/features/resdex/provider/email_template_provider.dart';
+import 'package:recruiter_app/widgets/common_alertdialogue.dart';
+import 'package:recruiter_app/widgets/common_snackbar.dart';
+import 'package:recruiter_app/widgets/reusable_button.dart';
 
 class EmailTemplateCard extends StatelessWidget {
   final EmailTemplateModel template;
@@ -30,7 +35,7 @@ class EmailTemplateCard extends StatelessWidget {
           transitionType: ContainerTransitionType.fade,
           transitionDuration: const Duration(milliseconds: 500),
           closedShape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           closedBuilder: (BuildContext context, VoidCallback openContainer) {
             return AnimatedContainer(
               duration: 500.ms,
@@ -81,7 +86,11 @@ class EmailTemplateCard extends StatelessWidget {
                           ),
                         ),
                         InkWell(
-                          onTap: () {},
+                          onTap: () {
+                            CustomFunctions().shareContent(
+                                content: "${template.body}",
+                                subject: "${template.subject}");
+                          },
                           child: Icon(
                             Icons.share,
                             size: 18.sp,
@@ -89,7 +98,11 @@ class EmailTemplateCard extends StatelessWidget {
                           ),
                         ),
                         InkWell(
-                          onTap: () {},
+                          onTap: () async {
+                            if (template.id != null) {
+                              _showDeleteDialogue(context, id: template.id!);
+                            }
+                          },
                           child: Icon(
                             Icons.delete,
                             size: 18.sp,
@@ -107,9 +120,85 @@ class EmailTemplateCard extends StatelessWidget {
             return EmailTemplateForm(
               isEdit: true,
               emailTemplte: template,
-              
             );
           },
         ));
+  }
+
+  void _showDeleteDialogue(BuildContext context, {required int id}) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return CommonAlertDialog(
+              title: "Delete",
+              message: "Are you sure want to delete this template?",
+              cancelButtonText: "No",
+              confirmButtonText: "Yes",
+              height: 80.h,
+              titleColor: Colors.red,
+              onConfirm: () async {
+                final result = await Provider.of<EmailTemplateProvider>(context,
+                        listen: false)
+                    .deleteTemplate(id: template.id!);
+                if (result == "success") {
+                   Navigator.pop(context);
+                  CommonSnackbar.show(context,
+                      message: "Successfully deleted the template");
+                  Provider.of<EmailTemplateProvider>(context, listen: false)
+                      .fetchEmailTemplates();
+                } else {
+                   Navigator.pop(context);
+                  CommonSnackbar.show(context, message: result.toString());
+                }
+              },
+              onCancel: () {
+                Navigator.pop(context);
+              });
+          // return AlertDialog(
+          //   backgroundColor: Colors.white,
+          //   title: Row(
+          //     mainAxisAlignment: MainAxisAlignment.center,
+          //     children: [
+          //       Text(
+          //         "Delete",
+          //         style: Theme.of(context).textTheme.titleMedium!.copyWith(
+          //             color: Colors.red,
+          //             fontWeight: FontWeight.bold,
+          //             fontSize: 17.sp),
+          //       ),
+          //     ],
+          //   ),
+          //   content: AnimatedContainer(
+          //       duration: 500.ms,
+          //       height: 100.h,
+          //       decoration: const BoxDecoration(color: Colors.white),
+          //       child: Column(
+          //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //         children: [
+          //           Text("Are you sure want to delete this template?"),
+          //           Row(
+          //             spacing: 15,
+          //             children: [
+          //               Expanded(
+          //                 child: ReusableButton(
+          //                     height: 40,
+          //                     textColor: Colors.white,
+          //                     action: () {},
+          //                     text: "No",
+          //                     buttonColor: secondaryColor),
+          //               ),
+          //               Expanded(
+          //                   child: ReusableButton(
+          //                 height: 40,
+          //                 textColor: Colors.white,
+          //                 action: () {},
+          //                 text: "Yes",
+          //               ))
+          //             ],
+          //           )
+          //         ],
+          //       )),
+          // ).animate().fadeIn(duration: 200.ms).scale();
+        });
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:recruiter_app/services/api_lists.dart';
+import 'package:share_plus/share_plus.dart';
 
 class CustomFunctions {
   final _secureStorage = const FlutterSecureStorage();
@@ -9,26 +10,24 @@ class CustomFunctions {
   }
 
   Future<String?> retrieveCredentials(String key) async {
-    final accessToken = await _secureStorage.read(
-        key: key);
+    final accessToken = await _secureStorage.read(key: key);
     return accessToken;
   }
 
-   bool isValidEmail(String email) {
+  bool isValidEmail(String email) {
     final emailRegex =
         RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
     return emailRegex.hasMatch(email);
   }
 
-    static String toSentenceCase(String input) {
+  static String toSentenceCase(String input) {
     if (input.isEmpty) return input;
 
     // Convert first letter to uppercase and the rest to lowercase
     return input[0].toUpperCase() + input.substring(1).toLowerCase();
   }
 
-
-   static String? validateUrl(String? url) {
+  static String? validateUrl(String? url) {
     const String baseUrl = ApiLists.imageBaseUrl;
 
     if (url == null || url.isEmpty) {
@@ -50,5 +49,16 @@ class CustomFunctions {
       return null;
     }
     return null;
+  }
+
+  Future<void> shareContent({
+    required String content, 
+    required String subject
+    }) async {
+    try {
+      await Share.share(content, subject: subject);
+    } catch (e) {
+      print('Error sharing: $e');
+    }
   }
 }

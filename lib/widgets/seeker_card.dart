@@ -17,7 +17,12 @@ import 'package:recruiter_app/widgets/shimmer_widget.dart';
 class SeekerCard extends StatefulWidget {
   final SeekerModel seekerData;
   final Color? borderColor;
-  const SeekerCard({Key? key, required this.seekerData, this.borderColor})
+  final bool isBookmarked;
+  const SeekerCard({Key? key, 
+  required this.seekerData, 
+  this.borderColor,
+  required this.isBookmarked
+  })
       : super(key: key);
 
   @override
@@ -34,7 +39,7 @@ class _SeekerCardState extends State<SeekerCard>
   @override
   void initState() {
     super.initState();
-
+print("bbbbbbbbbbbbbbbbbbbbbb ${widget.isBookmarked}");
     _controller =
         AnimationController(vsync: this, duration: Duration(milliseconds: 500));
 

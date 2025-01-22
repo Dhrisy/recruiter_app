@@ -136,7 +136,6 @@ class Onboarding3 extends StatelessWidget {
                     width: 100.h,
                     height: 35.h,
                     radius: 30.r,
-                    buttonColor: buttonColor,
                     textColor: buttonTextColor,
                   ),
                 ),

@@ -248,7 +248,7 @@ class _SeekerDetailsState extends State<SeekerDetails>
                               ),
                               action: () {},
                               text: "Download Resume",
-                              buttonColor: buttonColor)
+                          )
                           .animate()
                           .fadeIn(duration: 800.ms)
                           .scale(),
