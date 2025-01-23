@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:lottie/lottie.dart';
 import 'package:recruiter_app/core/constants.dart';
 
@@ -8,13 +9,13 @@ class CommonErrorWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Container(
+    return SizedBox(
       // height: 100,
       width: double.infinity,
       child: Column(
         children: [
           Lottie.asset(
-              'assets/images/error_animation.json', // Replace with your URL
+              'assets/images/error_animation.json',
               fit: BoxFit.cover,
               width: 100),
           Text(
@@ -28,6 +29,6 @@ class CommonErrorWidget extends StatelessWidget {
           )
         ],
       ),
-    );
+    ).animate().fadeIn(duration: 500.ms).scale();
   }
 }

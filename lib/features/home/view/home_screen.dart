@@ -1,6 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -130,16 +131,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       height: 10,
                     ),
                     JobCreditMeter(),
-                     const SizedBox(
+                    const SizedBox(
                       height: 10,
                     ),
                     RecentlyAddedJobsLists(),
-
                     SizedBox(
                       height: 100,
                     )
-
-
                   ],
                 ),
               )
@@ -164,7 +162,7 @@ class _HomeScreenState extends State<HomeScreen> {
           color: color, borderRadius: BorderRadius.circular(20.r)),
       child: _buildCountColumn(
           count: count, title: title, subtitle: subtitle, theme: theme),
-    );
+    ).animate().fadeIn(duration: 500.ms).scale();
   }
 
   Widget _buildCountColumn({
@@ -218,8 +216,8 @@ class _HomeScreenState extends State<HomeScreen> {
               Row(
                 children: [
                   CircleAvatar(
-                    radius: 30.r,
-                  ),
+                    radius: 25.r,
+                  ).animate().fadeIn(duration: 500.ms).scale(),
                   const SizedBox(
                     width: 20,
                   ),
@@ -230,12 +228,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         "Hello ",
                         style: theme.textTheme.bodyLarge!.copyWith(
                             color: Colors.white, fontWeight: FontWeight.bold),
-                      ),
+                      ).animate().fadeIn(duration: 500.ms).scale(),
                       Text(
                         "Good morning...!",
                         style: theme.textTheme.bodyMedium!
                             .copyWith(color: Colors.white),
-                      ),
+                      ).animate().fadeIn(duration: 600.ms).scale(),
                     ],
                   ),
                 ],
@@ -244,32 +242,19 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   InkWell(
                       onTap: () async {
-                        final _storage =
-                            FlutterSecureStorage(); // Remove 'await' from the constructor
-                        await _storage.deleteAll();
-                        await _storage.write(key: "user", value: "installed");
-
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          AnimatedNavigation().slideAnimation(SplashScreen()),
-                          (Route<dynamic> route) => false,
-                        );
+                       
                       },
                       child: Icon(
                         Icons.logout,
                         color: Colors.white,
                       )),
-                  Icon(
-                    Icons.bookmark,
-                    color: Colors.white,
-                  ),
                   const SizedBox(
                     width: 15,
                   ),
                   SizedBox(
                       child: SvgPicture.asset(
                     "assets/svgs/notification_icon.svg",
-                  ))
+                  )).animate().fadeIn(duration: 500.ms).scale()
                 ],
               )
             ],
@@ -318,7 +303,7 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         CarouselSlider(
           carouselController: _carouselController,
-          items: [
+          items: const [
             BannerWidget(),
             BannerWidget(),
             BannerWidget(),
@@ -350,13 +335,10 @@ class _HomeScreenState extends State<HomeScreen> {
             dotWidth: 15.w,
           ),
           onDotClicked: (index) {
-            _carouselController.animateToPage(index); // Jump to selected dot
+            _carouselController.animateToPage(index); 
           },
         ),
       ],
-    );
+    ).animate().fadeIn(duration: 500.ms).slideX(begin: -0.5, end: 0);
   }
-
-
-
 }

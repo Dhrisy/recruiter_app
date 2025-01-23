@@ -58,4 +58,22 @@ class SeekerService {
 
     return response;
   }
+
+  // fetch invited candidates
+  static Future<http.Response> fetchInvitedCandidates() async {
+    final url = Uri.parse(ApiLists.candidateInvitedEndpoint);
+
+    final accessToken =
+        await CustomFunctions().retrieveCredentials("access_token");
+
+    final response = await http.get(url, headers: {
+      'Authorization': 'Bearer ${accessToken.toString()}',
+      'Content-Type': 'application/json',
+    });
+
+    return response;
+  }
+
+
+  
 }

@@ -8,15 +8,15 @@ import 'package:recruiter_app/widgets/common_error_widget.dart';
 import 'package:recruiter_app/widgets/seeker_card.dart';
 import 'package:recruiter_app/widgets/shimmer_list_loading.dart';
 
-class SavedSearches extends StatefulWidget {
+class CandidateInvited extends StatefulWidget {
   
-  const SavedSearches({ Key? key }) : super(key: key);
+  const CandidateInvited({ Key? key }) : super(key: key);
 
   @override
-  _SavedSearchesState createState() => _SavedSearchesState();
+  _CandidateInvitedState createState() => _CandidateInvitedState();
 }
 
-class _SavedSearchesState extends State<SavedSearches> {
+class _CandidateInvitedState extends State<CandidateInvited> {
 
 
   bool _isLoading = true;
@@ -30,10 +30,10 @@ class _SavedSearchesState extends State<SavedSearches> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<SearchSeekerProvider>(context, listen: false)
-          .fetchSavedCandidatesLists().then((_){
+          .fetchInvitedCandidates().then((_){
             setState(() {
               _isLoading = false;
-_seekerLists = Provider.of<SearchSeekerProvider>(context, listen: false).bookMarkedLists;
+_seekerLists = Provider.of<SearchSeekerProvider>(context, listen: false).lists;
             });
           });
     });
@@ -44,7 +44,7 @@ _seekerLists = Provider.of<SearchSeekerProvider>(context, listen: false).bookMar
     return Column(
       spacing: 20,
       children: [
-        Text("View and manage the candidates you’ve saved for future reference. Easily access their profiles and keep track of potential prospects",
+        Text("Manage and track the candidates you’ve invited. Review their details, status, and take necessary actions to move forward",
         style: Theme.of(context).textTheme.bodyMedium!.copyWith(
           color: greyTextColor
         ),

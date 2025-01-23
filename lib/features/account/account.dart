@@ -9,6 +9,7 @@ import 'package:recruiter_app/features/account/account_provider.dart';
 import 'package:recruiter_app/features/account/account_shimmer_widget.dart';
 import 'package:recruiter_app/features/faqs/faq.dart';
 import 'package:recruiter_app/features/questionaires/view/questionaire1.dart';
+import 'package:recruiter_app/features/settings/settings.dart';
 import 'package:recruiter_app/widgets/common_appbar_widget.dart';
 import 'package:recruiter_app/widgets/common_error_widget.dart';
 import 'package:sliver_snap/widgets/sliver_snap.dart';
@@ -187,7 +188,7 @@ class _AccountState extends State<Account> with SingleTickerProviderStateMixin{
                           ),
                           InkWell(
                             onTap: (){
-                              Navigator.push(context, AnimatedNavigation().slideAnimation(FAQScreen()));
+                              Navigator.push(context, AnimatedNavigation().fadeAnimation(SettingsScreen()));
                             },
                             child: SizedBox(
                               child: Icon(Icons.settings),

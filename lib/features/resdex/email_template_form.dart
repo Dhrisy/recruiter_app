@@ -38,6 +38,7 @@ class _EmailTemplateFormState extends State<EmailTemplateForm> {
   final _salaryController = TextEditingController();
   final _currencyController = TextEditingController();
   final _periodicityController = TextEditingController();
+  final _jobNameCont = TextEditingController();
   late QuillController _quillController;
   bool _showSalaryDetails = false;
   String selectedJob = '';
@@ -60,15 +61,13 @@ class _EmailTemplateFormState extends State<EmailTemplateForm> {
             widget.emailTemplte!.templateName.toString();
         _fromEmailController.text = widget.emailTemplte!.email.toString();
         _subjectController.text = widget.emailTemplte!.subject.toString();
-        // final document = Document.fromJson(widget.emailTemplte!.body as List);
-        // _quillController = QuillController(
-        //   document: document,
-        //   selection: const TextSelection.collapsed(offset: 0),
-        // );
-        // Handle the body text
+
+        setState(() {
+          selectedJobId = widget.emailTemplte!.jobId;
+        });
+
         if (widget.emailTemplte!.body != null) {
           try {
-            // First attempt: Try parsing as JSON string
             final bodyData = jsonDecode(widget.emailTemplte!.body as String);
             if (bodyData is List) {
               final document = Document.fromJson(bodyData);
@@ -79,7 +78,6 @@ class _EmailTemplateFormState extends State<EmailTemplateForm> {
                 );
               });
             } else {
-              // If not a List, treat as plain text
               _quillController.document
                   .insert(0, widget.emailTemplte!.body as String);
             }
@@ -139,7 +137,35 @@ class _EmailTemplateFormState extends State<EmailTemplateForm> {
                       child: _buildBasicFields(),
                     ),
                     const SizedBox(height: 20),
-                    _buildSelectJob(),
+                    widget.isEdit == true
+                        ? BlocConsumer<JobBloc, JobsState>(
+                            listener: (context, state) {},
+                            builder: (context, state) {
+                              if (state is JobFetchSuccess) {
+                                List<JobPostModel> jobs = state.jobs;
+                                if (widget.isEdit &&
+                                    widget.emailTemplte != null) {
+                                  final selectedJobModel =
+                                      state.jobs.firstWhere(
+                                    (job) {
+                                      return job.id == selectedJobId;
+                                    },
+                                    orElse: () => JobPostModel(),
+                                  );
+                                  if (selectedJobModel.title != null) {
+                                    selectedJob = selectedJobModel.title!;
+                                  }
+                                }
+
+                                return ReusableTextfield(
+                                    labelText: "Job",
+                                    controller: TextEditingController(
+                                        text: selectedJob));
+                              }
+                              return ReusableTextfield(
+                                  controller: TextEditingController());
+                            })
+                        : _buildSelectJob(),
                     const SizedBox(height: 20),
                     _buildEditor(),
                   ],
@@ -165,6 +191,7 @@ class _EmailTemplateFormState extends State<EmailTemplateForm> {
 
                           if (result == "success") {
                             Navigator.pop(context);
+                            provider.fetchEmailTemplates();
                             CommonSnackbar.show(context,
                                 message: "Successfully saved the changes");
                           } else {
@@ -260,6 +287,7 @@ class _EmailTemplateFormState extends State<EmailTemplateForm> {
                 items: (filter, infiniteScrollProps) => _jobTitleLists,
                 selectedItem: selectedJob.isEmpty ? null : selectedJob,
                 onChanged: (selectedTitle) {
+                  print(widget.isEdit);
                   if (selectedTitle != null) {
                     final selectedJobModel = state.jobs.firstWhere(
                       (job) => job.title == selectedTitle,
@@ -269,13 +297,11 @@ class _EmailTemplateFormState extends State<EmailTemplateForm> {
                     if (selectedJobModel.id != null) {
                       setState(() {
                         selectedJob = selectedTitle;
-                        // Store the job ID
                         selectedJobId = selectedJobModel.id!;
                       });
-
-                      print('Selected Job ID: $selectedJobId');
-                      print('Selected Job Title: $selectedTitle');
                     }
+
+                    FocusScope.of(context).unfocus();
                   }
                 },
                 popupProps: PopupProps.menu(

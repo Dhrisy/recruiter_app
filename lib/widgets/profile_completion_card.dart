@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:recruiter_app/core/constants.dart';
@@ -76,7 +77,7 @@ class ProfileCompletionCard extends StatelessWidget {
             ],
           ),
         ),
-      ),
+      ).animate().fadeIn(duration: 500.ms).slideY(begin: 0.3, end: 0),
     );
   }
 }

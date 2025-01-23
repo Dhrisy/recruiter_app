@@ -60,7 +60,12 @@ class CommonAppbarWidget extends StatelessWidget {
             ),
             icon != null ? InkWell(
               onTap: action ?? (){},
-              child: Icon(icon)) : const SizedBox.shrink()
+              child: Icon(icon) .animate()
+                        .fadeIn(
+                            begin: 0.0,
+                            curve: Curves.easeInOut,
+                            duration: Duration(milliseconds: 800))
+                        .scale()) : const SizedBox.shrink()
           ],
         ),
       ),

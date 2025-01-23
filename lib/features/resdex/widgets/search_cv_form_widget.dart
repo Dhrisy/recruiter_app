@@ -5,6 +5,8 @@ import 'package:recruiter_app/features/resdex/model/seeker_model.dart';
 import 'package:recruiter_app/features/resdex/provider/search_seeker_provider.dart';
 import 'package:recruiter_app/widgets/common_empty_list.dart';
 import 'package:recruiter_app/widgets/common_error_widget.dart';
+import 'package:recruiter_app/widgets/common_nodatafound_widget.dart';
+import 'package:recruiter_app/widgets/common_search_widget.dart';
 import 'package:recruiter_app/widgets/seeker_card.dart';
 import 'package:recruiter_app/widgets/shimmer_list_loading.dart';
 
@@ -16,64 +18,101 @@ class SearchCvFormWidget extends StatefulWidget {
 }
 
 class _SearchCvFormWidgetState extends State<SearchCvFormWidget> {
+  Future<List<SeekerModel>?>? _seekerLists;
+  bool _isLoading = true;
+
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      
       Provider.of<SearchSeekerProvider>(context, listen: false)
-          .fetchAllSeekersLists();
+          .fetchAllSeekersLists()
+          .then((_) async {
+            setState(() {
+               _isLoading = false;
+            });
+
+        Provider.of<SearchSeekerProvider>(context, listen: false)
+            .initializeBookmarkedStates();
+
+       
+
+        setState(() {
+         
+          _seekerLists =
+              Provider.of<SearchSeekerProvider>(context, listen: false).lists;
+        });
+      });
     });
-  }
-
-
-   Future<bool> checkBookmarked({required SeekerModel seekerData}) async {
-    if (seekerData.personalData != null) {
-      final provider = Provider.of<SearchSeekerProvider>(context, listen: false);
-      final result = await provider.isSeekerSaved(
-        seekerData.personalData!.personal.id.toString(),
-        
-      );
-
-     return result; 
-    }else{
-      return false;
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child:
-          Consumer<SearchSeekerProvider>(builder: (context, provider, child) {
-        if (provider.error == "error") {
-          return const CommonErrorWidget();
-        }
-        if (provider.isLoading == true) {
-          return const ShimmerListLoading();
-        } else if (provider.seekersLists != null &&
-            provider.seekersLists!.isEmpty &&
-            provider.isLoading == false) {
-          return const CommonEmptyList(
-            text: "The lists of seekers are currently empty",
-          );
-        } else if (provider.seekersLists!.isNotEmpty) {
-          return Column(
-            children: List.generate(provider.seekersLists!.length, (index) {
-              final seekerData = provider.seekersLists![index];
-              final borderColor = index.isEven ? buttonColor : secondaryColor;
+    return Consumer<SearchSeekerProvider>(builder: (context, provider, child) {
+      return SizedBox(
+        width: double.infinity,
+        child: Column(
+          spacing: 15,
+          children: [
+            Text(
+              "Browse through the list of candidates and manage their details efficiently. Use filters to narrow down your search and find the right candidate quickly.",
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyMedium!
+                  .copyWith(color: greyTextColor),
+            ),
+            // provider.searchResultEmpty == false
+            // ?  CommonSearchWidget(onChanged: (_){
+            //   provider.searchSeeker(keyWords: [],
+            //   );
+            // })
+            // : const SizedBox.shrink(),
+            Column(
+              children: [
+                // if (_isLoading) ShimmerListLoading(),
+                FutureBuilder<List<SeekerModel>?>(
+                    future: provider.lists,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return ShimmerListLoading();
+                      } else if (snapshot.hasError || snapshot.data == null) {
+                        return CommonErrorWidget();
+                      } else if (provider.searchResultEmpty == true &&
+                          snapshot.data!.isEmpty) {
+                        return CommonNodatafoundWidget();
+                      } else if (snapshot.hasData && snapshot.data!.isEmpty) {
+                        return CommonEmptyList();
+                      } else {
+                        return Column(
+                          spacing: 10,
+                          children:
+                              List.generate(snapshot.data!.length, (index) {
+                            final seekerData = snapshot.data![index];
+                            final borderColor =
+                                index.isEven ? buttonColor : secondaryColor;
+                            final isBookmarked = provider.bookmarkedStates[
+                                    seekerData.personalData?.personal.id
+                                        .toString()] ??
+                                false;
 
-              return SeekerCard(
-                isBookmarked: false,
-                seekerData: seekerData,
-                borderColor: borderColor,
-              );
-            }),
-          );
-        } else {
-          return const CommonErrorWidget();
-        }
-      }),
-    );
+                            return SeekerCard(
+                              isBookmarked: isBookmarked,
+                              seekerData: seekerData,
+                              borderColor: borderColor,
+                              onBookmarkToggle: () {
+                                provider.toggleBookmark(seekerData);
+                              },
+                            );
+                          }),
+                        );
+                      }
+                    }),
+              ],
+            ),
+          ],
+        ),
+      );
+    });
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:recruiter_app/core/constants.dart';
 
@@ -56,7 +57,7 @@ class JobCreditMeter extends StatelessWidget {
               ],
             ),
           ),
-        )
+        ).animate().fadeIn(duration: 500.ms).slideY(begin: 0.3, end: 0)
       ],
     );
   }
@@ -76,6 +77,6 @@ class JobCreditMeter extends StatelessWidget {
         ),
         Text("Remaining: 35")
       ],
-    );
+    ).animate().fadeIn(duration: 500.ms).scale();
   }
 }

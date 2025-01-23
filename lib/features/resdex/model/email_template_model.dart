@@ -22,7 +22,7 @@ class EmailTemplateModel {
     return EmailTemplateModel(
       body: json["body"] ?? "N/A",
       subject: json["subject"] ?? "N/A",
-      jobId: json["job_id"],
+      jobId: json["job"],
       templateName: json["name"] ?? "N/A",
       createdOn: json["created_on"] ?? "",
       email: json["email"] ?? "N/A",

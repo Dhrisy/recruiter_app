@@ -106,9 +106,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
+import 'package:recruiter_app/features/resdex/model/seeker_model.dart';
+import 'package:recruiter_app/features/resdex/provider/search_seeker_provider.dart';
 import 'package:recruiter_app/features/responses/provider/seeker_provider.dart';
 import 'package:recruiter_app/widgets/common_appbar_widget.dart';
+import 'package:recruiter_app/widgets/common_empty_list.dart';
+import 'package:recruiter_app/widgets/common_error_widget.dart';
 import 'package:recruiter_app/widgets/common_search_widget.dart';
+import 'package:recruiter_app/widgets/seeker_card.dart';
+import 'package:recruiter_app/widgets/shimmer_list_loading.dart';
 
 class Response extends StatefulWidget {
   const Response({Key? key}) : super(key: key);
@@ -125,7 +131,9 @@ class _ResponseState extends State<Response>
   late Animation<Offset> _animation;
   late Animation<Offset> _searchBarAnimation;
   late Animation<Offset> _listsAnimation;
-  late Animation<Offset>  _listItemAnimation;
+  late Animation<Offset> _listItemAnimation;
+  bool _isLoading = true;
+  Future<List<SeekerModel>?>? _seekerLists;
 
   @override
   void initState() {
@@ -138,33 +146,32 @@ class _ResponseState extends State<Response>
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<SeekerProvider>(context, listen: false)
-          .fetchAllAppliedSeekers();
+          .fetchAllAppliedSeekers()
+          .then((_) {
+        setState(() {
+          _isLoading = false;
+          _seekerLists =
+              Provider.of<SeekerProvider>(context, listen: false).seekerLists;
+        });
+      });
     });
 
     _animation = Tween<Offset>(begin: const Offset(-0.1, 0), end: Offset.zero)
         .animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
-        _searchBarAnimation = Tween<Offset>(
-          begin: const Offset(-0.1, 0),
-          end: Offset.zero
-          ).animate(CurvedAnimation(parent: _controller, 
-          curve: Curves.easeInOut));
+    _searchBarAnimation = Tween<Offset>(
+            begin: const Offset(-0.1, 0), end: Offset.zero)
+        .animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
-           _listItemAnimation = Tween<Offset>(
-          begin: const Offset(-0.1, 0),
-          end: Offset.zero
-          ).animate(CurvedAnimation(parent: _controller, 
-          curve: Curves.easeInOut));
+    _listItemAnimation = Tween<Offset>(
+            begin: const Offset(-0.1, 0), end: Offset.zero)
+        .animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
+    _listsAnimation = Tween<Offset>(
+            begin: const Offset(0, 0.2), end: Offset.zero)
+        .animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
-
-          _listsAnimation = Tween<Offset>(
-            begin: const Offset(0, 0.2),
-            end: Offset.zero
-          ).animate(CurvedAnimation(parent: _controller, 
-          curve: Curves.easeInOut));
-
-        _controller.forward();
+    _controller.forward();
   }
 
   @override
@@ -231,9 +238,9 @@ class _ResponseState extends State<Response>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                   SlideTransition(
-                    position: _animation,
-                    child: CommonAppbarWidget(title: "Responses")),
+                  SlideTransition(
+                      position: _animation,
+                      child: CommonAppbarWidget(title: "Responses")),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15),
                     child: Column(
@@ -241,9 +248,10 @@ class _ResponseState extends State<Response>
                       children: [
                         const SizedBox(height: 15),
                         SlideTransition(
-                          position: _searchBarAnimation,
-                          child: CommonSearchWidget(onChanged: (_) {})),
+                            position: _searchBarAnimation,
+                            child: CommonSearchWidget(onChanged: (_) {})),
                         const SizedBox(height: 15),
+                        if (_isLoading == true) ShimmerListLoading(),
                         SizedBox(
                           height: MediaQuery.of(context).size.height - 200,
                           child: NotificationListener<ScrollNotification>(
@@ -251,28 +259,65 @@ class _ResponseState extends State<Response>
                               _updateItemVisibility(notification);
                               return true;
                             },
-                            child: SlideTransition(
-                              position: _listsAnimation,
-                              child: ListView.builder(
-                                controller: _scrollController,
-                                itemCount: 30,
-                                itemBuilder: (context, index) {
-                                  final visibility = _itemVisibility[index];
-                                  final scale = 0.85 + (0.15 * visibility);
-                                  final opacity = 0.6 + (0.4 * visibility);
-                              
-                                  return AnimatedScale(
-                                    scale: scale,
-                                    duration: const Duration(milliseconds: 200),
-                                    child: AnimatedOpacity(
-                                      opacity: opacity,
-                                      duration: const Duration(milliseconds: 200),
-                                      child: sizeIt(context, index),
-                                    ),
+                            child: FutureBuilder<List<SeekerModel>?>(
+                                future: _seekerLists,
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return ShimmerListLoading();
+                                  }
+
+                                  if (snapshot.hasError ||
+                                      snapshot.data == null) {
+                                    return CommonErrorWidget();
+                                  }
+
+                                  if (snapshot.hasData &&
+                                      snapshot.data!.isEmpty) {
+                                    return CommonEmptyList();
+                                  }
+
+                                  return ListView.builder(
+                                    controller: _scrollController,
+                                    itemCount: snapshot.data!.length,
+                                    itemBuilder: (context, index) {
+                                      final visibility = _itemVisibility[index];
+                                      final scale = 0.85 + (0.15 * visibility);
+                                      final opacity = 0.6 + (0.4 * visibility);
+
+                                      final seekerData = snapshot.data![index];
+
+                                      return AnimatedScale(
+                                        scale: scale,
+                                        duration:
+                                            const Duration(milliseconds: 200),
+                                        child: AnimatedOpacity(
+                                          opacity: opacity,
+                                          duration:
+                                              const Duration(milliseconds: 200),
+                                          child: Consumer<SearchSeekerProvider>(
+                                              builder:
+                                                  (context, provider, child) {
+                                            final isBookmarked =
+                                                provider.bookmarkedStates[
+                                                        seekerData.personalData
+                                                            ?.personal.id
+                                                            .toString()] ??
+                                                    false;
+                                            return SeekerCard(
+                                              seekerData: seekerData,
+                                              isBookmarked: isBookmarked,
+                                              onBookmarkToggle: () {
+                                                provider
+                                                    .toggleBookmark(seekerData);
+                                              },
+                                            );
+                                          }),
+                                        ),
+                                      );
+                                    },
                                   );
-                                },
-                              ),
-                            ),
+                                }),
                           ),
                         ),
                       ],

@@ -15,6 +15,7 @@ import 'package:recruiter_app/widgets/reusable_button.dart';
 
 class SeekerDetails extends StatefulWidget {
   final SeekerModel seekerData;
+  
   const SeekerDetails({Key? key, required this.seekerData}) : super(key: key);
 
   @override
@@ -36,25 +37,25 @@ class _SeekerDetailsState extends State<SeekerDetails>
     _controller.forward();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      checkBookmarked();
+      // checkBookmarked();
     });
   }
 
-  void checkBookmarked() async {
-    if (widget.seekerData.personalData != null) {
-      Provider.of<SearchSeekerProvider>(context, listen: false).isSaved = false;
-      final res =
-          await Provider.of<SearchSeekerProvider>(context, listen: false)
-              .isSeekerSaved(
-                  widget.seekerData.personalData!.personal.id.toString());
+  // void checkBookmarked() async {
+  //   if (widget.seekerData.personalData != null) {
+  //     Provider.of<SearchSeekerProvider>(context, listen: false).isSaved = false;
+  //     final res =
+  //         await Provider.of<SearchSeekerProvider>(context, listen: false)
+  //             .isSeekerSaved(
+  //                 widget.seekerData.personalData!.personal.id.toString());
 
-      Provider.of<SearchSeekerProvider>(context, listen: false).isSaved = res;
+  //     Provider.of<SearchSeekerProvider>(context, listen: false).isSaved = res;
 
-      // setState(() {
-      //   isSaved = res;
-      // });
-    }
-  }
+  //     // setState(() {
+  //     //   isSaved = res;
+  //     // });
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -86,43 +87,51 @@ class _SeekerDetailsState extends State<SeekerDetails>
                         builder: (context, provider, child) {
                       return CommonAppbarWidget(
                         isBackArrow: true,
-                        icon: provider.isSaved == true
+                        icon: provider.bookmarkedStates[widget.seekerData.personalData!.personal.id] == true
                             ? Icons.bookmark
                             : Icons.bookmark_outline,
-                        action: () async {
-                          if (widget.seekerData.personalData != null) {
-                            final _isSaved = await provider.toggleSaveCandidate(
-                                id: widget.seekerData.personalData!.personal.id
-                                    .toString());
+                            action: (){
+                              provider.toggleBookmark(widget.seekerData);
+                            },
 
-                            final seekerSaved = await provider.isSeekerSaved(
-                                widget.seekerData.personalData!.personal.id
-                                    .toString());
 
-                            if (seekerSaved == true) {
-                              provider.setSaved(true);
-                              // setState(() {
-                              //   isSaved = true;
-                              // });
-                              CommonSnackbar.show(context, message: "Saved ");
-                            } else if (seekerSaved == false) {
-                              // setState(() {
-                              provider.setSaved(false);
-                              //   isSaved = false;
-                              // });
-                              CommonSnackbar.show(context, message: "Removed");
-                            } else {
-                              CommonSnackbar.show(context,
-                                  message: "Something went wrong!");
-                            }
-                          }
+                        // action: () async {
+                        //   if (widget.seekerData.personalData != null) {
+                        //     final _isSaved = await provider.toggleSaveCandidate(
+                        //         id: widget.seekerData.personalData!.personal.id
+                        //             .toString());
 
-                          await Provider.of<SearchSeekerProvider>(context,
-                                  listen: false)
-                              .isSeekerSaved(widget
-                                  .seekerData.personalData!.personal.id
-                                  .toString());
-                        },
+                        //     final seekerSaved = await provider.isSeekerSaved(
+                        //         widget.seekerData.personalData!.personal.id
+                        //             .toString());
+
+                        //     if (seekerSaved == true) {
+                        //       // provider.setSaved(true);
+                        //       // setState(() {
+                        //       //   isSaved = true;
+                        //       // });
+                        //       CommonSnackbar.show(context, message: "Saved ");
+                        //     } else if (seekerSaved == false) {
+                        //       // setState(() {
+                        //       // provider.setSaved(false);
+                        //       //   isSaved = false;
+                        //       // });
+                        //       CommonSnackbar.show(context, message: "Removed");
+                        //     } else {
+                        //       CommonSnackbar.show(context,
+                        //           message: "Something went wrong!");
+                        //     }
+                        //   }
+
+                        //   await Provider.of<SearchSeekerProvider>(context,
+                        //           listen: false)
+                        //       .isSeekerSaved(widget
+                        //           .seekerData.personalData!.personal.id
+                        //           .toString());
+                        // },
+                       
+                       
+                       
                         title: CustomFunctions.toSentenceCase(seekerName),
                       );
                     }),

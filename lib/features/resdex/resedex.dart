@@ -10,6 +10,7 @@ import 'package:recruiter_app/core/utils/country_lists.dart';
 import 'package:recruiter_app/core/utils/nationalities.dart';
 import 'package:recruiter_app/features/resdex/email_template_form.dart';
 import 'package:recruiter_app/features/resdex/provider/search_seeker_provider.dart';
+import 'package:recruiter_app/features/resdex/widgets/candidate_invited.dart';
 import 'package:recruiter_app/features/resdex/widgets/email_template_widget.dart';
 import 'package:recruiter_app/features/resdex/widgets/saved_searches.dart';
 import 'package:recruiter_app/features/resdex/widgets/search_cv_form_widget.dart';
@@ -153,37 +154,6 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
     print(maxYears);
   }
 
-  // void _updateExperienceRange(
-  //     {required String minCont,
-  //     required String maxiCont,
-  //     required List<Map<String, dynamic>> lists}) {
-  //   List<Map<String, dynamic>> selectedOptions =
-  //       lists.where((option) => option['isChecked'] == true).toList();
-
-  //   if (selectedOptions.isEmpty) {
-  //     minCont = '';
-  //     maxiCont = '';
-  //     return;
-  //   }
-  //   print("bbbbbbbb $minCont,  $maxiCont");
-
-  //   int minYears = selectedOptions.map((option) {
-  //     final (min, _) = _extractYearRange(option['label']);
-  //     return min;
-  //   }).reduce((min, current) => min < current ? min : current);
-
-  //   int maxYears = selectedOptions.map((option) {
-  //     final (_, max) = _extractYearRange(option['label']);
-  //     return max;
-  //   }).reduce((max, current) => max > current ? max : current);
-
-  //   setState(() {
-  //     minExp = minYears.toString();
-  //     maxExp = maxYears.toString();
-  //   });
-  // }
-
-  // Method to handle checkbox state changes
   void updateCheckboxState(
       int index, bool? value, List<Map<String, dynamic>> lists) {
     setState(() {
@@ -269,7 +239,7 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
                                     title: "Search CV's", index: 0)),
                             Expanded(
                                 child: _buildOptionContainer(
-                                    title: "Application Response", index: 1)),
+                                    title: "Invited Candidate", index: 1)),
                             Expanded(
                                 child: _buildOptionContainer(
                                     title: "Schedule Interview ", index: 2))
@@ -305,6 +275,9 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
                     currentScreenIndex == 0
                         ? SearchCvFormWidget()
                         : SizedBox.shrink(),
+                    currentScreenIndex == 1
+                        ? CandidateInvited()
+                        : SizedBox.shrink(),
 
                     currentScreenIndex == 4
                         ? SavedSearches()
@@ -323,7 +296,6 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
     );
   }
 
-  
   void _showAnimatedBottomSheet({required ThemeData theme}) {
     showModalBottomSheet(
       context: context,
@@ -348,7 +320,6 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
               child: Form(
                 key: _bottomSHeetFormKey,
                 child: Column(
-                  // crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Drag Handle
                     Container(
@@ -735,9 +706,9 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
                               theme: theme,
                               color: buttonColor,
                               action: () {
-                                print(maxSalary);
-                                print(minSalary);
-
+                                Provider.of<SearchSeekerProvider>(context,
+                                        listen: false)
+                                    .changeSearchResult(true);
                                 if (selectedKeywords.isEmpty &&
                                     _selectedCountry == "" &&
                                     _selectedEducation == "" &&
@@ -751,8 +722,6 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
                                   CommonSnackbar.show(context,
                                       message: "Select any filter");
                                 } else {
-                                  print(maxSalary);
-                                  print(minSalary);
                                   Provider.of<SearchSeekerProvider>(context,
                                           listen: false)
                                       .searchSeeker(
@@ -778,6 +747,33 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
                               text: "Remove filter",
                               theme: theme,
                               action: () {
+                                 Provider.of<SearchSeekerProvider>(context,
+                                        listen: false)
+                                    .changeSearchResult(false);
+                                setModalState(() {
+                                  selectedKeywords = [];
+                                  _selectedCountry == "";
+                                  _selectedEducation == "";
+                                  maxSalary == "";
+                                  minSalary == "";
+                                  _expYear.text == "";
+                                  _expMonth.text == "";
+                                  _selectedGender == "";
+                                  _selectedNationality == "";
+                                });
+                                setState(() {
+                                   selectedKeywords = [];
+                                  _selectedCountry == "";
+                                  _selectedEducation == "";
+                                  maxSalary == "";
+                                  minSalary == "";
+                                  _expYear.clear();
+                                  _expMonth.clear();
+                                  _selectedGender == "";
+                                  _selectedNationality == "";
+
+                                });
+
                                 Provider.of<SearchSeekerProvider>(context,
                                         listen: false)
                                     .fetchAllSeekersLists();
@@ -804,11 +800,8 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
         );
       }),
     ).then((_) {
-      // Reset the animation controller when bottom sheet is closed
       _controller.reset();
     });
-
-    // Start the animation
     _controller.forward();
   }
 
@@ -839,35 +832,6 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
             ),
           ),
         ));
-  }
-
-  Widget _buildCheckboxListWidget({
-    required ThemeData theme,
-    required List<Map<String, dynamic>> list,
-    required void Function(bool?)? onChnaged,
-  }) {
-    return Column(
-      children: List.generate(list.length, (index) {
-        final option = list[index];
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                Checkbox(
-                  activeColor: secondaryColor,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(3.r)),
-                  value: option['isChecked'],
-                  onChanged: onChnaged,
-                ),
-                Text(option['label']),
-              ],
-            ),
-          ],
-        );
-      }),
-    );
   }
 
   Widget _buildBottomsheetTitle(

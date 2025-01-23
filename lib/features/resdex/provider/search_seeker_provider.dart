@@ -1,52 +1,130 @@
-import 'package:flutter/foundation.dart';
+
+
+
+
+import 'package:flutter/material.dart';
 import 'package:recruiter_app/features/resdex/data/seeker_repository.dart';
 import 'package:recruiter_app/features/resdex/model/seeker_model.dart';
 
 class SearchSeekerProvider extends ChangeNotifier {
-  List<SeekerModel>? seekersLists  = [];
-  SeekerEmploymetModel? seekerEmploymentData;
-  SeekerPersonalModel? seekerPersonalData;
-  SeekerQualificationModel? seekerQualificationData;
+  // List<SeekerModel>? seekersLists = [];
   String error = '';
   bool isLoading = false;
+  Map<String, bool> bookmarkedStates = {};
+  // List<SeekerModel> bookmarkedSeekerLists = [];
+  Future<List<SeekerModel>?>? bookMarkedLists;
   bool searchResultEmpty = false;
-  bool isSaved = false;
-  bool isSerach = false;
-  List<SeekerModel> bookmarkedSeekers = [];
+  Future<List<SeekerModel>?>? lists;
 
-
-
-  void setSaved(bool val){
-    isSaved = val;
-    notifyListeners();
-  }
-
-  // experience options
-
+  /// Fetch all seekers list and initialize bookmarked states
   Future<void> fetchAllSeekersLists() async {
     isLoading = true;
     notifyListeners();
     try {
-      final result = await SeekerRepository().fetchAllSeekers();
+      final result =  SeekerRepository().fetchAllSeekers();
       if (result != null) {
-        seekersLists = result;
-        isLoading = false;
-        searchResultEmpty = false;
-        notifyListeners();
+        // seekersLists = result;
+        lists = result;
+        await initializeBookmarkedStates(); // Initialize bookmarked states after fetching seekers
+        error = '';
       } else {
-         isLoading = false;
-        error = "error";
-        notifyListeners();
+        error = "Error fetching seekers.";
       }
     } catch (e) {
-      error = "error";
+      error = "Error: $e";
+    } finally {
       isLoading = false;
-      searchResultEmpty = false;
       notifyListeners();
     }
   }
 
-  Future<void> searchSeeker({
+  // fetch invited candidate
+  Future<void>  fetchInvitedCandidates() async{
+    try {
+      final result = SeekerRepository().fetchAllInvitedSeekers();
+      lists = result;
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  /// Initialize bookmarked states for seekers
+  Future<void> initializeBookmarkedStates() async {
+    final seekersLists = await lists;
+    if (seekersLists != null) {
+      for (var seeker in seekersLists!) {
+        final id = seeker.personalData?.personal.id.toString();
+        if (id != null) {
+          final isSaved = await isSeekerSaved(id);
+          bookmarkedStates[id] = isSaved;
+        }
+      }
+      notifyListeners();
+    }
+  }
+
+  /// Toggle bookmark status for a seeker
+  Future<void> toggleBookmark(SeekerModel seekerData) async {
+    final id = seekerData.personalData?.personal.id.toString();
+    if (id != null) {
+      final isCurrentlySaved = bookmarkedStates[id] ?? false;
+      final result = await toggleSaveCandidate(id: id);
+      if (result) {
+        bookmarkedStates[id] = !isCurrentlySaved;
+      }
+      notifyListeners();
+    }
+  }
+
+  Future<bool> toggleSaveCandidate({required String id}) async {
+    try {
+      final isSaved = await isSeekerSaved(id);
+      if (isSaved) {
+        final result = await SeekerRepository().saveCandidate(id: id);
+        await fetchSavedCandidatesLists();
+        return result ?? false;
+      } else {
+        final result = await SeekerRepository().saveCandidate(id: id);
+         await fetchSavedCandidatesLists();
+        return result ?? false;
+      }
+    } catch (e) {
+      print("Error toggling save candidate: $e");
+      return false;
+    }
+  }
+
+  Future<bool> isSeekerSaved(String id) async {
+    try {
+      final savedCandidates = await fetchSavedCandidatesLists();
+      return savedCandidates
+              ?.any((seeker) => seeker.personalData?.personal.id == id) ??
+          false;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<List<SeekerModel>?> fetchSavedCandidatesLists() async {
+    try {
+      final lists =  SeekerRepository().fetchSavedCandidate();
+      // bookmarkedSeekerLists = lists ?? [];
+      bookMarkedLists = lists;
+      notifyListeners();
+      return lists;
+    } catch (e) {
+      print("Error fetching saved candidates: $e");
+      return null;
+    }
+  }
+
+
+void changeSearchResult(bool val){
+  searchResultEmpty = val;
+  notifyListeners();
+}
+  // search seeker
+    Future<void> searchSeeker({
     required List<String> keyWords,
     String? experienceYear,
     String? experienceMonth,
@@ -61,7 +139,7 @@ class SearchSeekerProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await SeekerRepository().searchSeeker(
+      final response =  SeekerRepository().searchSeeker(
         keyWords: keyWords,
         education: education,
         experienceMonth: experienceMonth == "" ? "0" : experienceMonth ?? "0",
@@ -75,18 +153,18 @@ class SearchSeekerProvider extends ChangeNotifier {
 
       print("Response of search  ${response},");
 
-      seekersLists = response;
-      if (seekersLists != null && seekersLists!.isEmpty) {
-        searchResultEmpty = true;
+      lists = response;
+      if (lists != null) {
+        // searchResultEmpty = true;
         isLoading = false;
         notifyListeners();
       } else {
-        searchResultEmpty = false;
+        // searchResultEmpty = false;
         isLoading = false;
         notifyListeners();
       }
     } catch (e) {
-      seekersLists = null;
+      lists = null;
       isLoading = false;
       notifyListeners();
       print("Error occurred: $e");
@@ -94,72 +172,5 @@ class SearchSeekerProvider extends ChangeNotifier {
       isLoading = false;
       notifyListeners();
     }
-  }
-
-  Future<bool> toggleSaveCandidate({required String id}) async {
-    try {
-      // Fetch the current saved candidates list
-      final savedCandidateLists = await fetchSavedCandidatesLists();
-
-      bool isAlreadySaved = savedCandidateLists
-              ?.any((item) => item.personalData?.personal.id == id) ??
-          false;
-
-      // Perform save or remove based on the current state
-      final result = await SeekerRepository().saveCandidate(id: id);
-
-      if (result == true) {
-        if (isAlreadySaved) {
-          // Remove from saved
-          isSaved = false;
-          isSeekerSaved(id);
-        } else {
-          // Add to saved
-
-          isSaved = true;
-          isSeekerSaved(id);
-        }
-
-        notifyListeners();
-        return isSaved;
-      } else {
-        return false;
-      }
-    } catch (e) {
-      print("Error $e");
-      isSaved = false;
-      notifyListeners();
-      return false;
-    }
-  }
-
-  Future<List<SeekerModel>?> fetchSavedCandidatesLists() async {
-    try {
-      final result = await SeekerRepository().fetchSavedCandidate();
-
-      if (result != null) {
-        bookmarkedSeekers = result;
-        notifyListeners();
-        return bookmarkedSeekers;
-      } else {
-        return null;
-      }
-    } catch (e) {
-      print("error $e");
-      return null;
-    }
-  }
-
-  // Check if a seeker exists in the list
-  Future<bool> isSeekerSaved(String id) async {
-    List<SeekerModel>? savedSeekersLists = await fetchSavedCandidatesLists();
-    return savedSeekersLists != null
-        ? savedSeekersLists.any((item) {
-            if (item.personalData != null) {
-              return item.personalData!.personal.id == id;
-            }
-            return false;
-          })
-        : false;
   }
 }
