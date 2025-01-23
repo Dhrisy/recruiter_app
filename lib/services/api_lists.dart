@@ -24,7 +24,7 @@ class ApiLists {
  static String updateEmailTemplated = "$baseUrl/recruiter_actions/update_template";
  static String deleteEmailTemplated = "$baseUrl/recruiter_actions/delete_template";
  static String candidateInvitedEndpoint = "$baseUrl/recruiter_actions/candidates_invited";
-
+static String inviteEndpoint = "$baseUrl/recruiter_actions/invite_candidates";
 
 
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
@@ -7,6 +8,9 @@ import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/core/utils/custom_functions.dart';
 import 'package:recruiter_app/features/resdex/model/seeker_model.dart';
 import 'package:recruiter_app/features/resdex/provider/search_seeker_provider.dart';
+import 'package:recruiter_app/features/resdex/widgets/common_dropdown_widget.dart';
+import 'package:recruiter_app/features/seeker_details/invite_seeker_provider.dart';
+import 'package:recruiter_app/viewmodels/job_viewmodel.dart';
 import 'package:recruiter_app/widgets/chip_container_widget.dart';
 import 'package:recruiter_app/widgets/common_appbar_widget.dart';
 import 'package:recruiter_app/widgets/common_error_widget.dart';
@@ -15,7 +19,7 @@ import 'package:recruiter_app/widgets/reusable_button.dart';
 
 class SeekerDetails extends StatefulWidget {
   final SeekerModel seekerData;
-  
+
   const SeekerDetails({Key? key, required this.seekerData}) : super(key: key);
 
   @override
@@ -25,6 +29,9 @@ class SeekerDetails extends StatefulWidget {
 class _SeekerDetailsState extends State<SeekerDetails>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
+
+  String _selectedJob = '';
+  int? jobId;
   // bool isSaved = false;
 
   @override
@@ -36,26 +43,8 @@ class _SeekerDetailsState extends State<SeekerDetails>
     );
     _controller.forward();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // checkBookmarked();
-    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {});
   }
-
-  // void checkBookmarked() async {
-  //   if (widget.seekerData.personalData != null) {
-  //     Provider.of<SearchSeekerProvider>(context, listen: false).isSaved = false;
-  //     final res =
-  //         await Provider.of<SearchSeekerProvider>(context, listen: false)
-  //             .isSeekerSaved(
-  //                 widget.seekerData.personalData!.personal.id.toString());
-
-  //     Provider.of<SearchSeekerProvider>(context, listen: false).isSaved = res;
-
-  //     // setState(() {
-  //     //   isSaved = res;
-  //     // });
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -87,51 +76,14 @@ class _SeekerDetailsState extends State<SeekerDetails>
                         builder: (context, provider, child) {
                       return CommonAppbarWidget(
                         isBackArrow: true,
-                        icon: provider.bookmarkedStates[widget.seekerData.personalData!.personal.id] == true
+                        icon: provider.bookmarkedStates[widget
+                                    .seekerData.personalData!.personal.id] ==
+                                true
                             ? Icons.bookmark
                             : Icons.bookmark_outline,
-                            action: (){
-                              provider.toggleBookmark(widget.seekerData);
-                            },
-
-
-                        // action: () async {
-                        //   if (widget.seekerData.personalData != null) {
-                        //     final _isSaved = await provider.toggleSaveCandidate(
-                        //         id: widget.seekerData.personalData!.personal.id
-                        //             .toString());
-
-                        //     final seekerSaved = await provider.isSeekerSaved(
-                        //         widget.seekerData.personalData!.personal.id
-                        //             .toString());
-
-                        //     if (seekerSaved == true) {
-                        //       // provider.setSaved(true);
-                        //       // setState(() {
-                        //       //   isSaved = true;
-                        //       // });
-                        //       CommonSnackbar.show(context, message: "Saved ");
-                        //     } else if (seekerSaved == false) {
-                        //       // setState(() {
-                        //       // provider.setSaved(false);
-                        //       //   isSaved = false;
-                        //       // });
-                        //       CommonSnackbar.show(context, message: "Removed");
-                        //     } else {
-                        //       CommonSnackbar.show(context,
-                        //           message: "Something went wrong!");
-                        //     }
-                        //   }
-
-                        //   await Provider.of<SearchSeekerProvider>(context,
-                        //           listen: false)
-                        //       .isSeekerSaved(widget
-                        //           .seekerData.personalData!.personal.id
-                        //           .toString());
-                        // },
-                       
-                       
-                       
+                        action: () {
+                          provider.toggleBookmark(widget.seekerData);
+                        },
                         title: CustomFunctions.toSentenceCase(seekerName),
                       );
                     }),
@@ -156,15 +108,178 @@ class _SeekerDetailsState extends State<SeekerDetails>
                           ],
                         ),
                       ),
+                    ),
+                    const SizedBox(
+                      height: 80,
                     )
                   ],
                 ),
               ),
             ),
+
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsets.all(15),
+                child: Row(
+                  spacing: 15,
+                  children: [
+                    Expanded(
+                        child: ReusableButton(
+                            buttonColor: secondaryColor,
+                            textColor: Colors.white,
+                            height: 40.h,
+                            action: () {
+                              if (widget.seekerData.personalData != null) {
+                                _showInviteSheet(theme: theme);
+                              }
+                            },
+                            text: "Invite")),
+                    Expanded(
+                        child: ReusableButton(
+                            height: 40.h,
+                            textColor: Colors.white,
+                            action: () {},
+                            text: "Unsave"))
+                  ],
+                ),
+              ),
+            )
           ],
         ),
       ),
     );
+  }
+
+  void _showInviteSheet({required ThemeData theme}) {
+    showModalBottomSheet(
+        context: context,
+        builder: (context) => StatefulBuilder(
+                builder: (BuildContext context, StateSetter setModalState) {
+              return Container(
+                height: 260.h,
+                width: double.infinity,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        children: [
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          Container(
+                            height: 2,
+                            width: 90,
+                            decoration: BoxDecoration(color: borderColor),
+                          ),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Do you want to invite",
+                                style: theme.textTheme.titleMedium!.copyWith(),
+                              ),
+                              Text(
+                                " ${CustomFunctions.toSentenceCase(widget.seekerData.personalData!.user.name.toString())}",
+                                style: theme.textTheme.titleMedium!.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: buttonColor),
+                              )
+                            ],
+                          )
+                              .animate()
+                              .fadeIn(duration: 400.ms)
+                              .slideX(begin: -0.3, end: 0),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Text(
+                            "Select a job from the list below to invite the candidate and match them with the right opportunity",
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium!
+                                .copyWith(color: greyTextColor),
+                          )
+                              .animate()
+                              .fadeIn(duration: 700.ms)
+                              .slideX(begin: -0.4, end: 0),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          BlocConsumer<JobBloc, JobsState>(
+                              listener: (context, state) {},
+                              builder: (context, state) {
+                                if (state is JobFetchSuccess) {
+                                  List<String> _jobTitleLists =
+                                      state.jobs.map((job) {
+                                    return job.title ?? '';
+                                  }).toList();
+                                  return CommonDropdownWidget(
+                                          hintText: "Select job",
+                                          labelText: "Job",
+                                          list: _jobTitleLists,
+                                          onChanged: (value) {
+                                            setModalState(() {
+                                              _selectedJob = value ?? '';
+                                              // Find the job object that matches the selected title
+
+                                              final _job = state.jobs
+                                                  .firstWhere((job) =>
+                                                      job.title ==
+                                                      _selectedJob);
+
+                                              jobId = _job.id;
+                                            });
+                                          },
+                                          selectedVariable: _selectedJob,
+                                          theme: theme)
+                                      .animate()
+                                      .fadeIn(duration: 900.ms)
+                                      .slideX(begin: -0.5, end: 0);
+                                } else {
+                                  return Text("Failed to load jobs");
+                                }
+                              }),
+                        ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 15),
+                        child: ReusableButton(
+                                textColor: Colors.white,
+                                buttonColor: _selectedJob == ''
+                                    ? secondaryColor.withValues(alpha: 0.6)
+                                    : secondaryColor,
+                                action: () async {
+                                  if (jobId != null) {
+                                    print(jobId);
+                                    await Provider.of<InviteSeekerProvider>(
+                                            context,
+                                            listen: false)
+                                        .inviteCandidate(
+                                            candidateId: int.parse(widget
+                                                .seekerData
+                                                .personalData!
+                                                .personal
+                                                .id
+                                                .toString()),
+                                            jobId: jobId!);
+                                  }
+                                },
+                                text: "Sent Invitation")
+                            .animate()
+                            .fadeIn(duration: 500.ms)
+                            .slideY(begin: 0.5, end: 0),
+                      )
+                    ],
+                  ),
+                ),
+              );
+            }));
   }
 
   Widget _buildProfileCard(
@@ -249,18 +364,15 @@ class _SeekerDetailsState extends State<SeekerDetails>
                   children: [
                     Expanded(
                       child: ReusableButton(
-                              height: 30.h,
-                              textColor: Colors.white,
-                              iconWidget: const Icon(
-                                Icons.download_rounded,
-                                color: Colors.white,
-                              ),
-                              action: () {},
-                              text: "Download Resume",
-                          )
-                          .animate()
-                          .fadeIn(duration: 800.ms)
-                          .scale(),
+                        height: 30.h,
+                        textColor: Colors.white,
+                        iconWidget: const Icon(
+                          Icons.download_rounded,
+                          color: Colors.white,
+                        ),
+                        action: () {},
+                        text: "Download Resume",
+                      ).animate().fadeIn(duration: 800.ms).scale(),
                     ),
                   ],
                 )
@@ -288,10 +400,9 @@ class _SeekerDetailsState extends State<SeekerDetails>
           child: Column(
             children: [
               Text(
-                  "Performing hot reload...cReloaded 1 of 2617 libraries in 1,247ms (compile: 59 ms, reload: 514 ms, reassemble: 321 ms). D/EGL_emulation(14066): app_time_stats: avg=58219.61ms min=58219.61ms max=58219.61ms count=1",
-                  style: theme.textTheme.bodyMedium!.copyWith(
-                  ),
-                  )
+                "Performing hot reload...cReloaded 1 of 2617 libraries in 1,247ms (compile: 59 ms, reload: 514 ms, reassemble: 321 ms). D/EGL_emulation(14066): app_time_stats: avg=58219.61ms min=58219.61ms max=58219.61ms count=1",
+                style: theme.textTheme.bodyMedium!.copyWith(),
+              )
             ],
           ),
         )
@@ -341,28 +452,30 @@ class _SeekerDetailsState extends State<SeekerDetails>
               style: theme.textTheme.titleLarge!
                   .copyWith(fontWeight: FontWeight.bold, color: secondaryColor),
             ),
-          skills.isNotEmpty
-          ?  Wrap(
-              spacing: 10,
-              children: skills.asMap().entries.map((entry) {
-                int index = entry.key;
-                String item = entry.value;
-                final color = index.isEven ? secondaryColor : buttonColor;
-                final animationDuration = (900 + (index * 50)).ms;
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: ChipContainerWidget(
-                    text: item,
-                    color: color,
-                    textColor: Colors.white,
-                    // duration: animationDuration,
-                  ).animate().fadeIn(duration: 500.ms).slideY(begin: 0.5, end: 0),
-                );
-              }).toList(),
-            )
-            : _buildEmptyDataWidget(icon: Icons.lightbulb_outlined, text: "No skills found")
-          
-          
+            skills.isNotEmpty
+                ? Wrap(
+                    spacing: 10,
+                    children: skills.asMap().entries.map((entry) {
+                      int index = entry.key;
+                      String item = entry.value;
+                      final color = index.isEven ? secondaryColor : buttonColor;
+                      final animationDuration = (900 + (index * 50)).ms;
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: ChipContainerWidget(
+                          text: item,
+                          color: color,
+                          textColor: Colors.white,
+                          // duration: animationDuration,
+                        )
+                            .animate()
+                            .fadeIn(duration: 500.ms)
+                            .slideY(begin: 0.5, end: 0),
+                      );
+                    }).toList(),
+                  )
+                : _buildEmptyDataWidget(
+                    icon: Icons.lightbulb_outlined, text: "No skills found")
           ],
         )
       ],
@@ -494,7 +607,8 @@ class _SeekerDetailsState extends State<SeekerDetails>
                   );
                 }).toList(),
               )
-            : _buildEmptyDataWidget(icon: Icons.work_outline, text: "No experience found")
+            : _buildEmptyDataWidget(
+                icon: Icons.work_outline, text: "No experience found")
       ],
     );
   }
@@ -591,7 +705,8 @@ class _SeekerDetailsState extends State<SeekerDetails>
                   );
                 }).toList(),
               )
-            : _buildEmptyDataWidget(icon: Icons.workspace_premium, text: "No qualification Found")
+            : _buildEmptyDataWidget(
+                icon: Icons.workspace_premium, text: "No qualification Found")
       ],
     );
   }
@@ -867,45 +982,38 @@ class _SeekerDetailsState extends State<SeekerDetails>
     );
   }
 
-Widget _buildEmptyDataWidget({
-  required IconData icon,
-  required String text
-}){
-return AnimatedContainer(
-              duration: 500.ms,
-              width: double.infinity,
-              height: 50.h,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                 borderRadius: BorderRadius.circular(15.r),
-                 boxShadow: [
-                          BoxShadow(
-                              blurRadius: 8.r,
-                              offset: const Offset(0, 4.5),
-                              color: borderColor)
-                        ],
-              ),
-              child:  Padding(
-                padding: const EdgeInsets.all(10),
-                child: Row(
-                  spacing: 10,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(icon,
-                    size: 20,
-                    color: greyTextColor,
-                    ),
-                    Text(text,
-                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                      fontSize: 13.sp,
-                      fontWeight: FontWeight.w500,
-                      color: greyTextColor
-                    ))
-                  ],
-                ),
-              ),
-            ).animate().fadeIn(duration: 500.ms).slideY(begin: 0.5, end: 0);
-          
-}
-
+  Widget _buildEmptyDataWidget({required IconData icon, required String text}) {
+    return AnimatedContainer(
+      duration: 500.ms,
+      width: double.infinity,
+      height: 50.h,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(15.r),
+        boxShadow: [
+          BoxShadow(
+              blurRadius: 8.r, offset: const Offset(0, 4.5), color: borderColor)
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(10),
+        child: Row(
+          spacing: 10,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 20,
+              color: greyTextColor,
+            ),
+            Text(text,
+                style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                    fontSize: 13.sp,
+                    fontWeight: FontWeight.w500,
+                    color: greyTextColor))
+          ],
+        ),
+      ),
+    ).animate().fadeIn(duration: 500.ms).slideY(begin: 0.5, end: 0);
+  }
 }

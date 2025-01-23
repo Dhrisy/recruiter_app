@@ -20,11 +20,13 @@ class SeekerCard extends StatefulWidget {
   final Color? borderColor;
   final bool isBookmarked;
   final VoidCallback onBookmarkToggle; 
+  final bool? isInvited;
   const SeekerCard({Key? key, 
   required this.seekerData, 
   this.borderColor,
   required this.isBookmarked,
    required this.onBookmarkToggle,
+   this.isInvited
   })
       : super(key: key);
 
@@ -59,18 +61,7 @@ class _SeekerCardState extends State<SeekerCard>
         .animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
-  // void checkBookmarked() async {
-  //   if (widget.seekerData.personalData != null) {
-  //     Provider.of<SearchSeekerProvider>(context, listen: false).isSaved = false;
-
-  //     final res =
-  //         await Provider.of<SearchSeekerProvider>(context, listen: false)
-  //             .isSeekerSaved(
-  //                 widget.seekerData.personalData!.personal.id.toString());
-  //     Provider.of<SearchSeekerProvider>(context, listen: false).isSaved = res;
-  //   }
-  // }
-
+ 
   @override
   void dispose() {
     _controller.dispose();
@@ -255,54 +246,93 @@ class _SeekerCardState extends State<SeekerCard>
                   ],
                 ),
                 const SizedBox(height: 12),
-                widget.seekerData.personalData!.personal.skills!.isEmpty
-                    ? Text(
-                        "No skills found",
-                        style: theme.textTheme.bodyMedium!.copyWith(
-                            color: greyTextColor,
-                            fontWeight: FontWeight.bold),
-                      )
-                    : Wrap(
-                        spacing: 8.w,
-                        runSpacing: 8.h,
-                        children: List.generate(
-                            widget.seekerData.personalData!.personal.skills!
-                                .length, (index) {
-                          return Row(
-                            children: [
-                              Text(
-                                "Skills : ",
-                                style: theme.textTheme.bodyMedium!.copyWith(
-                                    color: greyTextColor,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              Expanded(
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 8.w,
-                                    vertical: 4.h,
+                Wrap(
+                  children: [
+
+                    widget.seekerData.personalData!.personal.skills!.isEmpty
+                        ? Text(
+                            "No skills found",
+                            style: theme.textTheme.bodyMedium!.copyWith(
+                                color: greyTextColor,
+                                fontWeight: FontWeight.bold),
+                          )
+                        : Wrap(
+                            spacing: 8.w,
+                            runSpacing: 8.h,
+                            children: List.generate(
+                                widget.seekerData.personalData!.personal.skills!
+                                    .length, (index) {
+                              return Row(
+                                children: [
+                                  Text(
+                                    "Skills : ",
+                                    style: theme.textTheme.bodyMedium!.copyWith(
+                                        color: greyTextColor,
+                                        fontWeight: FontWeight.bold),
                                   ),
-                                  decoration: BoxDecoration(
-                                    color: buttonColor.withOpacity(0.1),
-                                    borderRadius: BorderRadius.circular(4.r),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Flexible(
-                                        child: Text(
-                                          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
+                                  Expanded(
+                                    child: Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 8.w,
+                                        vertical: 4.h,
                                       ),
-                                    ],
+                                      decoration: BoxDecoration(
+                                        color: buttonColor.withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(4.r),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Flexible(
+                                            child: Text(
+                                              "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                            ],
-                          );
-                        }),
-                      )
+                                ],
+                              );
+                            }),
+                          ),
+                 
+
+                 Padding(
+                   padding: const EdgeInsets.only(top: 10),
+                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                     children: [
+                       Container(
+                        // width: MediaQuery.of(context).size.width * 0.4,
+                        decoration: BoxDecoration(
+                          color: secondaryColor,
+                          borderRadius: BorderRadius.circular(15.r)
+                        ),
+                         child: Padding(
+                           padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                           child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                             children: [
+                               Text("ddddddddd",
+                               style: theme.textTheme.bodyMedium!.copyWith(
+                                color: Colors.white
+                               ),
+                               ),
+                             ],
+                           ),
+                         ),
+                       ),
+                     ],
+                   ),
+                 )
+                 
+                  ],
+                )
+             
+             
+             
               ],
             ),
           ),

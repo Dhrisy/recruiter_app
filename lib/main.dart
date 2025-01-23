@@ -2,9 +2,11 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:recruiter_app/core/theme.dart';
 import 'package:recruiter_app/core/utils/app_theme_data.dart';
+import 'package:recruiter_app/core/utils/custom_functions.dart';
 import 'package:recruiter_app/features/account/account_provider.dart';
 import 'package:recruiter_app/features/auth/bloc/auth_bloc.dart';
 import 'package:recruiter_app/features/auth/data/auth_repository.dart';
@@ -18,21 +20,52 @@ import 'package:recruiter_app/features/questionaires/data/questionaire_repositor
 import 'package:recruiter_app/features/resdex/provider/email_template_provider.dart';
 import 'package:recruiter_app/features/resdex/provider/search_seeker_provider.dart';
 import 'package:recruiter_app/features/responses/provider/seeker_provider.dart';
+import 'package:recruiter_app/features/seeker_details/invite_seeker_provider.dart';
 import 'package:recruiter_app/features/splash_screen/splash_screen.dart';
 import 'package:recruiter_app/viewmodels/job_viewmodel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 int retryCount = 0;
-  int maxRetries = 3;
+int maxRetries = 3;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  
+
   // Load theme preference before running the app
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   final bool isDarkMode = prefs.getBool('isDarkMode') ?? false;
 
+  OneSignal.initialize("f57460e6-1f9e-418a-ab47-c499dce28870");
+
+  // Add basic notification handler
+  OneSignal.Notifications.addForegroundWillDisplayListener((event) {
+    print("NOTIFICATION RECEIVED: ${event.notification.title}");
+    // Actually display the notification
+    event.notification.display();
+  });
+
+  try {
+    // Get device token
+    String? deviceToken = await OneSignal.User.pushSubscription.token;
+    print("OneSignal Device Token: $deviceToken");
+
+    // Get user ID
+    String? userId = await OneSignal.User.pushSubscription.id;
+    print("OneSignal User ID: $userId");
+
+    // Save device token and user ID into secure storage
+    if (deviceToken != null) {
+      await CustomFunctions().storeCredentials("one_signal_id", deviceToken);
+      print("Device token saved successfully.");
+    }
+
+    if (userId != null) {
+      await CustomFunctions().storeCredentials("one_signal_userid", userId);
+      print("User ID saved successfully.");
+    }
+  } catch (e) {
+    print("Error occurred while retrieving or saving OneSignal data: $e");
+  }
 
   runApp(MyApp(initialThemeMode: isDarkMode));
 }
@@ -52,23 +85,18 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    
+
     // Initialize the theme bloc with the initial theme mode
     _themeBloc = AppThemeDataBloc();
-    
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-    _themeBloc.add(ChangeTheme(isDarkMode: widget.initialThemeMode));
-    
-    // Add a listener to track state changes
-    _themeBloc.stream.listen((state) {
-      print("Theme state updated: ${state.isDarkMode}");
+      _themeBloc.add(ChangeTheme(isDarkMode: widget.initialThemeMode));
+
+      // Add a listener to track state changes
+      _themeBloc.stream.listen((state) {
+        print("Theme state updated: ${state.isDarkMode}");
+      });
     });
-  });
-
-   
-
- 
   }
 
   @override
@@ -83,22 +111,26 @@ class _MyAppState extends State<MyApp> {
       designSize: const Size(360, 690),
       builder: (context, child) => MultiProvider(
         providers: [
-          ChangeNotifierProvider(create: (context) => LoginProvider(authRepository: AuthRepository())),
+          ChangeNotifierProvider(
+              create: (context) =>
+                  LoginProvider(authRepository: AuthRepository())),
           ChangeNotifierProvider(create: (context) => AccountProvider()),
           ChangeNotifierProvider(create: (context) => SearchSeekerProvider()),
           ChangeNotifierProvider(create: (context) => SearchJobProvider()),
           ChangeNotifierProvider(create: (context) => SeekerProvider()),
-          ChangeNotifierProvider(create: (context) => EmailTemplateProvider())
+          ChangeNotifierProvider(create: (context) => EmailTemplateProvider()),
+          ChangeNotifierProvider(create: (context) => InviteSeekerProvider())
         ],
         child: MultiBlocProvider(
           providers: [
             BlocProvider(create: (context) => NavBarBloc()),
             BlocProvider.value(value: _themeBloc),
             BlocProvider(create: (context) => AuthBloc(AuthRepository())),
-            BlocProvider(create: (context) => QuestionaireBloc(QuestionaireRepository())),
+            BlocProvider(
+                create: (context) =>
+                    QuestionaireBloc(QuestionaireRepository())),
             BlocProvider(create: (context) => JobPostBloc(JobPostRepository())),
             BlocProvider(create: (context) => JobBloc(JobPostRepository())),
-
           ],
           child: BlocBuilder<AppThemeDataBloc, AppThemeDataState>(
             bloc: _themeBloc,

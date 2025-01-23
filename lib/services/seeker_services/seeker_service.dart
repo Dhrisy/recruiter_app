@@ -75,5 +75,26 @@ class SeekerService {
   }
 
 
+// sent invitation
+static Future<http.Response>  sentInviteCandidate({required int jobId, required int seekerId}) async{
+  final url = Uri.parse(ApiLists.inviteEndpoint);
+
+    final accessToken =
+        await CustomFunctions().retrieveCredentials("access_token");
+
+    final response = await http.post(url, 
+    body: jsonEncode({
+      "candidate_id": seekerId,
+      "job_id": jobId
+    }),
+    headers: {
+      'Authorization': 'Bearer ${accessToken.toString()}',
+      'Content-Type': 'application/json',
+    });
+
+    return response;
+
+}
+
   
 }
