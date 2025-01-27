@@ -1,33 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/core/utils/custom_functions.dart';
 import 'package:recruiter_app/core/utils/navigation_animation.dart';
-import 'package:recruiter_app/core/utils/skills.dart';
-import 'package:recruiter_app/features/details/job_details.dart';
+import 'package:recruiter_app/features/job_post/model/job_post_model.dart';
 import 'package:recruiter_app/features/resdex/model/seeker_model.dart';
 import 'package:recruiter_app/features/resdex/provider/search_seeker_provider.dart';
-import 'package:recruiter_app/features/responses/provider/seeker_provider.dart';
 import 'package:recruiter_app/features/seeker_details/seeker_details.dart';
+import 'package:recruiter_app/widgets/common_alertdialogue.dart';
 import 'package:recruiter_app/widgets/common_snackbar.dart';
-import 'package:recruiter_app/widgets/shimmer_widget.dart';
+import 'package:recruiter_app/widgets/reusable_button.dart';
 
 class SeekerCard extends StatefulWidget {
   final SeekerModel seekerData;
   final Color? borderColor;
   final bool isBookmarked;
-  final VoidCallback onBookmarkToggle; 
+  final VoidCallback onBookmarkToggle;
   final bool? isInvited;
-  const SeekerCard({Key? key, 
-  required this.seekerData, 
-  this.borderColor,
-  required this.isBookmarked,
-   required this.onBookmarkToggle,
-   this.isInvited
-  })
+  final JobPostModel? jobData;
+  final bool? fromResponse;
+  const SeekerCard(
+      {Key? key,
+      required this.seekerData,
+      this.borderColor,
+      required this.isBookmarked,
+      required this.onBookmarkToggle,
+      this.jobData,
+      this.isInvited,
+      this.fromResponse
+      })
       : super(key: key);
 
   @override
@@ -61,12 +64,13 @@ class _SeekerCardState extends State<SeekerCard>
         .animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
- 
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -80,15 +84,19 @@ class _SeekerCardState extends State<SeekerCard>
               BoxShadow(
                   blurRadius: 5,
                   color: borderColor,
-                  offset: const Offset(-2, 1))
+                  offset: Offset(-2, 1))
             ]),
         child: InkWell(
           onTap: () {
             Navigator.push(
                 context,
-                AnimatedNavigation().fadeAnimation(SeekerDetails(
+                AnimatedNavigation().fadeAnimation(
+                  SeekerDetails(
+                    fromResponse: widget.fromResponse,
+                    isInvited: widget.isInvited,
                   seekerData: widget.seekerData,
-                )));
+                ),
+                ));
           },
           borderRadius: BorderRadius.circular(8),
           child: Padding(
@@ -96,6 +104,24 @@ class _SeekerCardState extends State<SeekerCard>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                widget.isInvited == true
+                    ? Row(
+                        children: [
+                          Text(
+                            "Invited job : ",
+                            style: theme.textTheme.bodyMedium!
+                                .copyWith(color: greyTextColor),
+                          ),
+                          Text(
+                            widget.jobData != null
+                            ? widget.jobData!.title.toString().toUpperCase() : "N/A",
+                            style: theme.textTheme.titleMedium!.copyWith(
+                                fontWeight: FontWeight.bold, fontSize: 12.sp),
+                          ),
+                        ],
+                      )
+                    : const SizedBox.shrink(),
+                const SizedBox(height: 12),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -120,8 +146,8 @@ class _SeekerCardState extends State<SeekerCard>
                                   children: [
                                     Expanded(
                                       child: Text(
-                                        widget.seekerData.personalData!.user
-                                            .name
+                                        widget
+                                            .seekerData.personalData!.user.name
                                             .toString()
                                             .toUpperCase(),
                                         overflow: TextOverflow.ellipsis,
@@ -145,17 +171,21 @@ class _SeekerCardState extends State<SeekerCard>
                                   ],
                                 ),
                               ),
-                               // Bookmark Icon
-                  InkWell(
-                    onTap: widget.onBookmarkToggle,
-                    child: ScaleTransition(
-                      scale: _iconAnimation,
-                      child: Icon(
-                        widget.isBookmarked ? Icons.bookmark : Icons.bookmark_outline,
-                        color: widget.isBookmarked ? secondaryColor : Colors.grey,
-                      ),
-                    ),
-                  ),
+                              // Bookmark Icon
+                              InkWell(
+                                onTap: widget.onBookmarkToggle,
+                                child: ScaleTransition(
+                                  scale: _iconAnimation,
+                                  child: Icon(
+                                    widget.isBookmarked
+                                        ? Icons.bookmark
+                                        : Icons.bookmark_outline,
+                                    color: widget.isBookmarked
+                                        ? secondaryColor
+                                        : Colors.grey,
+                                  ),
+                                ),
+                              ),
                               // Consumer<SearchSeekerProvider>(
                               //     builder: (context, provider, child) {
                               //   return InkWell(
@@ -167,12 +197,12 @@ class _SeekerCardState extends State<SeekerCard>
                               //                   id: widget.seekerData
                               //                       .personalData!.personal.id
                               //                       .toString());
-      
+
                               //           final seekerSaved = await provider
                               //               .isSeekerSaved(widget.seekerData
                               //                   .personalData!.personal.id
                               //                   .toString());
-      
+
                               //           if (seekerSaved == true) {
                               //             provider.setSaved(true);
                               //             // setState(() {
@@ -203,8 +233,6 @@ class _SeekerCardState extends State<SeekerCard>
                               //               child: Icon(
                               //                   Icons.bookmark_outline)));
                               // })
-                            
-                            
                             ],
                           ),
                           const SizedBox(height: 4),
@@ -246,98 +274,122 @@ class _SeekerCardState extends State<SeekerCard>
                   ],
                 ),
                 const SizedBox(height: 12),
-                Wrap(
-                  children: [
-
-                    widget.seekerData.personalData!.personal.skills!.isEmpty
-                        ? Text(
-                            "No skills found",
+                widget.seekerData.personalData!.personal.skills!.isEmpty
+                    ? Text(
+                        "No skills found",
+                        style: theme.textTheme.bodyMedium!.copyWith(
+                            color: greyTextColor, fontWeight: FontWeight.bold),
+                      )
+                    : Row(
+                        children: [
+                          Text(
+                            "Skills : ",
                             style: theme.textTheme.bodyMedium!.copyWith(
                                 color: greyTextColor,
                                 fontWeight: FontWeight.bold),
-                          )
-                        : Wrap(
-                            spacing: 8.w,
-                            runSpacing: 8.h,
+                          ),
+                          Expanded(
+                              child: Wrap(
                             children: List.generate(
                                 widget.seekerData.personalData!.personal.skills!
                                     .length, (index) {
-                              return Row(
-                                children: [
-                                  Text(
-                                    "Skills : ",
-                                    style: theme.textTheme.bodyMedium!.copyWith(
-                                        color: greyTextColor,
-                                        fontWeight: FontWeight.bold),
+                              final skill = widget.seekerData.personalData!
+                                  .personal.skills![index];
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 5, vertical: 5),
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 8.w,
+                                    vertical: 4.h,
                                   ),
-                                  Expanded(
-                                    child: Container(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 8.w,
-                                        vertical: 4.h,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: buttonColor.withOpacity(0.1),
-                                        borderRadius: BorderRadius.circular(4.r),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Flexible(
-                                            child: Text(
-                                              "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
+                                  decoration: BoxDecoration(
+                                    color: buttonColor.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(4.r),
                                   ),
-                                ],
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Flexible(
+                                        child: Text(
+                                          skill,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               );
                             }),
-                          ),
-                 
+                          ))
+                        ],
+                      ),
+                widget.isInvited == true
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          ReusableButton(
+                              buttonColor: secondaryColor,
+                              textColor: Colors.white,
+                              height: 25.h,
+                              width: 150.w,
+                              radius: 8,
+                              action: () {
 
-                 Padding(
-                   padding: const EdgeInsets.only(top: 10),
-                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                     children: [
-                       Container(
-                        // width: MediaQuery.of(context).size.width * 0.4,
-                        decoration: BoxDecoration(
-                          color: secondaryColor,
-                          borderRadius: BorderRadius.circular(15.r)
-                        ),
-                         child: Padding(
-                           padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                             children: [
-                               Text("ddddddddd",
-                               style: theme.textTheme.bodyMedium!.copyWith(
-                                color: Colors.white
-                               ),
-                               ),
-                             ],
-                           ),
-                         ),
-                       ),
-                     ],
-                   ),
-                 )
-                 
-                  ],
-                )
-             
-             
-             
+                                showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return CommonAlertDialog(
+                                          titleColor: secondaryColor,
+                                          title: "Withdraw Invite",
+                                          subTitle:
+                                              "Are you sure want to withraw the invitation for ${CustomFunctions.toSentenceCase(widget.seekerData.personalData!.user.name.toString())}",
+                                          message:
+                                              "If you withdraw the invitation for [Candidate Name], you will need to re-invite them by visiting the job or seeker details. Please confirm your action.",
+                                          onConfirm: () async {
+                                            if (widget.jobData !=
+                                                null && widget.jobData!.id != null) {
+
+                                                  
+                                              final result = await Provider.of<
+                                                          SearchSeekerProvider>(
+                                                      context,
+                                                      listen: false)
+                                                  .deleteInvitedSeeker(
+                                                    id: widget.jobData!.id!
+                                                  );
+
+                                              if (result == true) {
+                                                Navigator.pop(context);
+                                                CommonSnackbar.show(context,
+                                                    message:
+                                                        "Invite deleted successfully!");
+                                                Provider.of<SearchSeekerProvider>(
+                                                        context,
+                                                        listen: false)
+                                                    .fetchInvitedCandidates();
+                                              } else {
+                                                Navigator.pop(context);
+                                                CommonSnackbar.show(context,
+                                                    message: result.toString());
+                                              }
+                                            }
+                                          },
+                                          onCancel: () {
+                                           Navigator.pop(context);
+                                          },
+                                          height: 200);
+                                    });
+                              },
+                              text: "Withdraw invite")
+                        ],
+                      )
+                    : const SizedBox.shrink()
               ],
             ),
           ),
         ),
-      ).animate().fadeIn(duration: 600.ms).slideX(begin: -0.5, end: 0);
+      ).animate().fadeIn(duration: 500.ms).slideY(begin: 0.5, end: 0);
     } else {
       return Text("Error seeker data is null");
     }

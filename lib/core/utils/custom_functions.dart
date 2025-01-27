@@ -61,4 +61,23 @@ class CustomFunctions {
       print('Error sharing: $e');
     }
   }
+
+    String formatCTC(dynamic ctc) {
+    if (ctc == null) return 'N/A';
+
+    try {
+      double ctcValue = double.parse(ctc.toString());
+      if (ctcValue >= 1000000) {
+        // For millions
+        return '${(ctcValue / 1000000).toStringAsFixed(1)}M';
+      } else if (ctcValue >= 1000) {
+        // For thousands
+        return '${(ctcValue / 1000).toStringAsFixed(1)}K';
+      }
+      return '$ctcValue';
+    } catch (e) {
+      return 'N/A';
+    }
+  }
+
 }

@@ -113,7 +113,8 @@ import 'package:recruiter_app/features/resdex/resedex.dart';
 import 'package:recruiter_app/features/responses/view/response.dart';
 
 class Navbar extends StatefulWidget {
-  const Navbar({Key? key}) : super(key: key);
+  final int? index;
+  const Navbar({Key? key, this.index}) : super(key: key);
 
   @override
   _NavbarState createState() => _NavbarState();
@@ -128,6 +129,13 @@ class _NavbarState extends State<Navbar> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
     tabController = TabController(length: 4, vsync: this);
+    WidgetsBinding.instance.addPostFrameCallback((_){
+      if(widget.index != null){
+        setState(() {
+          currentIndex = widget.index!;
+        });
+      }
+    });
   }
 
   @override

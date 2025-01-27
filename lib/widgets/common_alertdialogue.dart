@@ -14,6 +14,7 @@ class CommonAlertDialog extends StatelessWidget {
   final VoidCallback onCancel;
   final double? height;
   final bool isLoading;
+  final String? subTitle;
 
   const CommonAlertDialog({
     Key? key,
@@ -26,6 +27,7 @@ class CommonAlertDialog extends StatelessWidget {
     required this.onCancel,
    required this.height,
     this.isLoading = false,
+    this.subTitle
   }) : super(key: key);
 
   @override
@@ -51,7 +53,21 @@ class CommonAlertDialog extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(message),
+            Column(
+              spacing: 10,
+              children: [
+
+            subTitle != null ?   Text(subTitle!,
+            textAlign: TextAlign.center,
+            
+            ) : const SizedBox.shrink(),
+                Text(message,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                  color: greyTextColor
+                ),),
+              ],
+            ),
             Row(
               spacing: 15,
               children: [

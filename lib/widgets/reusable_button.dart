@@ -63,11 +63,15 @@ class _ReusableButtonState extends State<ReusableButton> {
                 ? LoadingWidget(
                   color: Colors.white,
                 )
-                : Text(
-                    widget.text,
-                    style: AppTheme.bodyText(widget.textColor ?? lightTextColor)
-                        .copyWith(fontSize: widget.textSize ?? mediumSmallFont),
-                  ),
+                : Expanded(
+                  child: Text(
+                      widget.text,
+                      textAlign: TextAlign.center,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTheme.bodyText(widget.textColor ?? lightTextColor)
+                          .copyWith(fontSize: widget.textSize ?? mediumSmallFont),
+                    ),
+                ),
 
                   widget.iconWidget != null
                   ? widget.iconWidget! : const SizedBox.shrink()

@@ -1,27 +1,29 @@
-
-
-
-
 import 'package:flutter/material.dart';
+import 'package:recruiter_app/core/utils/custom_functions.dart';
 import 'package:recruiter_app/features/resdex/data/seeker_repository.dart';
+import 'package:recruiter_app/features/resdex/model/invite_seeker_model.dart';
 import 'package:recruiter_app/features/resdex/model/seeker_model.dart';
+import 'package:recruiter_app/widgets/common_snackbar.dart';
 
 class SearchSeekerProvider extends ChangeNotifier {
   // List<SeekerModel>? seekersLists = [];
   String error = '';
   bool isLoading = false;
-  Map<String, bool> bookmarkedStates = {};
+
+  Map<int, bool> bookmarkedStates = {};
   // List<SeekerModel> bookmarkedSeekerLists = [];
-  Future<List<SeekerModel>?>? bookMarkedLists;
+  List<SeekerModel>? bookMarkedLists;
   bool searchResultEmpty = false;
   Future<List<SeekerModel>?>? lists;
+
+  Future<List<InvitedSeekerWithJob>?>? invitedLists;
 
   /// Fetch all seekers list and initialize bookmarked states
   Future<void> fetchAllSeekersLists() async {
     isLoading = true;
     notifyListeners();
     try {
-      final result =  SeekerRepository().fetchAllSeekers();
+      final result = SeekerRepository().fetchAllSeekers();
       if (result != null) {
         // seekersLists = result;
         lists = result;
@@ -39,12 +41,28 @@ class SearchSeekerProvider extends ChangeNotifier {
   }
 
   // fetch invited candidate
-  Future<void>  fetchInvitedCandidates() async{
+  Future<void> fetchInvitedCandidates() async {
     try {
       final result = SeekerRepository().fetchAllInvitedSeekers();
-      lists = result;
+      invitedLists = result;
     } catch (e) {
       throw Exception(e);
+    }
+  }
+
+  // delete invited candidate
+  Future<bool?> deleteInvitedSeeker({required int id}) async {
+    try {
+      final result = await SeekerRepository().deleteInvitedSeeker(id: id);
+      if (result != null && result == "success") {
+        return true;
+      } else {
+        error = result.toString();
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      return null;
     }
   }
 
@@ -52,8 +70,8 @@ class SearchSeekerProvider extends ChangeNotifier {
   Future<void> initializeBookmarkedStates() async {
     final seekersLists = await lists;
     if (seekersLists != null) {
-      for (var seeker in seekersLists!) {
-        final id = seeker.personalData?.personal.id.toString();
+      for (var seeker in seekersLists) {
+        final id = seeker.personalData?.personal.id;
         if (id != null) {
           final isSaved = await isSeekerSaved(id);
           bookmarkedStates[id] = isSaved;
@@ -64,28 +82,34 @@ class SearchSeekerProvider extends ChangeNotifier {
   }
 
   /// Toggle bookmark status for a seeker
-  Future<void> toggleBookmark(SeekerModel seekerData) async {
-    final id = seekerData.personalData?.personal.id.toString();
+  Future<void> toggleBookmark(
+      SeekerModel seekerData, BuildContext context) async {
+    final id = seekerData.personalData?.personal.id;
     if (id != null) {
       final isCurrentlySaved = bookmarkedStates[id] ?? false;
-      final result = await toggleSaveCandidate(id: id);
+      final result = await toggleSaveCandidate(id: id, context: context);
+      await fetchSavedCandidatesLists();
       if (result) {
         bookmarkedStates[id] = !isCurrentlySaved;
+        await fetchSavedCandidatesLists();
       }
       notifyListeners();
     }
   }
 
-  Future<bool> toggleSaveCandidate({required String id}) async {
+  Future<bool> toggleSaveCandidate(
+      {required int id, required BuildContext context}) async {
     try {
       final isSaved = await isSeekerSaved(id);
       if (isSaved) {
-        final result = await SeekerRepository().saveCandidate(id: id);
+        final result =
+            await SeekerRepository().saveCandidate(id: id, context: context);
         await fetchSavedCandidatesLists();
         return result ?? false;
       } else {
-        final result = await SeekerRepository().saveCandidate(id: id);
-         await fetchSavedCandidatesLists();
+        final result =
+            await SeekerRepository().saveCandidate(id: id, context: context);
+        await fetchSavedCandidatesLists();
         return result ?? false;
       }
     } catch (e) {
@@ -94,7 +118,7 @@ class SearchSeekerProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> isSeekerSaved(String id) async {
+  Future<bool> isSeekerSaved(int id) async {
     try {
       final savedCandidates = await fetchSavedCandidatesLists();
       return savedCandidates
@@ -107,9 +131,9 @@ class SearchSeekerProvider extends ChangeNotifier {
 
   Future<List<SeekerModel>?> fetchSavedCandidatesLists() async {
     try {
-      final lists =  SeekerRepository().fetchSavedCandidate();
+      final lists = SeekerRepository().fetchSavedCandidate();
       // bookmarkedSeekerLists = lists ?? [];
-      bookMarkedLists = lists;
+      bookMarkedLists = await lists;
       notifyListeners();
       return lists;
     } catch (e) {
@@ -118,13 +142,13 @@ class SearchSeekerProvider extends ChangeNotifier {
     }
   }
 
+  void changeSearchResult(bool val) {
+    searchResultEmpty = val;
+    notifyListeners();
+  }
 
-void changeSearchResult(bool val){
-  searchResultEmpty = val;
-  notifyListeners();
-}
   // search seeker
-    Future<void> searchSeeker({
+  Future<void> searchSeeker({
     required List<String> keyWords,
     String? experienceYear,
     String? experienceMonth,
@@ -139,7 +163,7 @@ void changeSearchResult(bool val){
     notifyListeners();
 
     try {
-      final response =  SeekerRepository().searchSeeker(
+      final response = SeekerRepository().searchSeeker(
         keyWords: keyWords,
         education: education,
         experienceMonth: experienceMonth == "" ? "0" : experienceMonth ?? "0",

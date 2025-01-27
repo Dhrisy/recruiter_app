@@ -5,90 +5,47 @@ class SeekerModel {
   final List<SeekerEmploymetModel>? employmentData;
   final List<SeekerQualificationModel>? qualificationData;
 
-  SeekerModel({this.employmentData, this.personalData, this.qualificationData});
+  SeekerModel(
+      {this.employmentData,
+      this.personalData,
+      this.qualificationData,
+      });
 
   factory SeekerModel.fromJson(Map<String, dynamic> json) {
+
     return SeekerModel(
-      personalData: json["personal"] != null
-          ? SeekerPersonalModel.fromJson(json["personal"])
-          : null,
-      employmentData: json["employment"] != null
-          ? (json["employment"] as List<dynamic>)
-              .map((e) => SeekerEmploymetModel.fromJson(e))
-              .toList()
-          : null,
-      qualificationData: json["qualification"] != null
-          ? (json["qualification"] as List<dynamic>)
-              .map((q) => SeekerQualificationModel.fromJson(q))
-              .toList()
-          : null,
+        personalData: json["personal"] != null
+            ? SeekerPersonalModel.fromJson(json["personal"])
+            : null,
+        employmentData: json["employment"] != null
+            ? (json["employment"] as List<dynamic>)
+                .map((e) => SeekerEmploymetModel.fromJson(e))
+                .toList()
+            : null,
+        qualificationData: json["qualification"] != null
+            ? (json["qualification"] as List<dynamic>)
+                .map((q) => SeekerQualificationModel.fromJson(q))
+                .toList()
+            : null
     );
+        
   }
 }
 
 class SeekerPersonalModel {
-  // final String? id;
   final User user;
   final Personal personal;
-  // final String? introduction;
-  // final bool? employed;
-  // final String? city;
-  // final String? state;
-  // final String? nationality;
-  // final String? gender;
-  // final String? cv;
-  // final String? profileImage;
-  // final Map<String, dynamic>? skills;
-  // final Map<String, dynamic>? languages;
-  // final Map<String, dynamic>? certificates;
-  // final Map<String, dynamic>? projects;
-  // final String? preferedSalaryPackage;
-  // final Map<String, dynamic>? preferedWorkLocations;
-  // final String? totalExperienceYears;
-  // final String? totalExperienceMonths;
-
   SeekerPersonalModel({
-    // this.certificates,
-    // this.city,
-    // this.cv,
-    // this.employed,
-    // this.gender,
     required this.user,
     required this.personal,
-    // this.introduction,
-    // this.languages,
-    // this.nationality,
-    // this.preferedSalaryPackage,
-    // this.preferedWorkLocations,
-    // this.profileImage,
-    // this.projects,
-    // this.skills,
-    // this.state,
-    // this.totalExperienceMonths,
-    // this.totalExperienceYears,
   });
 
   factory SeekerPersonalModel.fromJson(Map<String, dynamic> json) {
     return SeekerPersonalModel(
-        // certificates: json["certificates"] ?? {},
-        // city: json["city"] ?? "N/A",
-        // cv: json["cv"],
-        // employed: json["employed"] ?? false,
-        // gender: json["gender"] ?? "N/A",
-        user: User.fromJson(json["user"]),
-        personal: Personal.fromJson(json["personal"]),
-        // introduction: json["intro"] ?? "N/A",
-        // languages: json["languages"] ?? {},
-        // nationality: json["nationality"] ?? "N/A",
-        // preferedSalaryPackage: json["prefered_salary_pa"].toString(),
-        // preferedWorkLocations: json["prefered_work_loc"] ?? {},
-        // profileImage: CustomFunctions.validateUrl(json["profile_image"] ?? ""),
-        // projects: json["projects"] ?? {},
-        // skills: json["skills"] ?? {},
-        // state: json["state"] ?? "N/A",
-        // totalExperienceMonths: json["total_experience_years"].toString(),
-        // totalExperienceYears: json["total_experience_months"].toString()
-        );
+      user: User.fromJson(json["user"]),
+      personal: Personal.fromJson(json["personal"]),
+      
+    );
   }
 }
 
@@ -107,14 +64,12 @@ class User {
         id: json["id"].toString(),
         name: json["name"] ?? "N/A",
         role: json["role"] ?? "N/A",
-        phoneNumber: json["username"] ?? "N/A"
-        
-        );
+        phoneNumber: json["username"] ?? "N/A");
   }
 }
 
 class Personal {
-  final String? id;
+  final int id;
   final String? introduction;
   final bool? employed;
   final String? city;
@@ -135,31 +90,30 @@ class Personal {
   final String? dob;
   final bool? isDifferentlyAbled;
 
-  Personal({
-    this.id,
-    this.certificates,
-    this.city,
-    this.cv,
-    this.employed,
-    this.gender,
-    this.introduction,
-    this.languages,
-    this.nationality,
-    this.preferedSalaryPackage,
-    this.preferedWorkLocations,
-    this.profileImage,
-    this.projects,
-    this.skills,
-    this.state,
-    this.totalExperienceMonths,
-    this.totalExperienceYears,
-    this.address,
-    this.dob,
-    this.isDifferentlyAbled
-  });
+  Personal(
+      {required this.id,
+      this.certificates,
+      this.city,
+      this.cv,
+      this.employed,
+      this.gender,
+      this.introduction,
+      this.languages,
+      this.nationality,
+      this.preferedSalaryPackage,
+      this.preferedWorkLocations,
+      this.profileImage,
+      this.projects,
+      this.skills,
+      this.state,
+      this.totalExperienceMonths,
+      this.totalExperienceYears,
+      this.address,
+      this.dob,
+      this.isDifferentlyAbled});
   factory Personal.fromJson(Map<String, dynamic> json) {
     return Personal(
-      id: json["id"].toString(),
+        id: json["id"],
         certificates: json["certificates"] ?? [],
         city: json["city"] ?? "N/A",
         cv: json["cv"],

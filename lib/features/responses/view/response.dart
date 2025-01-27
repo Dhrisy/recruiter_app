@@ -302,14 +302,15 @@ class _ResponseState extends State<Response>
                                                 provider.bookmarkedStates[
                                                         seekerData.personalData
                                                             ?.personal.id
-                                                            .toString()] ??
+                                                            ] ??
                                                     false;
                                             return SeekerCard(
                                               seekerData: seekerData,
                                               isBookmarked: isBookmarked,
+                                              fromResponse: true,
                                               onBookmarkToggle: () {
                                                 provider
-                                                    .toggleBookmark(seekerData);
+                                                    .toggleBookmark(seekerData, context);
                                               },
                                             );
                                           }),

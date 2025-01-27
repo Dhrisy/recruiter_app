@@ -19,7 +19,8 @@ import 'package:recruiter_app/widgets/custom_fab_btn_widget.dart';
 import 'package:recruiter_app/widgets/reusable_textfield.dart';
 
 class Resedex extends StatefulWidget {
-  const Resedex({Key? key}) : super(key: key);
+  final int? index;
+  const Resedex({Key? key, this.index}) : super(key: key);
 
   @override
   State<Resedex> createState() => _ResedexState();
@@ -68,18 +69,6 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
     {'label': '200000+', 'isChecked': false},
   ];
 
-  void _addRows() {
-    setState(() {
-      experienceOptions.addAll([
-        {'label': '12 - 15 Years', 'count': 500000, 'isChecked': false},
-        {'label': '15 - 20 Years', 'count': 350000, 'isChecked': false},
-        {'label': '20 - 25 Years', 'count': 350000, 'isChecked': false},
-        {'label': '25 - 30 Years', 'count': 350000, 'isChecked': false},
-        {'label': '30+ Years', 'count': 350000, 'isChecked': false},
-      ]);
-    });
-  }
-
   @override
   void initState() {
     super.initState();
@@ -91,6 +80,14 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
       parent: _controller,
       curve: Curves.easeInOut,
     );
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.index != null) {
+        setState(() {
+          currentScreenIndex = widget.index!;
+        });
+      }
+    });
   }
 
   // Helper method to extract min and max years from label
@@ -747,7 +744,7 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
                               text: "Remove filter",
                               theme: theme,
                               action: () {
-                                 Provider.of<SearchSeekerProvider>(context,
+                                Provider.of<SearchSeekerProvider>(context,
                                         listen: false)
                                     .changeSearchResult(false);
                                 setModalState(() {
@@ -762,7 +759,7 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
                                   _selectedNationality == "";
                                 });
                                 setState(() {
-                                   selectedKeywords = [];
+                                  selectedKeywords = [];
                                   _selectedCountry == "";
                                   _selectedEducation == "";
                                   maxSalary == "";
@@ -771,7 +768,6 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
                                   _expMonth.clear();
                                   _selectedGender == "";
                                   _selectedNationality == "";
-
                                 });
 
                                 Provider.of<SearchSeekerProvider>(context,

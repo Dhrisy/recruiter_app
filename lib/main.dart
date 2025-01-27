@@ -14,10 +14,12 @@ import 'package:recruiter_app/features/auth/provider/login_provider.dart';
 import 'package:recruiter_app/features/job_post/data/job_post_repository.dart';
 import 'package:recruiter_app/features/job_post/viewmodel.dart/jobpost_provider.dart';
 import 'package:recruiter_app/features/job_post/viewmodel.dart/search_job_provider.dart';
+import 'package:recruiter_app/features/navbar/view/animated_navbar.dart';
 import 'package:recruiter_app/features/navbar/view_model/navbar_viewmodel.dart';
 import 'package:recruiter_app/features/questionaires/bloc/questionaire_bloc.dart';
 import 'package:recruiter_app/features/questionaires/data/questionaire_repository.dart';
 import 'package:recruiter_app/features/resdex/provider/email_template_provider.dart';
+import 'package:recruiter_app/features/resdex/provider/interview_provider.dart';
 import 'package:recruiter_app/features/resdex/provider/search_seeker_provider.dart';
 import 'package:recruiter_app/features/responses/provider/seeker_provider.dart';
 import 'package:recruiter_app/features/seeker_details/invite_seeker_provider.dart';
@@ -119,7 +121,8 @@ class _MyAppState extends State<MyApp> {
           ChangeNotifierProvider(create: (context) => SearchJobProvider()),
           ChangeNotifierProvider(create: (context) => SeekerProvider()),
           ChangeNotifierProvider(create: (context) => EmailTemplateProvider()),
-          ChangeNotifierProvider(create: (context) => InviteSeekerProvider())
+          ChangeNotifierProvider(create: (context) => InviteSeekerProvider()),
+          ChangeNotifierProvider(create: (context) => InterviewProvider())
         ],
         child: MultiBlocProvider(
           providers: [
@@ -141,7 +144,7 @@ class _MyAppState extends State<MyApp> {
                 theme: state.isDarkMode
                     ? RecruiterAppTheme.darkTheme
                     : RecruiterAppTheme.lightTheme,
-                home: const SplashScreen(),
+                home:  CustomBottomNavBar(),
               );
             },
           ),
