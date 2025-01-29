@@ -29,3 +29,29 @@ class ShimmerListLoading extends StatelessWidget {
     );
   }
 }
+
+
+class RowListShimmerLoadingWidget extends StatelessWidget {
+const RowListShimmerLoadingWidget({ Key? key }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context){
+     return SizedBox(
+      // height: 320.h,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          spacing: 15,
+          children: List.generate(6, (index){
+            return ShimmerWidget(width: 200.w,
+        height: 100.h,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15.r)
+        ),
+        );
+          }),
+        ),
+      ));
+  
+  }
+}

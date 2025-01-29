@@ -43,7 +43,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
           emit(AuthSuccess());
         } else {
-          print("ssssssssssssss  $success");
           if (success == "Email not verified for login") {
             emit(EmailVerifyNeeded());
           } else {

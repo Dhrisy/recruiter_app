@@ -1,6 +1,7 @@
 import 'package:animations/animations.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
@@ -12,8 +13,10 @@ import 'package:recruiter_app/features/resdex/email_template_form.dart';
 import 'package:recruiter_app/features/resdex/provider/search_seeker_provider.dart';
 import 'package:recruiter_app/features/resdex/widgets/candidate_invited.dart';
 import 'package:recruiter_app/features/resdex/widgets/email_template_widget.dart';
+import 'package:recruiter_app/features/resdex/widgets/interview_scheduled_widget.dart';
 import 'package:recruiter_app/features/resdex/widgets/saved_searches.dart';
 import 'package:recruiter_app/features/resdex/widgets/search_cv_form_widget.dart';
+import 'package:recruiter_app/widgets/common_appbar_widget.dart';
 import 'package:recruiter_app/widgets/common_snackbar.dart';
 import 'package:recruiter_app/widgets/custom_fab_btn_widget.dart';
 import 'package:recruiter_app/widgets/reusable_textfield.dart';
@@ -189,7 +192,7 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
                     },
                     openBuilder:
                         (BuildContext context, VoidCallback closeContainer) {
-                      return EmailTemplateForm(
+                      return const EmailTemplateForm(
                         isEdit: false,
                       );
                     },
@@ -209,19 +212,12 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
               padding: const EdgeInsets.symmetric(horizontal: 15),
               child: SingleChildScrollView(
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(
                       height: 40,
                     ),
-                    Row(
-                      children: [
-                        Text(
-                          "Resdex",
-                          style: theme.textTheme.titleLarge!.copyWith(
-                              fontWeight: FontWeight.bold, fontSize: 20.sp),
-                        )
-                      ],
-                    ),
+                    CommonAppbarWidget(title: "Resdex"),
                     const SizedBox(
                       height: 25,
                     ),
@@ -275,6 +271,11 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
                     currentScreenIndex == 1
                         ? CandidateInvited()
                         : SizedBox.shrink(),
+
+                        currentScreenIndex == 2
+                        ? InterviewScheduledWidget()
+                        : SizedBox.shrink(),
+
 
                     currentScreenIndex == 4
                         ? SavedSearches()
@@ -957,7 +958,7 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
             ],
           ),
         ),
-      ),
+      ).animate().fadeIn(duration: 300.ms).scale(duration: 600.ms),
     );
   }
 }

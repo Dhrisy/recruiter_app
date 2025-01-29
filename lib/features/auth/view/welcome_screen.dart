@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:recruiter_app/features/navbar/view/animated_navbar.dart';
 import 'package:recruiter_app/features/navbar/view/navbar.dart';
 
 class WelcomeScreen extends StatefulWidget {
@@ -38,7 +39,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           context,
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
-                const Navbar(),
+                 CustomBottomNavBar(),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               var fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(

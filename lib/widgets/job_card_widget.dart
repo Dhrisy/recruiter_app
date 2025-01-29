@@ -42,7 +42,7 @@ class _JobCardWidgetState extends State<JobCardWidget> {
         setState(() {
           _isSelected = !_isSelected;
         });
-        Navigator.push(context, AnimatedNavigation().slideAnimation(JobDetails(jobData: widget.job)));
+        Navigator.push(context, AnimatedNavigation().fadeAnimation(JobDetails(jobData: widget.job)));
       },
       child: Stack(
         children: [

@@ -21,14 +21,7 @@ class JobPostModel {
    List<dynamic>? customQuestions;
    String? currency;
    int? id;
-
-
-
-  
-  // String? description;
-  // String? jobType;
-  // String? city;
-  // String? country;
+   String? createdOn;
 
   JobPostModel(
       {this.candidateLocation,
@@ -52,30 +45,11 @@ class JobPostModel {
       this.requirements,
       this.skills,
       this.currency,
-      this.id
+      this.id,
+      this.createdOn
       });
 
-    //    {
-    //     "id": 2,
-    //     "company": 5,
-    //     "title": "string",
-    //     "description": "string",
-    //     "type": "string",
-    //     "category": "string",
-    //     "city": "string",
-    //     "country": "string",
-    //     "vacancy": 0,
-    //     "industry": "string",
-    //     "functional_area": "string",
-    //     "gender": "string",
-    //     "nationality": "string",
-    //     "experience_min": 0,
-    //     "experience_max": 0,
-    //     "candidate_location": "string",
-    //     "education": "string",
-    //     "salary_min": 0,
-    //     "salary_max": 0
-    // },
+   
 
   factory JobPostModel.fromJson(Map<String, dynamic> json) {
     return JobPostModel(
@@ -99,7 +73,8 @@ class JobPostModel {
       skills: json["skills"],
       customQuestions: json["custon_qns"],
       currency: json["currency"],
-      id: json["id"]
+      id: json["id"],
+      createdOn: json["created_on"]
     );
   }
 

@@ -11,6 +11,7 @@ import 'package:recruiter_app/features/account/account_provider.dart';
 import 'package:recruiter_app/features/auth/bloc/auth_bloc.dart';
 import 'package:recruiter_app/features/auth/data/auth_repository.dart';
 import 'package:recruiter_app/features/auth/provider/login_provider.dart';
+import 'package:recruiter_app/features/details/job_details_provider.dart';
 import 'package:recruiter_app/features/job_post/data/job_post_repository.dart';
 import 'package:recruiter_app/features/job_post/viewmodel.dart/jobpost_provider.dart';
 import 'package:recruiter_app/features/job_post/viewmodel.dart/search_job_provider.dart';
@@ -122,7 +123,8 @@ class _MyAppState extends State<MyApp> {
           ChangeNotifierProvider(create: (context) => SeekerProvider()),
           ChangeNotifierProvider(create: (context) => EmailTemplateProvider()),
           ChangeNotifierProvider(create: (context) => InviteSeekerProvider()),
-          ChangeNotifierProvider(create: (context) => InterviewProvider())
+          ChangeNotifierProvider(create: (context) => InterviewProvider()),
+          ChangeNotifierProvider(create: (context) => JobDetailsProvider())
         ],
         child: MultiBlocProvider(
           providers: [
@@ -144,7 +146,7 @@ class _MyAppState extends State<MyApp> {
                 theme: state.isDarkMode
                     ? RecruiterAppTheme.darkTheme
                     : RecruiterAppTheme.lightTheme,
-                home:  CustomBottomNavBar(),
+                home:  SplashScreen(),
               );
             },
           ),

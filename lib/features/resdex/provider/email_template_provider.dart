@@ -14,7 +14,6 @@ class EmailTemplateProvider extends ChangeNotifier {
       final result = await EmailTemplateRepository()
           .createEmailTemplate(template: template);
 
-          print("sssssssssssssssss $result");
 
       if (result != null && result == "success") {
         isLoading = false;

@@ -18,8 +18,14 @@ class SeekerService {
     return response;
   }
 
-  static Future<http.Response> fetchRespondedSeeker({String? jobId}) async {
-    final url = Uri.parse("${ApiLists.respondedSeekerEndPoint}?${jobId ?? ""}");
+  static Future<http.Response> fetchRespondedSeeker({int? jobId}) async {
+    String _url = "";
+    if (jobId != null) {
+      _url = "${ApiLists.respondedSeekerEndPoint}?job_id=$jobId";
+    } else {
+      _url = "${ApiLists.respondedSeekerEndPoint}";
+    }
+    final url = Uri.parse(_url);
     final accessToken =
         await CustomFunctions().retrieveCredentials("access_token");
 
@@ -27,6 +33,7 @@ class SeekerService {
       'Authorization': 'Bearer ${accessToken.toString()}',
       'Content-Type': 'application/json',
     });
+
 
     return response;
   }
@@ -60,8 +67,19 @@ class SeekerService {
   }
 
   // fetch invited candidates
-  static Future<http.Response> fetchInvitedCandidates() async {
-    final url = Uri.parse(ApiLists.candidateInvitedEndpoint);
+  static Future<http.Response> fetchInvitedCandidates({int? jobId}) async {
+    
+    String _url = "";
+
+    if (jobId != null) {
+      _url = "${ApiLists.candidateInvitedEndpoint}?job_id=$jobId";
+    } else {
+      _url = ApiLists.candidateInvitedEndpoint;
+    }
+
+    final url = Uri.parse(_url);
+
+    print(url);
 
     final accessToken =
         await CustomFunctions().retrieveCredentials("access_token");
@@ -74,69 +92,57 @@ class SeekerService {
     return response;
   }
 
-
 // sent invitation
-static Future<http.Response>  sentInviteCandidate({required int jobId, required int seekerId}) async{
-  final url = Uri.parse(ApiLists.inviteEndpoint);
+  static Future<http.Response> sentInviteCandidate(
+      {required int jobId, required int seekerId}) async {
+    final url = Uri.parse(ApiLists.inviteEndpoint);
 
     final accessToken =
         await CustomFunctions().retrieveCredentials("access_token");
 
-    final response = await http.post(url, 
-    body: jsonEncode({
-      "candidate_id": seekerId,
-      "job_id": jobId
-    }),
-    headers: {
-      'Authorization': 'Bearer ${accessToken.toString()}',
-      'Content-Type': 'application/json',
-    });
+    final response = await http.post(url,
+        body: jsonEncode({"candidate_id": seekerId, "job_id": jobId}),
+        headers: {
+          'Authorization': 'Bearer ${accessToken.toString()}',
+          'Content-Type': 'application/json',
+        });
 
     return response;
-
-}
+  }
 
 // delete invite
-static Future<http.Response> deleteInvitedCandidate({required int id}) async{
-  final url = Uri.parse("${ApiLists.candidateInvitedEndpoint}?id=$id");
-final accessToken =
+  static Future<http.Response> deleteInvitedCandidate({required int id}) async {
+    final url = Uri.parse("${ApiLists.candidateInvitedEndpoint}?id=$id");
+    final accessToken =
         await CustomFunctions().retrieveCredentials("access_token");
 
-    final response = await http.delete(url, 
-   
-    headers: {
+    final response = await http.delete(url, headers: {
       'Authorization': 'Bearer ${accessToken.toString()}',
       'Content-Type': 'application/json',
     });
 
     return response;
-
-
-}
-
-
-
+  }
 
 // schedule interview
-static Future<http.Response>  scheduleInterviewCandidate({required int jobId, required int seekerId, required String date }) async{
-  final url = Uri.parse(ApiLists.scheduleInterviewEndpoint);
+  static Future<http.Response> scheduleInterviewCandidate(
+      {required int jobId, required int seekerId, required String date}) async {
+    final url = Uri.parse(ApiLists.scheduleInterviewEndpoint);
 
     final accessToken =
         await CustomFunctions().retrieveCredentials("access_token");
 
-    final response = await http.post(url, 
-    body: jsonEncode({
-      "candidate_id": seekerId,
-      "job_id": jobId,
-      "schedule": date
-    }),
-    headers: {
-      'Authorization': 'Bearer ${accessToken.toString()}',
-      'Content-Type': 'application/json',
-    });
+    final response = await http.post(url,
+        body: jsonEncode(
+            {"candidate_id": seekerId, "job_id": jobId, "schedule": date}),
+        headers: {
+          'Authorization': 'Bearer ${accessToken.toString()}',
+          'Content-Type': 'application/json',
+        });
 
     return response;
+  }
 
-}
-  
+
+
 }

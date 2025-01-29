@@ -3,6 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/core/utils/custom_functions.dart';
 import 'package:recruiter_app/features/auth/view/login_screen.dart';
+import 'package:recruiter_app/features/navbar/view/animated_navbar.dart';
 import 'package:recruiter_app/features/navbar/view/navbar.dart';
 import 'package:recruiter_app/features/onboarding/onboarding.dart';
 import 'package:recruiter_app/features/onboarding/landing_screen.dart';
@@ -44,12 +45,14 @@ class _SplashScreenState extends State<SplashScreen>
     // Navigate to the next screen after animation completes
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
+        print(_isLoogedIn);
+        print(_isLoogedIn == false && isInstalled == true);
         Navigator.pushReplacement(
           context,
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
                 _isLoogedIn
-                ? Navbar() 
+                ? CustomBottomNavBar() 
                 : _isLoogedIn == false && isInstalled == true
                 ? LoginScreen()
                : LandingScreen(),

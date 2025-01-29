@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:recruiter_app/core/constants.dart';
+import 'package:recruiter_app/core/utils/custom_functions.dart';
 import 'package:recruiter_app/core/utils/navigation_animation.dart';
 import 'package:recruiter_app/features/account/account.dart';
 import 'package:recruiter_app/features/home/view/home_screen.dart';
@@ -54,7 +55,9 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
         floatingActionButton: FloatingActionButton(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
-          onPressed: () {
+          onPressed: () async{
+            final token = await CustomFunctions().retrieveCredentials("access_token");
+            print(token);
             Navigator.push(context,
                 AnimatedNavigation().fadeAnimation(const JobPostForm()));
           },

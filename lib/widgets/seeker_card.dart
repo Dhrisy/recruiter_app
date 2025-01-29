@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/core/utils/custom_functions.dart';
 import 'package:recruiter_app/core/utils/navigation_animation.dart';
+import 'package:recruiter_app/features/details/job_details.dart';
 import 'package:recruiter_app/features/job_post/model/job_post_model.dart';
 import 'package:recruiter_app/features/resdex/model/seeker_model.dart';
 import 'package:recruiter_app/features/resdex/provider/search_seeker_provider.dart';
@@ -29,8 +30,7 @@ class SeekerCard extends StatefulWidget {
       required this.onBookmarkToggle,
       this.jobData,
       this.isInvited,
-      this.fromResponse
-      })
+      this.fromResponse})
       : super(key: key);
 
   @override
@@ -70,8 +70,6 @@ class _SeekerCardState extends State<SeekerCard>
     super.dispose();
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -82,9 +80,7 @@ class _SeekerCardState extends State<SeekerCard>
             borderRadius: BorderRadius.circular(15.r),
             boxShadow: const [
               BoxShadow(
-                  blurRadius: 5,
-                  color: borderColor,
-                  offset: Offset(-2, 1))
+                  blurRadius: 5, color: borderColor, offset: Offset(-2, 1))
             ]),
         child: InkWell(
           onTap: () {
@@ -94,8 +90,8 @@ class _SeekerCardState extends State<SeekerCard>
                   SeekerDetails(
                     fromResponse: widget.fromResponse,
                     isInvited: widget.isInvited,
-                  seekerData: widget.seekerData,
-                ),
+                    seekerData: widget.seekerData,
+                  ),
                 ));
           },
           borderRadius: BorderRadius.circular(8),
@@ -114,9 +110,37 @@ class _SeekerCardState extends State<SeekerCard>
                           ),
                           Text(
                             widget.jobData != null
-                            ? widget.jobData!.title.toString().toUpperCase() : "N/A",
+                                ? widget.jobData!.title.toString().toUpperCase()
+                                : "N/A",
                             style: theme.textTheme.titleMedium!.copyWith(
                                 fontWeight: FontWeight.bold, fontSize: 12.sp),
+                          ),
+                        ],
+                      )
+                    : const SizedBox.shrink(),
+                     widget.fromResponse == true
+                    ? Row(
+                        children: [
+                          Text(
+                            "Applied to : ",
+                            style: theme.textTheme.bodyMedium!
+                                .copyWith(color: greyTextColor),
+                          ),
+                          InkWell(
+                            onTap: (){
+                              if(widget.jobData != null){
+                              Navigator.push(context, AnimatedNavigation().fadeAnimation(JobDetails(jobData: widget.jobData!)));
+
+                              }
+                            },
+                            child: Text(
+                              widget.jobData != null
+                                  ? widget.jobData!.title.toString().toUpperCase()
+                                  : "N/A",
+                              style: theme.textTheme.titleMedium!.copyWith(
+                                color: Colors.blue,
+                                  fontWeight: FontWeight.bold, fontSize: 12.sp),
+                            ),
                           ),
                         ],
                       )
@@ -160,9 +184,9 @@ class _SeekerCardState extends State<SeekerCard>
                                     widget.seekerData.personalData!.personal
                                                 .employed ==
                                             false
-                                        ? Text(" - Fresher")
+                                        ? Text("Fresher")
                                         : Text(
-                                            " - ${CustomFunctions.toSentenceCase(widget.seekerData.personalData!.personal.introduction.toString())}",
+                                            "${CustomFunctions.toSentenceCase(widget.seekerData.personalData!.personal.introduction.toString())}",
                                             style: theme.textTheme.bodyMedium!
                                                 .copyWith(
                                               color: greyTextColor,
@@ -186,54 +210,7 @@ class _SeekerCardState extends State<SeekerCard>
                                   ),
                                 ),
                               ),
-                              // Consumer<SearchSeekerProvider>(
-                              //     builder: (context, provider, child) {
-                              //   return InkWell(
-                              //       onTap: () async {
-                              //         if (widget.seekerData.personalData !=
-                              //             null) {
-                              //           final _isSaved = await provider
-                              //               .toggleSaveCandidate(
-                              //                   id: widget.seekerData
-                              //                       .personalData!.personal.id
-                              //                       .toString());
-
-                              //           final seekerSaved = await provider
-                              //               .isSeekerSaved(widget.seekerData
-                              //                   .personalData!.personal.id
-                              //                   .toString());
-
-                              //           if (seekerSaved == true) {
-                              //             provider.setSaved(true);
-                              //             // setState(() {
-                              //             //   isSaved = true;
-                              //             // });
-                              //             CommonSnackbar.show(context,
-                              //                 message: "Saved ");
-                              //           } else if (seekerSaved == false) {
-                              //             // setState(() {
-                              //             //   isSaved = false;
-                              //             // });
-                              //             provider.setSaved(false);
-                              //             CommonSnackbar.show(context,
-                              //                 message: "Removed");
-                              //           } else {
-                              //             CommonSnackbar.show(context,
-                              //                 message:
-                              //                     "Something went wrong!");
-                              //           }
-                              //         }
-                              //       },
-                              //       child: provider.isSaved == true
-                              //           ? ScaleTransition(
-                              //               scale: _iconAnimation,
-                              //               child: Icon(Icons.bookmark))
-                              //           : ScaleTransition(
-                              //               scale: _iconAnimation,
-                              //               child: Icon(
-                              //                   Icons.bookmark_outline)));
-                              // })
-                            ],
+                             ],
                           ),
                           const SizedBox(height: 4),
                           Row(
@@ -335,7 +312,6 @@ class _SeekerCardState extends State<SeekerCard>
                               width: 150.w,
                               radius: 8,
                               action: () {
-
                                 showDialog(
                                     context: context,
                                     builder: (BuildContext context) {
@@ -347,17 +323,14 @@ class _SeekerCardState extends State<SeekerCard>
                                           message:
                                               "If you withdraw the invitation for [Candidate Name], you will need to re-invite them by visiting the job or seeker details. Please confirm your action.",
                                           onConfirm: () async {
-                                            if (widget.jobData !=
-                                                null && widget.jobData!.id != null) {
-
-                                                  
+                                            if (widget.jobData != null &&
+                                                widget.jobData!.id != null) {
                                               final result = await Provider.of<
                                                           SearchSeekerProvider>(
                                                       context,
                                                       listen: false)
                                                   .deleteInvitedSeeker(
-                                                    id: widget.jobData!.id!
-                                                  );
+                                                      id: widget.jobData!.id!);
 
                                               if (result == true) {
                                                 Navigator.pop(context);
@@ -376,7 +349,7 @@ class _SeekerCardState extends State<SeekerCard>
                                             }
                                           },
                                           onCancel: () {
-                                           Navigator.pop(context);
+                                            Navigator.pop(context);
                                           },
                                           height: 200);
                                     });
