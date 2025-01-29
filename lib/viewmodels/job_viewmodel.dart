@@ -47,7 +47,7 @@ class JobBloc extends Bloc<JobFetchEvent, JobsState> {
   JobBloc(this.jobRepository) : super(JobInitial()) {
     on<JobFetchEvent>((event, emit) async {
       emit(JobLoading());
-
+print("ttttttttttttttttttttttttttttttttttttttttt");
       try {
         final response = await JobPostRepository().fetchPostedJobs();
         if (response != null) {

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:provider/provider.dart';
 import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/core/theme.dart';
 import 'package:recruiter_app/core/utils/city_lists.dart';
@@ -12,23 +11,20 @@ import 'package:recruiter_app/core/utils/currency_lists.dart';
 import 'package:recruiter_app/core/utils/functional_area_lists.dart';
 import 'package:recruiter_app/core/utils/industry_lists.dart';
 import 'package:recruiter_app/core/utils/nationalities.dart';
-import 'package:recruiter_app/core/utils/navigation_animation.dart';
-import 'package:recruiter_app/core/utils/skills.dart';
 import 'package:recruiter_app/core/utils/states.dart';
 import 'package:recruiter_app/features/auth/bloc/auth_bloc.dart';
 import 'package:recruiter_app/features/auth/data/auth_repository.dart';
-import 'package:recruiter_app/features/job_post/data/job_post_repository.dart';
 import 'package:recruiter_app/features/job_post/model/job_post_model.dart';
-import 'package:recruiter_app/features/job_post/view/preview_job.dart';
 import 'package:recruiter_app/features/job_post/viewmodel.dart/jobpost_provider.dart';
-import 'package:recruiter_app/features/navbar/view/navbar.dart';
 import 'package:recruiter_app/viewmodels/job_viewmodel.dart';
 import 'package:recruiter_app/widgets/common_snackbar.dart';
 import 'package:recruiter_app/widgets/reusable_button.dart';
 import 'package:recruiter_app/widgets/reusable_textfield.dart';
 
 class JobPostForm extends StatefulWidget {
-  const JobPostForm({Key? key}) : super(key: key);
+  final bool? isEdit;
+  final JobPostModel? jobData;
+  const JobPostForm({Key? key, this.isEdit, this.jobData}) : super(key: key);
 
   @override
   _JobPostFormState createState() => _JobPostFormState();
@@ -38,15 +34,8 @@ class _JobPostFormState extends State<JobPostForm> {
   final TextEditingController _titleCont = TextEditingController();
   final TextEditingController _descriptionCont = TextEditingController();
   final TextEditingController _vaccancyCont = TextEditingController();
-  final TextEditingController _countryCont = TextEditingController();
-  final TextEditingController _industryCont = TextEditingController();
-  final TextEditingController _areaCont = TextEditingController();
-  final TextEditingController _genderCont = TextEditingController();
   final TextEditingController _minExpCont = TextEditingController();
   final TextEditingController _maxExpCont = TextEditingController();
-  final TextEditingController _nationalityCont = TextEditingController();
-  final TextEditingController _preferredLocationsCont = TextEditingController();
-  final TextEditingController _educationCont = TextEditingController();
   final TextEditingController _minSalaryCont = TextEditingController();
   final TextEditingController _maxSalaryCont = TextEditingController();
   final TextEditingController _skillCont = TextEditingController();
@@ -80,6 +69,58 @@ class _JobPostFormState extends State<JobPostForm> {
   void initState() {
     super.initState();
     _fetchStates();
+    setFields();
+  }
+
+  void setFields() {
+    if (widget.jobData != null) {
+      setState(() {
+        _titleCont.text = widget.jobData!.title ?? "";
+
+        _vaccancyCont.text = widget.jobData!.vaccancy.toString();
+        _minExpCont.text = widget.jobData!.minimumExperience.toString();
+        _maxExpCont.text = widget.jobData!.maximumExperience.toString();
+        _minSalaryCont.text = widget.jobData!.minimumSalary.toString();
+        _maxSalaryCont.text = widget.jobData!.maximumSalary.toString();
+
+        String fullText = widget.jobData!.description ?? "";
+        List<String> sections = fullText.split('Candidate\'s desired profile:');
+
+        if (sections.length == 2) {
+          // Remove the "Roles and responsibilities:" prefix and trim whitespace
+          _descriptionCont.text = sections[0]
+              .replaceFirst('Roles and responsibilities:', '')
+              .trim();
+
+          // Trim whitespace from the candidate profile section
+          _roleDescriptionCont.text = sections[1].trim();
+        } else {
+          // If the text doesn't contain the expected split, set both to empty or handle as needed
+          _descriptionCont.text = fullText;
+          _roleDescriptionCont.text = '';
+        }
+
+        // Selected dropdowns
+        _selectedIndustry = widget.jobData!.industry ?? '';
+        _selectedFunctionalArea = widget.jobData!.functionalArea ?? '';
+        _selectedCity = widget.jobData!.city ?? '';
+        _selectedCountry = widget.jobData!.country ?? '';
+        _selectedGender = widget.jobData!.gender ?? '';
+        _selectedNationality = widget.jobData!.nationality ?? '';
+        _selectedType = widget.jobData!.jobType ?? '';
+        _selectedEducation = widget.jobData!.education ?? '';
+        _selectedCurrency = widget.jobData!.currency ?? 'INR';
+        if (widget.jobData!.skills != null) {
+          selectedSkills = List<String>.from(widget.jobData!.skills!);
+        }
+
+        print(selectedSkills);
+        if (widget.jobData!.candidateLocation != null) {
+          selectedLocations =
+              List<String>.from(widget.jobData!.candidateLocation!);
+        }
+      });
+    }
   }
 
   void _fetchStates() {
@@ -114,9 +155,9 @@ class _JobPostFormState extends State<JobPostForm> {
   }
 
   void submitForm() {
-    final _bloc = AuthBloc(AuthRepository());
-    try {
+    if (widget.isEdit == true && widget.jobData != null) {
       final job = JobPostModel(
+        id: widget.jobData!.id,
           candidateLocation: [_selectedLocation],
           city: _selectedCity,
           country: _selectedCountry,
@@ -139,9 +180,38 @@ class _JobPostFormState extends State<JobPostForm> {
           customQuestions: ["jsdkadd", "sdfghjk"],
           currency: _selectedCurrency);
 
-      context.read<JobPostBloc>().add(JobPostFormEvent(job: job));
-    } catch (e) {
-      print(e);
+      context.read<JobPostBloc>().add(EditJobPostFormEvent(job: job));
+      
+      
+    } else {
+      try {
+        final job = JobPostModel(
+            candidateLocation: [_selectedLocation],
+            city: _selectedCity,
+            country: _selectedCountry,
+            description:
+                "Roles and responsibilities:${_roleDescriptionCont.text}\nCandidate's desired profile:\n${_descriptionCont.text}",
+            education: _selectedEducation,
+            functionalArea: _selectedFunctionalArea,
+            gender: _selectedGender,
+            industry: _selectedIndustry,
+            jobType: _selectedType,
+            maximumExperience: int.parse(_minExpCont.text),
+            maximumSalary: int.parse(_maxSalaryCont.text),
+            minimumExperience: int.parse(_minExpCont.text),
+            minimumSalary: int.parse(_minSalaryCont.text),
+            nationality: _selectedNationality,
+            title: _titleCont.text,
+            vaccancy: int.parse(_vaccancyCont.text),
+            requirements: "nnnnnnnnn",
+            benefits: "benefits",
+            customQuestions: ["jsdkadd", "sdfghjk"],
+            currency: _selectedCurrency);
+
+        context.read<JobPostBloc>().add(JobPostFormEvent(job: job));
+      } catch (e) {
+        print(e);
+      }
     }
   }
 
@@ -248,15 +318,23 @@ class _JobPostFormState extends State<JobPostForm> {
                         getSteps(theme)[_currentStep].content,
                         BlocConsumer<JobPostBloc, JobPostState>(
                             listener: (context, state) {
+                              print(state);
                           if (state is JobSubmitSuccess) {
                             Navigator.pop(context);
 
                             CommonSnackbar.show(context,
                                 message: "Job added successfully");
-                                context.read<JobBloc>().add(JobFetchEvent());
+                            context.read<JobBloc>().add(JobFetchEvent());
                           } else if (state is JobSubmitFailure) {
                             CommonSnackbar.show(context,
                                 message: "Failed to post job");
+                          }
+
+
+                          if(state is EditJobFormSubmitSuccess){
+                            
+                            Navigator.pop(context);
+                            context.read<JobBloc>().add(JobFetchEvent());
                           }
                         }, builder: (context, state) {
                           return Container(
@@ -267,45 +345,31 @@ class _JobPostFormState extends State<JobPostForm> {
                                 if (_currentStep > 0)
                                   Expanded(
                                     child: ReusableButton(
-                                        action: () {
-                                          setState(() {
-                                            if (_currentStep > 0) {
-                                              _currentStep--;
-                                            }
-                                          });
-                                        },
-                                        text: "BACK",
-                                      ),
+                                      action: () {
+                                        setState(() {
+                                          if (_currentStep > 0) {
+                                            _currentStep--;
+                                          }
+                                        });
+                                      },
+                                      text: "BACK",
+                                    ),
                                   ),
                                 if (_currentStep > 0) const SizedBox(width: 16),
-
                                 Expanded(
                                   child: ReusableButton(
-                                      // isLoading: ,
-                                      action: () async {
-                                        handleNext(theme);
-                                      },
-                                      text: _currentStep <
-                                              getSteps(theme).length - 1
-                                          ? 'NEXT'
-                                          : 'FINISH',
-                                    ),
+                                    // isLoading: ,
+                                    action: () async {
+                                      handleNext(theme);
+                                    },
+                                    text: _currentStep <
+                                            getSteps(theme).length - 1
+                                        ? 'NEXT'
+                                        : widget.isEdit == true
+                                            ? "SAVE"
+                                            : 'FINISH',
+                                  ),
                                 ),
-
-                                // ElevatedButton(
-                                //   onPressed: () {
-                                //     setState(() {
-                                //       if (_currentStep < getSteps(theme).length - 1) {
-                                //         _currentStep++;
-                                //       }
-                                //     });
-                                //   },
-                                //   child: Text(
-                                //     _currentStep < getSteps(theme).length - 1
-                                //         ? 'NEXT'
-                                //         : 'FINISH',
-                                //   ),
-                                // ),
                               ],
                             ),
                           );
@@ -323,6 +387,7 @@ class _JobPostFormState extends State<JobPostForm> {
   }
 
   Widget _buildJobDetailsForm({required ThemeData theme}) {
+    print(selectedSkills.length);
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -370,12 +435,6 @@ class _JobPostFormState extends State<JobPostForm> {
                   ReusableTextfield(
                     controller: _skillCont,
                     labelText: "Skills",
-                    validation: (_) {
-                      if (selectedSkills.isEmpty) {
-                        return "This field is required";
-                      }
-                      return null;
-                    },
                     float: FloatingLabelBehavior.never,
                     hintText: "Enter the skills associated with this job",
                     onSubmit: (value) {
@@ -1016,10 +1075,14 @@ class _JobPostFormState extends State<JobPostForm> {
       ),
       child: DropdownSearch<String>(
         validator: (_) {
-          if (selectedVariable == '') {
-            return "This field is required";
+          if (labelText == "Select location") {
+            return null;
+          } else {
+            if (selectedVariable == '') {
+              return "This field is required";
+            }
+            return null;
           }
-          return null;
         },
         decoratorProps: DropDownDecoratorProps(
           expands: false,

@@ -24,6 +24,15 @@ class JobPostFormEvent extends JobPostEvent {
   List<Object?> get props => [job];
 }
 
+// edit form event
+class EditJobPostFormEvent extends JobPostEvent {
+  final JobPostModel job;
+  EditJobPostFormEvent({required this.job});
+
+  @override
+  List<Object?> get props => [job];
+}
+
 // state
 class JobPostState extends Equatable {
   @override
@@ -35,6 +44,8 @@ class JobPostLoading extends JobPostState {}
 class JobSubmitInitial extends JobPostState {}
 
 class JobSubmitSuccess extends JobPostState {}
+
+class EditJobFormSubmitSuccess extends JobPostState {}
 
 class JobSubmitFailure extends JobPostState {
   final String error;
@@ -55,6 +66,23 @@ class JobPostBloc extends Bloc<JobPostEvent, JobPostState> {
         emit(JobSubmitSuccess());
       } else {
         emit(JobSubmitFailure(error: result.toString()));
+      }
+    });
+
+    on<EditJobPostFormEvent>((event, emit) async {
+      emit(JobPostLoading());
+      try {
+        final result =
+            await jobRepository.editJobPostRepository(job: event.job);
+
+        if (result == "success") {
+          emit(EditJobFormSubmitSuccess());
+          
+        } else {
+          emit(JobSubmitFailure(error: result.toString()));
+        }
+      } catch (e) {
+        emit(JobSubmitFailure(error: e.toString()));
       }
     });
   }

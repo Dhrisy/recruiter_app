@@ -35,4 +35,7 @@ class ApiLists {
   static String inviteEndpoint = "$baseUrl/recruiter_actions/invite_candidates";
   static String scheduleInterviewEndpoint =
       "$baseUrl/recruiter_actions/schedule_interview";
+
+
+       static String updateJobPostEndPoint = "$baseUrl/jobs/edit";
 }
