@@ -26,6 +26,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:recruiter_app/core/theme.dart';
+import 'package:recruiter_app/features/navbar/view/animated_navbar.dart';
 import 'package:recruiter_app/features/navbar/view/navbar.dart';
 import '../../../../core/constants.dart';
 
@@ -279,7 +280,7 @@ class _SuccessfullyRegisteredScreenState
           // Navigate to next screen
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
-              builder: (context) => const Navbar(), // Replace with your next screen
+              builder: (context) =>  CustomBottomNavBar(), // Replace with your next screen
             ),
           );
         }

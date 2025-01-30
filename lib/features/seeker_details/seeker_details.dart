@@ -9,11 +9,14 @@ import 'package:provider/provider.dart';
 import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/core/utils/custom_functions.dart';
 import 'package:recruiter_app/features/details/job_details.dart';
+import 'package:recruiter_app/features/job_post/model/job_post_model.dart';
 import 'package:recruiter_app/features/resdex/model/seeker_model.dart';
 import 'package:recruiter_app/features/resdex/provider/interview_provider.dart';
 import 'package:recruiter_app/features/resdex/provider/search_seeker_provider.dart';
 import 'package:recruiter_app/features/resdex/widgets/common_dropdown_widget.dart';
 import 'package:recruiter_app/features/seeker_details/invite_seeker_provider.dart';
+import 'package:recruiter_app/features/seeker_details/widgets/details_tab_widget.dart';
+import 'package:recruiter_app/features/seeker_details/widgets/job_activity_tab.dart';
 import 'package:recruiter_app/viewmodels/job_viewmodel.dart';
 import 'package:recruiter_app/widgets/chip_container_widget.dart';
 import 'package:recruiter_app/widgets/common_appbar_widget.dart';
@@ -25,8 +28,13 @@ class SeekerDetails extends StatefulWidget {
   final SeekerModel seekerData;
   final bool? isInvited;
   final bool? fromResponse;
+  final JobPostModel? jobData;
   const SeekerDetails(
-      {Key? key, required this.seekerData, this.isInvited, this.fromResponse})
+      {Key? key,
+      required this.seekerData,
+      this.isInvited,
+      this.fromResponse,
+      this.jobData})
       : super(key: key);
 
   @override
@@ -74,30 +82,6 @@ class _SeekerDetailsState extends State<SeekerDetails>
             color: Colors.white,
           ),
           children: <SpeedDialChild>[
-            // SpeedDialChild(
-            //   child: Consumer<SearchSeekerProvider>(
-            //       builder: (context, provider, child) {
-            //     return Icon(
-            //       provider.bookmarkedStates[
-            //                   widget.seekerData.personalData!.personal.id] ==
-            //               true
-            //           ? Icons.bookmark
-            //           : Icons.bookmark_outline,
-            //       color: Colors.white,
-            //     );
-            //   }),
-            //   foregroundColor: Colors.white,
-            //   backgroundColor: buttonColor,
-            //   label: Provider.of<SearchSeekerProvider>(context, listen: false)
-            // .bookmarkedStates[id] == true ? "Unsave $seekerName" : "Save $seekerName",
-            //   onTap: () {
-
-            //       Provider.of<SearchSeekerProvider>(context, listen: false)
-            //           .toggleBookmark(widget.seekerData, context);
-
-            //   },
-            // ),
-
             if (widget.fromResponse == null)
               SpeedDialChild(
                 child: const Icon(
@@ -148,105 +132,76 @@ class _SeekerDetailsState extends State<SeekerDetails>
               ),
             ),
             SafeArea(
-                child: 
-                
-            //     DefaultTabController(
-            //   length: 2,
-            //   child: SizedBox(
-            //     width: double.infinity,
-            //     height: double.infinity,
-            //     child: Column(
-            //       children: [
-            //         CommonAppbarWidget(
-            //           title: CustomFunctions.toSentenceCase(seekerName),
-            //           isBackArrow: true,
-            //         ),
-            //         _buildProfileCard(
-            //             theme: theme, seekerData: widget.seekerData),
-            //         const SizedBox(
-            //           height: 10,
-            //         ),
-            //         TabBar(
-            //             indicatorColor: secondaryColor,
-            //             indicatorSize: TabBarIndicatorSize.tab,
-            //             unselectedLabelStyle: theme.textTheme.bodyLarge!
-            //                 .copyWith(color: greyTextColor),
-            //             labelStyle: theme.textTheme.bodyLarge!.copyWith(
-            //                 color: buttonColor, fontWeight: FontWeight.bold),
-            //             indicator: CustomTabIndicator(
-            //               color: secondaryColor.withValues(alpha: 0.7),
-            //               radius: 15,
-            //               indicatorHeight: 2.h,
-            //             ),
-            //             tabs: [
-            //               Tab(
-            //                 text: "Profile Details ",
-            //               ),
-            //               Tab(
-            //                 text: "Job Activity",
-            //               )
-            //             ]),
-            //         Expanded(
-            //           child: TabBarView(children: [
-            //             _profileTabWidget(theme: theme),
-            //             Text("data")
-            //           ]),
-            //         )
-            //       ],
-            //     ),
-            //   ),
-            // )
-               
-               
-               
-                SingleChildScrollView(
-                  child: Column(
-                    spacing: 15,
-                    children: [
-                      Consumer<SearchSeekerProvider>(
-                          builder: (context, provider, child) {
-                        return CommonAppbarWidget(
-                          isBackArrow: true,
-                          icon: provider.bookmarkedStates[widget
-                                      .seekerData.personalData!.personal.id] ==
-                                  true
-                              ? Icons.bookmark
-                              : Icons.bookmark_outline,
-                          action: () {
-                            provider.toggleBookmark(widget.seekerData, context);
-                          },
-                          title: CustomFunctions.toSentenceCase(seekerName),
-                        );
-                      }),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 15),
-                        child: DefaultTabController(
-                          length: 2,
+                child: widget.fromResponse == true
+                    ? DefaultTabController(
+                        length: 2,
+                        child: SizedBox(
+                          width: double.infinity,
+                          height: double.infinity,
                           child: Column(
-                            spacing: 15,
-                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _buildProfileCard(theme: theme, seekerData: widget.seekerData),
-                              _buildSummaryWidget(theme: theme, seekerData: widget.seekerData),
-                              _buildSkillWidget(theme: theme, skills: []),
-                              _buildBasicDetailsWidget(
+                              CommonAppbarWidget(
+                                title:
+                                    CustomFunctions.toSentenceCase(seekerName),
+                                isBackArrow: true,
+                              ),
+                              _buildProfileCard(
                                   theme: theme, seekerData: widget.seekerData),
-                              _buildExperienceWidget(
-                                  theme: theme, seekerData: widget.seekerData),
-                              _buildQualificationWidget(
-                                  theme: theme, seekerData: widget.seekerData),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              TabBar(
+                                  indicatorColor: secondaryColor,
+                                  indicatorSize: TabBarIndicatorSize.tab,
+                                  unselectedLabelStyle: theme
+                                      .textTheme.bodyLarge!
+                                      .copyWith(color: greyTextColor),
+                                  labelStyle: theme.textTheme.bodyLarge!
+                                      .copyWith(
+                                          color: buttonColor,
+                                          fontWeight: FontWeight.bold),
+                                  indicator: CustomTabIndicator(
+                                    color:
+                                        secondaryColor.withValues(alpha: 0.7),
+                                    radius: 15,
+                                    indicatorHeight: 2.h,
+                                  ),
+                                  tabs: [
+                                    Tab(
+                                      text: "Profile Details ",
+                                    ),
+                                    Tab(
+                                      text: "Job Activity",
+                                    )
+                                  ]),
+                              Expanded(
+                                child: TabBarView(children: [
+                                  _profileTabWidget(theme: theme),
+                                  JobActivityTab(jobData: widget.jobData,)
+                                ]),
+                              )
                             ],
                           ),
                         ),
-                      ),
-                      const SizedBox(
-                        height: 80,
                       )
-                    ],
-                  ),
-                ),
-
-                ),
+                    : SingleChildScrollView(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 15),
+                          child: Column(
+                            spacing: 20,
+                            children: [
+                              CommonAppbarWidget(
+                                title:
+                                    CustomFunctions.toSentenceCase(seekerName),
+                                isBackArrow: true,
+                              ),
+                              _buildProfileCard(
+                                  theme: theme, seekerData: widget.seekerData),
+                              DetailsTabWidget(seekerData: widget.seekerData),
+                            ],
+                          ),
+                        ),
+                      )),
           ],
         ),
       ),
@@ -265,13 +220,14 @@ class _SeekerDetailsState extends State<SeekerDetails>
             const SizedBox(
               height: 5,
             ),
-             Text("View the seeker's personal and professional information, including contact details, skills, experience, and qualifications",
-            style: theme.textTheme.bodyMedium!.copyWith(
-              color: greyTextColor
-            ),),
+            Text(
+              "View the seeker's personal and professional information, including contact details, skills, experience, and qualifications",
+              style: theme.textTheme.bodyMedium!.copyWith(color: greyTextColor),
+            ),
             _buildSummaryWidget(theme: theme, seekerData: widget.seekerData),
             _buildSkillWidget(theme: theme, skills: []),
-            _buildBasicDetailsWidget(theme: theme, seekerData: widget.seekerData),
+            _buildBasicDetailsWidget(
+                theme: theme, seekerData: widget.seekerData),
             _buildExperienceWidget(theme: theme, seekerData: widget.seekerData),
             _buildQualificationWidget(
                 theme: theme, seekerData: widget.seekerData),
@@ -281,11 +237,11 @@ class _SeekerDetailsState extends State<SeekerDetails>
     );
   }
 
-  Widget _jobActivityTabWidget({ required ThemeData theme,}){
+  Widget _jobActivityTabWidget({
+    required ThemeData theme,
+  }) {
     return Column(
-      children: [
-
-      ],
+      children: [],
     );
   }
 

@@ -88,6 +88,7 @@ class _SeekerCardState extends State<SeekerCard>
                 context,
                 AnimatedNavigation().fadeAnimation(
                   SeekerDetails(
+                    jobData: widget.jobData,
                     fromResponse: widget.fromResponse,
                     isInvited: widget.isInvited,
                     seekerData: widget.seekerData,

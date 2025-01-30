@@ -71,7 +71,6 @@ class JobsService {
     final url = Uri.parse(ApiLists.updateJobPostEndPoint);
     final token = await CustomFunctions().retrieveCredentials("access_token");
 
-    print("iiiiiii ${job.id}");
     final response = await http.patch(url,
         body: jsonEncode({
           "id": job.id,
@@ -107,4 +106,7 @@ class JobsService {
 
     return response;
   }
+
+
+  // static Future<http.Response>  deleteJob({})
 }

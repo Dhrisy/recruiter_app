@@ -7,7 +7,7 @@ import 'package:recruiter_app/core/utils/custom_functions.dart';
 import 'package:recruiter_app/core/utils/navigation_animation.dart';
 import 'package:recruiter_app/features/account/account.dart';
 import 'package:recruiter_app/features/home/view/home_screen.dart';
-import 'package:recruiter_app/features/job_post/view/job_post_form.dart';
+import 'package:recruiter_app/features/job_post/view/job_form.dart';
 import 'package:recruiter_app/features/resdex/resedex.dart';
 import 'package:recruiter_app/features/responses/view/response.dart';
 
@@ -53,13 +53,14 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
         backgroundColor: Colors.white,
         body: screens[_activeIndex],
         floatingActionButton: FloatingActionButton(
+          heroTag: "add_fab",
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
           onPressed: () async{
             final token = await CustomFunctions().retrieveCredentials("access_token");
             print(token);
             Navigator.push(context,
-                AnimatedNavigation().fadeAnimation(const JobPostForm()));
+                AnimatedNavigation().fadeAnimation(const JobForm()));
           },
           backgroundColor: secondaryColor,
           child: const Icon(

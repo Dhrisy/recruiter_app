@@ -121,6 +121,7 @@ class JobDetailsWidget extends StatelessWidget {
                 ? _buildSkillWidget(
                     theme: theme, skills: jobData.skills!, context: context)
                 : const SizedBox.shrink(),
+                
           ],
         ),
       ),

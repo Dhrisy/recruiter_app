@@ -26,21 +26,17 @@ class _SearchCvFormWidgetState extends State<SearchCvFormWidget> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       Provider.of<SearchSeekerProvider>(context, listen: false)
+          .initializeBookmarkedStates();
+      Provider.of<SearchSeekerProvider>(context, listen: false)
           .fetchAllSeekersLists()
           .then((_) async {
         if (mounted) {
           setState(() {
             _isLoading = false;
+            _seekerLists =
+                Provider.of<SearchSeekerProvider>(context, listen: false).lists;
           });
         }
-
-        Provider.of<SearchSeekerProvider>(context, listen: false)
-            .initializeBookmarkedStates();
-
-        setState(() {
-          _seekerLists =
-              Provider.of<SearchSeekerProvider>(context, listen: false).lists;
-        });
       });
     });
   }
@@ -90,8 +86,7 @@ class _SearchCvFormWidgetState extends State<SearchCvFormWidget> {
                             final borderColor =
                                 index.isEven ? buttonColor : secondaryColor;
                             final isBookmarked = provider.bookmarkedStates[
-                                    seekerData.personalData?.personal.id
-                                        ] ??
+                                    seekerData.personalData?.personal.id] ??
                                 false;
 
                             return SeekerCard(

@@ -12,7 +12,7 @@ class JobDetailsRepository {
   }) async {
     try {
       final response = await SeekerService.fetchRespondedSeeker(jobId: jobId);
-
+print("respnse fo applied seekers ${response.body}");
       if (response.statusCode == 200) {
         // final List<dynamic>  responseData = jsonDecode(response.body);
         final List<dynamic> responseData = jsonDecode(response.body);

@@ -78,6 +78,7 @@ class JobPostBloc extends Bloc<JobPostEvent, JobPostState> {
         if (result == "success") {
           emit(EditJobFormSubmitSuccess());
           
+          
         } else {
           emit(JobSubmitFailure(error: result.toString()));
         }

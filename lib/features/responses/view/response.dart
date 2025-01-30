@@ -47,12 +47,12 @@ class _ResponseState extends State<Response>
       Provider.of<SeekerProvider>(context, listen: false)
           .fetchAllAppliedSeekers()
           .then((_) {
-        if(mounted){
+        if (mounted) {
           setState(() {
-          _isLoading = false;
-          _seekerLists =
-              Provider.of<SeekerProvider>(context, listen: false).seekerLists;
-        });
+            _isLoading = false;
+            _seekerLists =
+                Provider.of<SeekerProvider>(context, listen: false).seekerLists;
+          });
         }
       });
     });
@@ -155,6 +155,7 @@ class _ResponseState extends State<Response>
                             child: Consumer<SeekerProvider>(
                                 builder: (context, provider, child) {
                               return CommonSearchWidget(
+                                controller: TextEditingController(),
                                 onChanged: (query) {
                                   provider.setSearchQuery(query);
                                 },
@@ -171,7 +172,6 @@ class _ResponseState extends State<Response>
                               .copyWith(color: greyTextColor),
                         ),
                         const SizedBox(height: 15),
-                        
                         SizedBox(
                           height: MediaQuery.of(context).size.height - 200,
                           child: NotificationListener<ScrollNotification>(
@@ -229,77 +229,7 @@ class _ResponseState extends State<Response>
                                 );
                               },
                             );
-                          })
-
-
-
-                              // FutureBuilder<List<JobResponseModel>?>(
-                              //     future: _seekerLists,
-                              //     builder: (context, snapshot) {
-                              //       if (snapshot.connectionState ==
-                              //           ConnectionState.waiting) {
-                              //         return ShimmerListLoading();
-                              //       }
-
-                              //       if (snapshot.hasError ||
-                              //           snapshot.data == null) {
-                              //         return CommonErrorWidget();
-                              //       }
-
-                              //       if (snapshot.hasData &&
-                              //           snapshot.data!.isEmpty) {
-                              //         return CommonEmptyList();
-                              //       }
-
-                              //       return ListView.builder(
-                              //         controller: _scrollController,
-                              //         itemCount: snapshot.data!.length,
-                              //         itemBuilder: (context, index) {
-                              //           final visibility = _itemVisibility[index];
-                              //           final scale = 0.85 + (0.15 * visibility);
-                              //           final opacity = 0.6 + (0.4 * visibility);
-
-                              //           final seekerData = snapshot.data![index];
-
-                              //           return AnimatedScale(
-                              //             scale: scale,
-                              //             duration:
-                              //                 const Duration(milliseconds: 200),
-                              //             child: AnimatedOpacity(
-                              //               opacity: opacity,
-                              //               duration:
-                              //                   const Duration(milliseconds: 200),
-                              //               child: Consumer<SearchSeekerProvider>(
-                              //                   builder:
-                              //                       (context, provider, child) {
-                              //                 final isBookmarked =
-                              //                     provider.bookmarkedStates[
-                              //                             seekerData
-                              //                                 .seeker
-                              //                                 .personalData
-                              //                                 ?.personal
-                              //                                 .id] ??
-                              //                         false;
-                              //                 return SeekerCard(
-
-                              //                   jobData: seekerData.job,
-                              //                   seekerData: seekerData.seeker,
-                              //                   isBookmarked: isBookmarked,
-                              //                   fromResponse: true,
-                              //                   onBookmarkToggle: () {
-                              //                     provider.toggleBookmark(
-                              //                         seekerData.seeker, context);
-                              //                   },
-                              //                 );
-                              //               }),
-                              //             ),
-                              //           );
-                              //         },
-                              // );
-
-                              // }
-                              // ),
-                              ),
+                          })),
                         ),
                       ],
                     ),

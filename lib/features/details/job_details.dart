@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
@@ -10,7 +11,8 @@ import 'package:recruiter_app/core/utils/navigation_animation.dart';
 import 'package:recruiter_app/features/details/widgets/additional_details_widget.dart';
 import 'package:recruiter_app/features/details/widgets/job_details_widget.dart';
 import 'package:recruiter_app/features/job_post/model/job_post_model.dart';
-import 'package:recruiter_app/features/job_post/view/job_post_form.dart';
+import 'package:recruiter_app/features/job_post/view/job_form.dart';
+import 'package:recruiter_app/viewmodels/job_viewmodel.dart';
 import 'package:recruiter_app/widgets/chip_container_widget.dart';
 import 'dart:math' as math;
 
@@ -130,118 +132,129 @@ class _JobDetailsState extends State<JobDetails> with TickerProviderStateMixin {
           SafeArea(
             child: DefaultTabController(
               length: 2,
-              child: Column(
-                spacing: 20,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      CommonAppbarWidget(
-                        // fromJobDetails: true,
-                        isBackArrow: true,
-                        title: widget.jobData.title.toString(),
-                      ),
-                      PopupMenuButton<String>(
-                          icon: const Icon(Icons.more_vert, color: secondaryColor,),
-                          position: PopupMenuPosition.under,
+              child: BlocConsumer<JobBloc, JobsState>(
+                  listener: (context, state) {},
+                  builder: (context, state) {
 
-                          color: secondaryColor,
-                          onSelected: (value) {
-                            switch (value) {
-                              case "edit":
-                              
-                                Navigator.push(context, AnimatedNavigation().fadeAnimation(JobPostForm(
-                                  isEdit: true, jobData: widget.jobData,
-                                )));
-                              case "delete":
-                                print("delete");
-                              case "share":
-                                print("share");
-                            }
-                          },
-                          itemBuilder: (BuildContext context) =>
-                              <PopupMenuEntry<String>>[
-                                 PopupMenuItem<String>(
-                                  value: 'edit',
-                                  child: Row(
-                                    children: [
-                                      Icon(Icons.edit, size: 20, color: buttonColor,),
-                                      SizedBox(width: 8),
-                                      Text('Edit Job', style: theme.textTheme.bodyMedium!.copyWith(
-                                        color: Colors.white
-                                      ),),
-                                    ],
-                                  ),
+                    return Column(
+                      spacing: 20,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: CommonAppbarWidget(
+                                // fromJobDetails: true,
+                                isBackArrow: true,
+                                title: widget.jobData.title.toString(),
+                              ),
+                            ),
+                            PopupMenuButton<String>(
+                                icon: const Icon(
+                                  Icons.more_vert,
+                                  color: secondaryColor,
                                 ),
-                                  PopupMenuItem<String>(
-                                  value: 'delete',
-                                  child: Row(
-                                    children: [
-                                      Icon(Icons.delete, size: 20, color: buttonColor,),
-                                      SizedBox(width: 8),
-                                      Text('Delete Job', style: theme.textTheme.bodyMedium!.copyWith(
-                                        color: Colors.white
-                                      ),),
-                                    ],
-                                  ),
-                                ),
-                                //   PopupMenuItem<String>(
-                               
-                              ])
-                    ],
-                  ),
-                  _buildHeaderWidget(theme: theme, jobData: widget.jobData)
-                      .animate()
-                      .fadeIn(duration: 500.ms)
-                      .slideX(begin: -0.5, end: 0),
-                  TabBar(
-                    indicatorColor: secondaryColor,
-                    indicatorSize: TabBarIndicatorSize.tab,
-                    unselectedLabelStyle: theme.textTheme.bodyLarge!
-                        .copyWith(color: greyTextColor),
-                    labelStyle: theme.textTheme.bodyLarge!.copyWith(
-                        color: buttonColor, fontWeight: FontWeight.bold),
-                    indicator: CustomTabIndicator(
-                      color: secondaryColor.withValues(alpha: 0.7),
-                      radius: 15,
-                      indicatorHeight: 2.h,
-                    ),
-                    tabs: const [
-                      Tab(
-                        text: "Job Details",
-                      ),
-                      Tab(
-                        text: "Additional",
-                      )
-                    ],
-                  ),
-                  Expanded(
-                      child: TabBarView(children: [
-                    JobDetailsWidget(jobData: widget.jobData),
-                    AdditionalDetailsWidget(jobId: widget.jobData.id)
-                  ]))
-                ],
-              ),
+                                position: PopupMenuPosition.under,
+                                color: secondaryColor,
+                                onSelected: (value) {
+                                  switch (value) {
+                                    case "edit":
+                                      Navigator.push(
+                                          context,
+                                          AnimatedNavigation()
+                                              .fadeAnimation(JobForm(
+                                            isEdit: true,
+                                            jobData: widget.jobData,
+                                          )));
+                                    case "delete":
+                                      print("delete");
+                                    case "share":
+                                      print("share");
+                                  }
+                                },
+                                itemBuilder: (BuildContext context) =>
+                                    <PopupMenuEntry<String>>[
+                                      PopupMenuItem<String>(
+                                        value: 'edit',
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              Icons.edit,
+                                              size: 20,
+                                              color: buttonColor,
+                                            ),
+                                            SizedBox(width: 8),
+                                            Text(
+                                              'Edit Job',
+                                              style: theme.textTheme.bodyMedium!
+                                                  .copyWith(
+                                                      color: Colors.white),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      PopupMenuItem<String>(
+                                        value: 'delete',
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              Icons.delete,
+                                              size: 20,
+                                              color: buttonColor,
+                                            ),
+                                            SizedBox(width: 8),
+                                            Text(
+                                              'Delete Job',
+                                              style: theme.textTheme.bodyMedium!
+                                                  .copyWith(
+                                                      color: Colors.white),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      //   PopupMenuItem<String>(
+                                    ])
+                          ],
+                        ),
+                        _buildHeaderWidget(
+                                theme: theme, jobData: widget.jobData)
+                            .animate()
+                            .fadeIn(duration: 500.ms)
+                            .slideX(begin: -0.5, end: 0),
+                        TabBar(
+                          indicatorColor: secondaryColor,
+                          indicatorSize: TabBarIndicatorSize.tab,
+                          unselectedLabelStyle: theme.textTheme.bodyLarge!
+                              .copyWith(color: greyTextColor),
+                          labelStyle: theme.textTheme.bodyLarge!.copyWith(
+                              color: buttonColor, fontWeight: FontWeight.bold),
+                          indicator: CustomTabIndicator(
+                            color: secondaryColor.withValues(alpha: 0.7),
+                            radius: 15,
+                            indicatorHeight: 2.h,
+                          ),
+                          tabs: const [
+                            Tab(
+                              text: "Job Details",
+                            ),
+                            Tab(
+                              text: "Additional",
+                            )
+                          ],
+                        ),
+                        Expanded(
+                            child: TabBarView(children: [
+                          JobDetailsWidget(jobData: widget.jobData),
+                          AdditionalDetailsWidget(jobId: widget.jobData.id)
+                        ]))
+                      ],
+                    );
+                  }),
             ),
           ),
 
-          // Positioned(
-          //   right: 30,
-          //   top: 30,
-          //   child: AnimatedContainer(duration: 500.ms,
-          //   height: 100,
-          //   width: 200,
-          //   decoration: BoxDecoration(
-          //     color: buttonColor
-          //   ),
-          //   child: Column(
-          //     children: [
-
-          //     ],
-          //   ),
-          //   ),
-          // )
+         
         ],
       ),
     );

@@ -58,7 +58,6 @@ class _AdditionalDetailsWidgetState extends State<AdditionalDetailsWidget> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-        
           _buildApplicationResponses(
               theme: theme, seekerData: widget.seekerData)
         ],
@@ -72,39 +71,36 @@ class _AdditionalDetailsWidgetState extends State<AdditionalDetailsWidget> {
   }) {
     return Consumer<JobDetailsProvider>(builder: (context, provider, child) {
       if (_isLoading == true) {
-        return   Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15),
-            child: Column(
-              spacing: 15,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ShimmerWidget(
-                  width: MediaQuery.of(context).size.width * 0.4.w, 
-                  height: 20.h,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15.r)
-                  ),
-                  ),
-              const  RowListShimmerLoadingWidget(),
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15),
+          child: Column(
+            spacing: 15,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
               ShimmerWidget(
-                  width: MediaQuery.of(context).size.width * 0.4.w, 
-                  height: 20.h,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15.r)
-                  ),
-                  ),
-              const  RowListShimmerLoadingWidget(),
+                width: MediaQuery.of(context).size.width * 0.4.w,
+                height: 20.h,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15.r)),
+              ),
+              const RowListShimmerLoadingWidget(),
               ShimmerWidget(
-                  width: MediaQuery.of(context).size.width * 0.4.w, 
-                  height: 20.h,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15.r)
-                  ),
-                  ),
-              const  RowListShimmerLoadingWidget(),
-              ],
-            ),
-          );
+                width: MediaQuery.of(context).size.width * 0.4.w,
+                height: 20.h,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15.r)),
+              ),
+              const RowListShimmerLoadingWidget(),
+              ShimmerWidget(
+                width: MediaQuery.of(context).size.width * 0.4.w,
+                height: 20.h,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15.r)),
+              ),
+              const RowListShimmerLoadingWidget(),
+            ],
+          ),
+        );
       }
 
       return Padding(
@@ -117,14 +113,16 @@ class _AdditionalDetailsWidgetState extends State<AdditionalDetailsWidget> {
               style: theme.textTheme.titleLarge!
                   .copyWith(fontWeight: FontWeight.bold),
             ),
-             Text("The following job seekers have responded to this job posting. Their applications have been submitted for review, and they are being considered based on their skills and experience",
-            style: theme.textTheme.bodyMedium!.copyWith(
-              color: greyTextColor
-            ),),
+            Text(
+              "The following job seekers have responded to this job posting. Their applications have been submitted for review, and they are being considered based on their skills and experience",
+              style: theme.textTheme.bodyMedium!.copyWith(color: greyTextColor),
+            ),
             const SizedBox(
               height: 10,
             ),
-            if (provider.message == "error" || provider.seekerLists == null)
+            if (provider.message != '')
+              _buildEmpty(theme: theme, text: "No seeker yet"),
+            if (provider.message == "" && provider.seekerLists == null)
               CommonErrorWidget(),
             if (provider.seekerLists != null &&
                 provider.message == "" &&
@@ -152,10 +150,10 @@ class _AdditionalDetailsWidgetState extends State<AdditionalDetailsWidget> {
               style: theme.textTheme.titleLarge!
                   .copyWith(fontWeight: FontWeight.bold),
             ),
-             Text("The following job seekers have been scheduled for an interview for this position. Their applications have been reviewed, and they have been shortlisted based on their qualifications and experience",
-            style: theme.textTheme.bodyMedium!.copyWith(
-              color: greyTextColor
-            ),),
+            Text(
+              "The following job seekers have been scheduled for an interview for this position. Their applications have been reviewed, and they have been shortlisted based on their qualifications and experience",
+              style: theme.textTheme.bodyMedium!.copyWith(color: greyTextColor),
+            ),
             const SizedBox(
               height: 10,
             ),
@@ -175,16 +173,16 @@ class _AdditionalDetailsWidgetState extends State<AdditionalDetailsWidget> {
               style: theme.textTheme.titleLarge!
                   .copyWith(fontWeight: FontWeight.bold),
             ),
-            Text("The following job seekers have been invited to apply for this position. They have been selected based on their skills and experience relevant to the job requirements",
-            style: theme.textTheme.bodyMedium!.copyWith(
-              color: greyTextColor
-            ),),
+            Text(
+              "The following job seekers have been invited to apply for this position. They have been selected based on their skills and experience relevant to the job requirements",
+              style: theme.textTheme.bodyMedium!.copyWith(color: greyTextColor),
+            ),
             const SizedBox(
               height: 10,
             ),
             if (provider.invitedMessage == "error" ||
                 provider.invitedSeekersLists == null)
-            const  CommonErrorWidget(),
+              const CommonErrorWidget(),
             if (provider.invitedSeekersLists != null &&
                 provider.invitedMessage == "" &&
                 provider.invitedSeekersLists!.isEmpty)

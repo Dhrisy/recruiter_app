@@ -6,7 +6,8 @@ import 'package:recruiter_app/core/constants.dart';
 
 class CommonSearchWidget extends StatefulWidget {
   final void Function(String)? onChanged;
-  const CommonSearchWidget({Key? key, required this.onChanged}) : super(key: key);
+  final TextEditingController controller;
+  const CommonSearchWidget({Key? key, required this.onChanged, required this.controller}) : super(key: key);
 
   @override
   _CommonSearchWidgetState createState() => _CommonSearchWidgetState();
@@ -32,6 +33,7 @@ class _CommonSearchWidgetState extends State<CommonSearchWidget> {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: TextFormField(
+          controller: widget.controller,
           onChanged: widget.onChanged,
           decoration: InputDecoration(
             hintText: "Search",

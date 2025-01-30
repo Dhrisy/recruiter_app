@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/core/theme.dart';
 import 'package:recruiter_app/core/utils/city_lists.dart';
@@ -11,26 +12,26 @@ import 'package:recruiter_app/core/utils/currency_lists.dart';
 import 'package:recruiter_app/core/utils/functional_area_lists.dart';
 import 'package:recruiter_app/core/utils/industry_lists.dart';
 import 'package:recruiter_app/core/utils/nationalities.dart';
+import 'package:recruiter_app/core/utils/navigation_animation.dart';
 import 'package:recruiter_app/core/utils/states.dart';
-import 'package:recruiter_app/features/auth/bloc/auth_bloc.dart';
-import 'package:recruiter_app/features/auth/data/auth_repository.dart';
 import 'package:recruiter_app/features/job_post/model/job_post_model.dart';
+import 'package:recruiter_app/features/job_post/view/all_jobs.dart';
+import 'package:recruiter_app/features/job_post/viewmodel.dart/job_posting_provider.dart';
 import 'package:recruiter_app/features/job_post/viewmodel.dart/jobpost_provider.dart';
-import 'package:recruiter_app/viewmodels/job_viewmodel.dart';
 import 'package:recruiter_app/widgets/common_snackbar.dart';
 import 'package:recruiter_app/widgets/reusable_button.dart';
 import 'package:recruiter_app/widgets/reusable_textfield.dart';
 
-class JobPostForm extends StatefulWidget {
-  final bool? isEdit;
+class JobForm extends StatefulWidget {
   final JobPostModel? jobData;
-  const JobPostForm({Key? key, this.isEdit, this.jobData}) : super(key: key);
+  final bool? isEdit;
+  const JobForm({Key? key, this.jobData, this.isEdit}) : super(key: key);
 
   @override
-  _JobPostFormState createState() => _JobPostFormState();
+  _JobFormState createState() => _JobFormState();
 }
 
-class _JobPostFormState extends State<JobPostForm> {
+class _JobFormState extends State<JobForm> {
   final TextEditingController _titleCont = TextEditingController();
   final TextEditingController _descriptionCont = TextEditingController();
   final TextEditingController _vaccancyCont = TextEditingController();
@@ -154,10 +155,10 @@ class _JobPostFormState extends State<JobPostForm> {
     }
   }
 
-  void submitForm() {
+  void submitForm() async {
     if (widget.isEdit == true && widget.jobData != null) {
       final job = JobPostModel(
-        id: widget.jobData!.id,
+          id: widget.jobData!.id,
           candidateLocation: [_selectedLocation],
           city: _selectedCity,
           country: _selectedCountry,
@@ -178,11 +179,19 @@ class _JobPostFormState extends State<JobPostForm> {
           requirements: "nnnnnnnnn",
           benefits: "benefits",
           customQuestions: ["jsdkadd", "sdfghjk"],
-          currency: _selectedCurrency);
-
-      context.read<JobPostBloc>().add(EditJobPostFormEvent(job: job));
-      
-      
+          currency: _selectedCurrency,
+          skills: selectedSkills);
+      final result =
+          await Provider.of<JobPostingProvider>(context, listen: false)
+              .editJobPost(job: job);
+      if (result == "success") {
+        Navigator.pushReplacement(
+            context, AnimatedNavigation().fadeAnimation(AllJobs()));
+        CommonSnackbar.show(context, message: "Chnages saved successfully!");
+        Provider.of<JobPostingProvider>(context, listen: false).fetchJobLists();
+      } else {
+        CommonSnackbar.show(context, message: result.toString());
+      }
     } else {
       try {
         final job = JobPostModel(
@@ -206,9 +215,19 @@ class _JobPostFormState extends State<JobPostForm> {
             requirements: "nnnnnnnnn",
             benefits: "benefits",
             customQuestions: ["jsdkadd", "sdfghjk"],
-            currency: _selectedCurrency);
-
-        context.read<JobPostBloc>().add(JobPostFormEvent(job: job));
+            currency: _selectedCurrency,
+            skills: selectedLocations
+            );
+        final result =
+            await Provider.of<JobPostingProvider>(context, listen: false)
+                .postJob(jobData: job);
+        if (result == "success") {
+          Provider.of<JobPostingProvider>(context, listen: false)
+              .fetchJobLists();
+          Navigator.pop(context);
+        } else {
+          CommonSnackbar.show(context, message: result.toString());
+        }
       } catch (e) {
         print(e);
       }
@@ -316,64 +335,42 @@ class _JobPostFormState extends State<JobPostForm> {
                     Column(
                       children: [
                         getSteps(theme)[_currentStep].content,
-                        BlocConsumer<JobPostBloc, JobPostState>(
-                            listener: (context, state) {
-                              print(state);
-                          if (state is JobSubmitSuccess) {
-                            Navigator.pop(context);
-
-                            CommonSnackbar.show(context,
-                                message: "Job added successfully");
-                            context.read<JobBloc>().add(JobFetchEvent());
-                          } else if (state is JobSubmitFailure) {
-                            CommonSnackbar.show(context,
-                                message: "Failed to post job");
-                          }
-
-
-                          if(state is EditJobFormSubmitSuccess){
-                            
-                            Navigator.pop(context);
-                            context.read<JobBloc>().add(JobFetchEvent());
-                          }
-                        }, builder: (context, state) {
-                          return Container(
-                            margin: const EdgeInsets.symmetric(vertical: 20),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                if (_currentStep > 0)
-                                  Expanded(
-                                    child: ReusableButton(
-                                      action: () {
-                                        setState(() {
-                                          if (_currentStep > 0) {
-                                            _currentStep--;
-                                          }
-                                        });
-                                      },
-                                      text: "BACK",
-                                    ),
-                                  ),
-                                if (_currentStep > 0) const SizedBox(width: 16),
+                        Container(
+                          margin: const EdgeInsets.symmetric(vertical: 20),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              if (_currentStep > 0)
                                 Expanded(
                                   child: ReusableButton(
-                                    // isLoading: ,
-                                    action: () async {
-                                      handleNext(theme);
+                                    action: () {
+                                      setState(() {
+                                        if (_currentStep > 0) {
+                                          _currentStep--;
+                                        }
+                                      });
                                     },
-                                    text: _currentStep <
-                                            getSteps(theme).length - 1
-                                        ? 'NEXT'
-                                        : widget.isEdit == true
-                                            ? "SAVE"
-                                            : 'FINISH',
+                                    text: "BACK",
                                   ),
                                 ),
-                              ],
-                            ),
-                          );
-                        }),
+                              if (_currentStep > 0) const SizedBox(width: 16),
+                              Expanded(
+                                child: ReusableButton(
+                                  // isLoading: ,
+                                  action: () async {
+                                    handleNext(theme);
+                                  },
+                                  text:
+                                      _currentStep < getSteps(theme).length - 1
+                                          ? 'NEXT'
+                                          : widget.isEdit == true
+                                              ? "SAVE"
+                                              : 'FINISH',
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
                       ],
                     ),
                   ],

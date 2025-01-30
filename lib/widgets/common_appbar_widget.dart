@@ -8,30 +8,31 @@ class CommonAppbarWidget extends StatelessWidget {
   final IconData? icon;
   final bool? isBackArrow;
   final VoidCallback? action;
+  final VoidCallback? backAction;
 
   const CommonAppbarWidget(
-      {Key? key, required this.title, this.icon, this.isBackArrow, this.action})
+      {Key? key, required this.title, this.icon, this.isBackArrow, this.action, this.backAction})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Container(
-      // height: MediaQuery.of(context).size.height * 0.09.h,
+      width: double.infinity,
+      // height: MediaQuery.of(context).size.height * 0.05.h,
       decoration: BoxDecoration(
         color: Colors.transparent,
       ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Row(
               spacing: 20,
               children: [
                 isBackArrow == true
                     ? InkWell(
-                            onTap: () {
+                            onTap: backAction ?? (){
                               Navigator.pop(context);
                             },
                             child: Icon(
@@ -45,29 +46,34 @@ class CommonAppbarWidget extends StatelessWidget {
                             duration: Duration(milliseconds: 800))
                         .scale()
                     : const SizedBox.shrink(),
-                Text(
-                  title,
-                  style:
-                      theme.textTheme.headlineMedium!.copyWith(fontSize: 20.sp),
+                Expanded(
+                  child: Text(
+                    title,
+                    style:
+                        theme.textTheme.headlineMedium!.copyWith(fontSize: 20.sp),
+                  )
+                      .animate()
+                      .fadeIn(
+                          begin: 0.0,
+                          curve: Curves.easeInOut,
+                          duration: Duration(milliseconds: 800))
+                      .scale(),
                 )
-                    .animate()
-                    .fadeIn(
-                        begin: 0.0,
-                        curve: Curves.easeInOut,
-                        duration: Duration(milliseconds: 800))
-                    .scale()
               ],
             ),
-            icon != null ? InkWell(
-              onTap: action ?? (){},
-              child: Icon(icon) .animate()
-                        .fadeIn(
-                            begin: 0.0,
-                            curve: Curves.easeInOut,
-                            duration: Duration(milliseconds: 800))
-                        .scale()) : const SizedBox.shrink()
-          ],
-        ),
+          ),
+          icon != null
+              ? InkWell(
+                  onTap: action ?? () {},
+                  child: Icon(icon)
+                      .animate()
+                      .fadeIn(
+                          begin: 0.0,
+                          curve: Curves.easeInOut,
+                          duration: Duration(milliseconds: 800))
+                      .scale())
+              : const SizedBox.shrink()
+        ],
       ),
     );
   }

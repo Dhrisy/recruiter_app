@@ -27,6 +27,9 @@ class JobDetailsProvider extends ChangeNotifier {
 
         notifyListeners();
       }
+
+
+      print("tt   $message,  ${seekerLists}");
     } catch (e) {
       message = e.toString();
       notifyListeners();
