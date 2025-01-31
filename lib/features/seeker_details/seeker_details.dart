@@ -8,8 +8,12 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/core/utils/custom_functions.dart';
+import 'package:recruiter_app/core/utils/navigation_animation.dart';
 import 'package:recruiter_app/features/details/job_details.dart';
 import 'package:recruiter_app/features/job_post/model/job_post_model.dart';
+import 'package:recruiter_app/features/job_post/view/job_form.dart';
+import 'package:recruiter_app/features/job_post/viewmodel.dart/job_posting_provider.dart';
+import 'package:recruiter_app/features/resdex/model/job_response_model.dart';
 import 'package:recruiter_app/features/resdex/model/seeker_model.dart';
 import 'package:recruiter_app/features/resdex/provider/interview_provider.dart';
 import 'package:recruiter_app/features/resdex/provider/search_seeker_provider.dart';
@@ -29,12 +33,16 @@ class SeekerDetails extends StatefulWidget {
   final bool? isInvited;
   final bool? fromResponse;
   final JobPostModel? jobData;
+  final bool? fromInterview;
+  final JobResponseModel? responseData;
   const SeekerDetails(
       {Key? key,
       required this.seekerData,
       this.isInvited,
       this.fromResponse,
-      this.jobData})
+      this.fromInterview,
+      this.jobData,
+      this.responseData})
       : super(key: key);
 
   @override
@@ -82,37 +90,54 @@ class _SeekerDetailsState extends State<SeekerDetails>
             color: Colors.white,
           ),
           children: <SpeedDialChild>[
-            if (widget.fromResponse == null)
-              SpeedDialChild(
-                child: const Icon(
-                  Icons.person,
-                  color: Colors.white,
-                ),
-                foregroundColor: Colors.white,
-                backgroundColor: buttonColor,
-                label: "Invite $seekerName for job",
-                onTap: () {
-                  _showInviteSheet(theme: theme);
-                },
+            SpeedDialChild(
+              child: const Icon(
+                Icons.person,
+                color: Colors.white,
               ),
+              foregroundColor: Colors.white,
+              backgroundColor: buttonColor,
+              label: "Invite $seekerName for job",
+              onTap: () {
+                _showInviteSheet(theme: theme);
+              },
+            ),
             if (widget.fromResponse == true)
               SpeedDialChild(
-                child: const Icon(
-                  Icons.calendar_month,
+                child: Icon(
+                  widget.fromInterview == true
+                      ? Icons.delete
+                      : Icons.calendar_month,
                   color: Colors.white,
                 ),
                 foregroundColor: Colors.black,
                 backgroundColor: buttonColor,
-                label: 'Schedule Interview',
+                label: widget.fromInterview == true
+                    ? "Delete scheduled interview"
+                    : 'Schedule Interview',
                 onTap: () {
                   if (widget.seekerData.personalData != null) {
-                    _showInterviewScheduleSheet(
-                        theme: theme,
-                        name: seekerName,
-                        seekerId: widget.seekerData.personalData!.personal.id);
+                    if (widget.fromInterview == true) {
+                    } else {
+                      _showInterviewScheduleSheet(
+                          theme: theme,
+                          name: seekerName,
+                          seekerId:
+                              widget.seekerData.personalData!.personal.id);
+                    }
                   }
                 },
               ),
+            SpeedDialChild(
+              child: Icon(
+                widget.fromInterview == true ? Icons.delete : Icons.email,
+                color: Colors.white,
+              ),
+              foregroundColor: Colors.black,
+              backgroundColor: buttonColor,
+              label: "Email",
+              onTap: () {},
+            ),
             //  Your other SpeedDialChildren go here.
           ],
           child: Icon(
@@ -132,7 +157,8 @@ class _SeekerDetailsState extends State<SeekerDetails>
               ),
             ),
             SafeArea(
-                child: widget.fromResponse == true
+                child: widget.fromResponse == true ||
+                        widget.fromInterview == true
                     ? DefaultTabController(
                         length: 2,
                         child: SizedBox(
@@ -140,13 +166,109 @@ class _SeekerDetailsState extends State<SeekerDetails>
                           height: double.infinity,
                           child: Column(
                             children: [
-                              CommonAppbarWidget(
-                                title:
-                                    CustomFunctions.toSentenceCase(seekerName),
-                                isBackArrow: true,
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 15),
+                                child: Consumer<SearchSeekerProvider>(
+                                    builder: (context, provider, child) {
+                                  return Row(
+                                    children: [
+                                      Expanded(
+                                        child: CommonAppbarWidget(
+                                          isBackArrow: true,
+                                          icon: provider.bookmarkedStates[widget
+                                                      .seekerData
+                                                      .personalData!
+                                                      .personal
+                                                      .id] ==
+                                                  true
+                                              ? Icons.bookmark
+                                              : Icons.bookmark_outline,
+                                          action: () {
+                                            provider.toggleBookmark(
+                                                widget.seekerData, context);
+                                          },
+                                          title: CustomFunctions.toSentenceCase(
+                                              seekerName),
+                                        ),
+                                      ),
+                                      PopupMenuButton<String>(
+                                          icon: const Icon(
+                                            Icons.more_vert,
+                                            color: secondaryColor,
+                                          ),
+                                          position: PopupMenuPosition.under,
+                                          color: secondaryColor,
+                                          onSelected: (value) {
+                                            switch (value) {
+                                              case "edit":
+                                              case "delete":
+                                                print("delete");
+                                              case "share":
+                                                print("share");
+                                            }
+                                          },
+                                          itemBuilder: (BuildContext context) =>
+                                              <PopupMenuEntry<String>>[
+                                                PopupMenuItem<String>(
+                                                  value: 'edit',
+                                                  child: Row(
+                                                    children: [
+                                                      Icon(
+                                                        Icons.edit,
+                                                        size: 20,
+                                                        color: buttonColor,
+                                                      ),
+                                                      SizedBox(width: 8),
+                                                      Text(
+                                                        'Edit Job',
+                                                        style: theme.textTheme
+                                                            .bodyMedium!
+                                                            .copyWith(
+                                                                color: Colors
+                                                                    .white),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                PopupMenuItem<String>(
+                                                  value: 'delete',
+                                                  child: Row(
+                                                    children: [
+                                                      Icon(
+                                                        Icons.delete,
+                                                        size: 20,
+                                                        color: buttonColor,
+                                                      ),
+                                                      SizedBox(width: 8),
+                                                      Text(
+                                                        'Delete Job',
+                                                        style: theme.textTheme
+                                                            .bodyMedium!
+                                                            .copyWith(
+                                                                color: Colors
+                                                                    .white),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                //   PopupMenuItem<String>(
+                                              ])
+                                    ],
+                                  );
+                                }),
                               ),
-                              _buildProfileCard(
-                                  theme: theme, seekerData: widget.seekerData),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              Text(widget.fromResponse.toString()),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 15),
+                                child: _buildProfileCard(
+                                    theme: theme,
+                                    seekerData: widget.seekerData),
+                              ),
                               const SizedBox(
                                 height: 10,
                               ),
@@ -177,7 +299,11 @@ class _SeekerDetailsState extends State<SeekerDetails>
                               Expanded(
                                 child: TabBarView(children: [
                                   _profileTabWidget(theme: theme),
-                                  JobActivityTab(jobData: widget.jobData,)
+                                  JobActivityTab(
+                                    responseData: widget.responseData,
+                                    isInterview: widget.fromInterview,
+                                    jobData: widget.jobData,
+                                  )
                                 ]),
                               )
                             ],
@@ -190,11 +316,26 @@ class _SeekerDetailsState extends State<SeekerDetails>
                           child: Column(
                             spacing: 20,
                             children: [
-                              CommonAppbarWidget(
-                                title:
-                                    CustomFunctions.toSentenceCase(seekerName),
-                                isBackArrow: true,
-                              ),
+                              Consumer<SearchSeekerProvider>(
+                                  builder: (context, provider, child) {
+                                return CommonAppbarWidget(
+                                  isBackArrow: true,
+                                  icon: provider.bookmarkedStates[widget
+                                              .seekerData
+                                              .personalData!
+                                              .personal
+                                              .id] ==
+                                          true
+                                      ? Icons.bookmark
+                                      : Icons.bookmark_outline,
+                                  action: () {
+                                    provider.toggleBookmark(
+                                        widget.seekerData, context);
+                                  },
+                                  title: CustomFunctions.toSentenceCase(
+                                      seekerName),
+                                );
+                              }),
                               _buildProfileCard(
                                   theme: theme, seekerData: widget.seekerData),
                               DetailsTabWidget(seekerData: widget.seekerData),
@@ -311,7 +452,7 @@ class _SeekerDetailsState extends State<SeekerDetails>
                             height: 15,
                           ),
                           Text(
-                            "Select job from below:",
+                            "Schedule inter for", //  "Select job from below:",
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyMedium!
@@ -323,39 +464,48 @@ class _SeekerDetailsState extends State<SeekerDetails>
                           const SizedBox(
                             height: 8,
                           ),
-                          BlocConsumer<JobBloc, JobsState>(
-                              listener: (context, state) {},
-                              builder: (context, state) {
-                                if (state is JobFetchSuccess) {
-                                  List<String> _jobTitleLists =
-                                      state.jobs.map((job) {
-                                    return job.title ?? '';
-                                  }).toList();
-                                  return CommonDropdownWidget(
-                                          hintText: "Select job",
-                                          labelText: "Job",
-                                          list: _jobTitleLists,
-                                          onChanged: (value) {
-                                            setModalState(() {
-                                              _selectedJob = value ?? '';
+                          Text(
+                            widget.jobData!.title.toString(),
+                            style: theme.textTheme.titleMedium!
+                                .copyWith(fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(
+                            height: 8,
+                          ),
 
-                                              final _job = state.jobs
-                                                  .firstWhere((job) =>
-                                                      job.title ==
-                                                      _selectedJob);
+                          // BlocConsumer<JobBloc, JobsState>(
+                          //     listener: (context, state) {},
+                          //     builder: (context, state) {
+                          //       if (state is JobFetchSuccess) {
+                          //         List<String> _jobTitleLists =
+                          //             state.jobs.map((job) {
+                          //           return job.title ?? '';
+                          //         }).toList();
+                          //         return CommonDropdownWidget(
+                          //                 hintText: "Select job",
+                          //                 labelText: "Job",
+                          //                 list: _jobTitleLists,
+                          //                 onChanged: (value) {
+                          //                   setModalState(() {
+                          //                     _selectedJob = value ?? '';
 
-                                              jobId = _job.id;
-                                            });
-                                          },
-                                          selectedVariable: _selectedJob,
-                                          theme: theme)
-                                      .animate()
-                                      .fadeIn(duration: 900.ms)
-                                      .slideX(begin: -0.5, end: 0);
-                                } else {
-                                  return Text("Failed to load jobs");
-                                }
-                              }),
+                          //                     final _job = state.jobs
+                          //                         .firstWhere((job) =>
+                          //                             job.title ==
+                          //                             _selectedJob);
+
+                          //                     jobId = _job.id;
+                          //                   });
+                          //                 },
+                          //                 selectedVariable: _selectedJob,
+                          //                 theme: theme)
+                          //             .animate()
+                          //             .fadeIn(duration: 900.ms)
+                          //             .slideX(begin: -0.5, end: 0);
+                          //       } else {
+                          //         return Text("Failed to load jobs");
+                          //       }
+                          //     }),
                           Text(
                             "Please select the date and time for the interview schedule",
                             style: Theme.of(context)
@@ -431,15 +581,15 @@ class _SeekerDetailsState extends State<SeekerDetails>
                             builder: (context, provider, child) {
                           return ReusableButton(
                                   textColor: Colors.white,
-                                  buttonColor: _selectedJob == ''
-                                      ? secondaryColor.withValues(alpha: 0.6)
-                                      : secondaryColor,
+                                  buttonColor: selectedTime != null &&
+                                          selectedDate != null
+                                      ? secondaryColor
+                                      : secondaryColor.withValues(alpha: 0.6),
                                   action: () async {
-                                    if (jobId != null &&
+                                    if (widget.jobData != null &&
+                                        widget.jobData!.id != null &&
                                         widget.seekerData.personalData !=
                                             null) {
-                                      print(jobId);
-
                                       final DateTime combinedDateTime =
                                           DateTime(
                                         selectedDate!.year,
@@ -454,14 +604,11 @@ class _SeekerDetailsState extends State<SeekerDetails>
                                               "yyyy-MM-ddTHH:mm:ss.SSS'Z'")
                                           .format(combinedDateTime);
 
-                                      print(
-                                          "Formatted DateTime: $formattedDateTime");
-
                                       final result =
                                           await provider.scheduleInterview(
                                               candidateId: widget.seekerData
                                                   .personalData!.personal.id,
-                                              jobId: jobId!,
+                                              jobId: widget.jobData!.id!,
                                               date: formattedDateTime);
 
                                       if (result == true) {
@@ -475,6 +622,8 @@ class _SeekerDetailsState extends State<SeekerDetails>
                                         CommonSnackbar.show(context,
                                             message: "${provider.message}!");
                                       }
+                                    } else {
+                                      print("llllllllllllllllllllll");
                                     }
                                   },
                                   text: "Schedule Interview")
@@ -491,12 +640,13 @@ class _SeekerDetailsState extends State<SeekerDetails>
   }
 
   void _showInviteSheet({required ThemeData theme}) {
+    bool isLoading = false;
     showModalBottomSheet(
         context: context,
         builder: (context) => StatefulBuilder(
                 builder: (BuildContext context, StateSetter setModalState) {
               return Container(
-                height: 260.h,
+                // height: 260.h,
                 width: double.infinity,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -550,40 +700,36 @@ class _SeekerDetailsState extends State<SeekerDetails>
                           const SizedBox(
                             height: 15,
                           ),
-                          BlocConsumer<JobBloc, JobsState>(
-                              listener: (context, state) {},
-                              builder: (context, state) {
-                                if (state is JobFetchSuccess) {
-                                  List<String> _jobTitleLists =
-                                      state.jobs.map((job) {
-                                    return job.title ?? '';
-                                  }).toList();
-                                  return CommonDropdownWidget(
-                                          hintText: "Select job",
-                                          labelText: "Job",
-                                          list: _jobTitleLists,
-                                          onChanged: (value) {
-                                            setModalState(() {
-                                              _selectedJob = value ?? '';
-                                              // Find the job object that matches the selected title
+                          Consumer<JobPostingProvider>(
+                              builder: (context, provider, child) {
+                            List<String> _jobTitleLists =
+                                provider.jobLists != null
+                                    ? provider.jobLists!.map((job) {
+                                        return job.title ?? '';
+                                      }).toList()
+                                    : [];
+                            return CommonDropdownWidget(
+                                    hintText: "Select job",
+                                    labelText: "Job",
+                                    list: _jobTitleLists,
+                                    onChanged: (value) {
+                                      setModalState(() {
+                                        _selectedJob = value ?? '';
+                                        // Find the job object that matches the selected title
 
-                                              final _job = state.jobs
-                                                  .firstWhere((job) =>
-                                                      job.title ==
-                                                      _selectedJob);
+                                        final job = provider.jobLists
+                                            ?.firstWhere((job) =>
+                                                job.title == _selectedJob);
 
-                                              jobId = _job.id;
-                                            });
-                                          },
-                                          selectedVariable: _selectedJob,
-                                          theme: theme)
-                                      .animate()
-                                      .fadeIn(duration: 900.ms)
-                                      .slideX(begin: -0.5, end: 0);
-                                } else {
-                                  return Text("Failed to load jobs");
-                                }
-                              }),
+                                        jobId = job?.id;
+                                      });
+                                    },
+                                    selectedVariable: _selectedJob,
+                                    theme: theme)
+                                .animate()
+                                .fadeIn(duration: 900.ms)
+                                .slideX(begin: -0.5, end: 0);
+                          }),
                         ],
                       ),
                       Padding(
@@ -591,13 +737,16 @@ class _SeekerDetailsState extends State<SeekerDetails>
                         child: Consumer<InviteSeekerProvider>(
                             builder: (context, provider, child) {
                           return ReusableButton(
+                            isLoading: isLoading,
                                   textColor: Colors.white,
                                   buttonColor: _selectedJob == ''
                                       ? secondaryColor.withValues(alpha: 0.6)
                                       : secondaryColor,
                                   action: () async {
                                     if (jobId != null) {
-                                      print(jobId);
+                                      setModalState(() {
+                                        isLoading = true;
+                                      });
                                       final result = await Provider.of<
                                                   InviteSeekerProvider>(context,
                                               listen: false)

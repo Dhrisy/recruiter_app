@@ -17,8 +17,6 @@ class SeekerRepository {
   Future<List<SeekerModel>?> fetchAllSeekers() async {
     try {
       final response = await SeekerService.fetchAllSeekers();
-      print(
-          "Response of fetch all seekers ${response.statusCode},  ${response.body}");
       if (response.statusCode == 200) {
         final List<dynamic> responseData = jsonDecode(response.body);
 
@@ -96,7 +94,9 @@ class SeekerRepository {
         //     .map((item) => SeekerModel.fromJson(item['candidate']))
         //     .toList();
 
-        List<JobResponseModel> seekerLists = responseData.map((item) => JobResponseModel.fromJson(item)).toList();
+        List<JobResponseModel> seekerLists = responseData
+            .map((item) => JobResponseModel.fromJson(item))
+            .toList();
 
         return seekerLists;
       } else if (response.statusCode == 401) {
@@ -106,8 +106,7 @@ class SeekerRepository {
           retryCount: retryCount + 1,
           maxRetries: maxRetries,
         );
-      } 
-      else {
+      } else {
         return null;
       }
     } catch (e) {
@@ -115,8 +114,6 @@ class SeekerRepository {
       return null;
     }
   }
-
-
 
   // Future<List<SeekerModel>?> fetchAllAppliedSeekers({
   //   int? jobId,
@@ -142,7 +139,7 @@ class SeekerRepository {
   //         retryCount: retryCount + 1,
   //         maxRetries: maxRetries,
   //       );
-  //     } 
+  //     }
   //     else {
   //       return null;
   //     }
@@ -152,9 +149,6 @@ class SeekerRepository {
   //   }
   // }
 
-
-
-
   Future<bool?> saveCandidate({
     required int id,
     required BuildContext context,
@@ -163,8 +157,8 @@ class SeekerRepository {
   }) async {
     try {
       final response = await SeekerService.saveSeeker(id: id);
-      
-     final Map<String, dynamic> responseData = jsonDecode(response.body);
+
+      final Map<String, dynamic> responseData = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
         CommonSnackbar.show(context, message: responseData["message"]);
@@ -233,7 +227,7 @@ class SeekerRepository {
 
       if (response.statusCode == 200) {
         final List<dynamic> responseData = jsonDecode(response.body);
-       
+
         print(responseData.runtimeType);
         List<InvitedSeekerWithJob> seekerWithJobList = responseData
             .map((dynamic item) =>
@@ -286,34 +280,70 @@ class SeekerRepository {
     }
   }
 
-
-
   // schedule interview
-  Future<String?>  scheduleInterview({
+  Future<String?> scheduleInterview({
     required int candidateId,
     required int jobId,
     required String date,
     int retryCount = 0,
     int maxRetries = 3,
-
-  }) async{
+  }) async {
     try {
-      final response = await SeekerService.scheduleInterviewCandidate(jobId: jobId, seekerId: candidateId, date: date);
-      print("Response of schedule interview ${response.statusCode},  ${response.body}");
-      if(response.statusCode == 200){
+      final response = await SeekerService.scheduleInterviewCandidate(
+          jobId: jobId, seekerId: candidateId, date: date);
+      print(
+          "Response of schedule interview ${response.statusCode},  ${response.body}");
+      if (response.statusCode == 200) {
         return "success";
-      }else if(response.statusCode == 401){
+      } else if (response.statusCode == 401) {
         await RefreshTokenService.refreshToken();
         return scheduleInterview(
-          candidateId: candidateId, jobId: jobId, date: date, retryCount: retryCount + 1, maxRetries: maxRetries);
-
-      }else{
+            candidateId: candidateId,
+            jobId: jobId,
+            date: date,
+            retryCount: retryCount + 1,
+            maxRetries: maxRetries);
+      } else {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         return responseData["message"];
       }
-
     } catch (e) {
       return e.toString();
+    }
+  }
+
+  Future<Map<String, dynamic>?> fetchInterviewScheduled(
+      {int retryCount = 0, int maxRetries = 3}) async {
+    try {
+      final response = await SeekerService.fetchInterviewScheduled();
+      log("Response of interview scheduled ${response.body}");
+
+      if (response.statusCode == 200) {
+        List<dynamic> lists = jsonDecode(response.body);
+
+        List<JobResponseModel> seekerLists = lists.map((item) {
+          print("Raw JSON item: $item"); // Check if viewed and status exist
+
+          final _it = JobResponseModel.fromJson(item);
+
+          print("Parsed Model - created_on: ${item["created_on"]}");
+          print("Parsed Model - viewed: ${item["viewed"]}");
+          print("Parsed Model - status: ${item["status"]}");
+          return _it;
+        }).toList();
+        print(seekerLists);
+
+        return {"list": seekerLists, "message": "success"};
+      } else if (response.statusCode == 401) {
+        return fetchInterviewScheduled(
+            retryCount: retryCount + 1, maxRetries: maxRetries);
+      } else {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        return {"list": null, "message": responseData["message"]};
+      }
+    } catch (e) {
+      print(e);
+      return null;
     }
   }
 }

@@ -5,14 +5,22 @@ class JobResponseModel {
   final int id;
   final SeekerModel seeker;
   final JobPostModel job;
+  final String status;
+  final String viewed;
 
-  JobResponseModel({required this.id, required this.seeker, required this.job});
+  JobResponseModel(
+      {required this.id,
+      required this.seeker,
+      required this.job,
+      required this.status,
+      required this.viewed});
 
   factory JobResponseModel.fromJson(Map<String, dynamic> json) {
     return JobResponseModel(
-        id: json["id"], 
+        id: json["id"],
+        viewed: json["viewed"].toString(),
+        status: json["status"] ?? "",
         seeker: SeekerModel.fromJson(json["candidate"]),
-        job: JobPostModel.fromJson(json["job"])
-        );
+        job: JobPostModel.fromJson(json["job"]));
   }
 }

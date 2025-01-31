@@ -218,6 +218,7 @@ class _ResponseState extends State<Response>
                                         jobData: seekerData.job,
                                         seekerData: seekerData.seeker,
                                         isBookmarked: isBookmarked,
+                                        responseData: seekerData,
                                         fromResponse: true,
                                         onBookmarkToggle: () {
                                           provider.toggleBookmark(

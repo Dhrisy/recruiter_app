@@ -7,6 +7,7 @@ import 'package:recruiter_app/core/utils/custom_functions.dart';
 import 'package:recruiter_app/core/utils/navigation_animation.dart';
 import 'package:recruiter_app/features/details/job_details.dart';
 import 'package:recruiter_app/features/job_post/model/job_post_model.dart';
+import 'package:recruiter_app/features/resdex/model/job_response_model.dart';
 import 'package:recruiter_app/features/resdex/model/seeker_model.dart';
 import 'package:recruiter_app/features/resdex/provider/search_seeker_provider.dart';
 import 'package:recruiter_app/features/seeker_details/seeker_details.dart';
@@ -22,6 +23,8 @@ class SeekerCard extends StatefulWidget {
   final bool? isInvited;
   final JobPostModel? jobData;
   final bool? fromResponse;
+  final bool? fromINterview;
+  final JobResponseModel? responseData;
   const SeekerCard(
       {Key? key,
       required this.seekerData,
@@ -30,6 +33,8 @@ class SeekerCard extends StatefulWidget {
       required this.onBookmarkToggle,
       this.jobData,
       this.isInvited,
+      this.fromINterview,
+      this.responseData,
       this.fromResponse})
       : super(key: key);
 
@@ -88,6 +93,8 @@ class _SeekerCardState extends State<SeekerCard>
                 context,
                 AnimatedNavigation().fadeAnimation(
                   SeekerDetails(
+                    responseData: widget.responseData,
+                    fromInterview: widget.fromINterview,
                     jobData: widget.jobData,
                     fromResponse: widget.fromResponse,
                     isInvited: widget.isInvited,
@@ -142,6 +149,50 @@ class _SeekerCardState extends State<SeekerCard>
                                 color: Colors.blue,
                                   fontWeight: FontWeight.bold, fontSize: 12.sp),
                             ),
+                          ),
+                        ],
+                      )
+                    : const SizedBox.shrink(),
+                     widget.fromINterview == true
+                    ? Row(
+                        children: [
+                          Text(
+                            "Applied to : ",
+                            style: theme.textTheme.bodyMedium!
+                                .copyWith(color: greyTextColor),
+                          ),
+                          Expanded(
+                            child: InkWell(
+                              onTap: (){
+                                if(widget.jobData != null){
+                                Navigator.push(context, AnimatedNavigation().fadeAnimation(JobDetails(jobData: widget.jobData!)));
+                            
+                                }
+                              },
+                              child: Text(
+                                widget.jobData != null
+                                    ? widget.jobData!.title.toString().toUpperCase()
+                                    : "N/A",
+                                style: theme.textTheme.titleMedium!.copyWith(
+                                  color: Colors.blue,
+                                    fontWeight: FontWeight.bold, fontSize: 12.sp),
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(
+                            width: 15,
+                          ),
+
+                          Expanded(
+                            child: Text(
+                                widget.responseData != null
+                                    ? widget.responseData!.status
+                                    : "N/A",
+                                style: theme.textTheme.titleMedium!.copyWith(
+                                  color: Colors.blue,
+                                    fontWeight: FontWeight.bold, fontSize: 12.sp),
+                              ),
                           ),
                         ],
                       )

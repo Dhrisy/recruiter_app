@@ -215,6 +215,9 @@ class _JobDetailsState extends State<JobDetails> with TickerProviderStateMixin {
                                       ),
                                       //   PopupMenuItem<String>(
                                     ])
+                          
+                          
+                          
                           ],
                         ),
                         _buildHeaderWidget(
@@ -246,7 +249,7 @@ class _JobDetailsState extends State<JobDetails> with TickerProviderStateMixin {
                         Expanded(
                             child: TabBarView(children: [
                           JobDetailsWidget(jobData: widget.jobData),
-                          AdditionalDetailsWidget(jobId: widget.jobData.id)
+                          AdditionalDetailsWidget(jobId: widget.jobData.id, jobData: widget.jobData,)
                         ]))
                       ],
                     );
@@ -282,6 +285,8 @@ class _JobDetailsState extends State<JobDetails> with TickerProviderStateMixin {
               duration: const Duration(milliseconds: 0),
               child: CircleAvatar(
                 radius: 40.r,
+                backgroundColor: Colors.white,
+                backgroundImage: AssetImage("assets/images/default_company_logo.png"),
               ),
             ),
             SizedBox(width: 12.w),

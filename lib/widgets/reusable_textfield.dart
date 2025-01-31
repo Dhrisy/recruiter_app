@@ -37,6 +37,7 @@ class _ReusableTextfieldState extends State<ReusableTextfield> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      
       controller: widget.controller,
       validator: widget.validation,
       keyboardType: widget.keyBoardType,
@@ -44,6 +45,7 @@ class _ReusableTextfieldState extends State<ReusableTextfield> {
       onFieldSubmitted: widget.onSubmit ?? (_){},
       maxLines: widget.maxLines ?? 1,
       decoration: InputDecoration(
+        
         hintText: widget.isRequired == true
             ? "${widget.hintText ?? ""}*"
             : widget.hintText ?? "",

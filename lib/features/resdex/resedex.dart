@@ -961,4 +961,7 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
       ).animate().fadeIn(duration: 300.ms).scale(duration: 600.ms),
     );
   }
+
+
+
 }

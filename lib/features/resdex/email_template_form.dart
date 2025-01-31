@@ -5,11 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/core/utils/custom_functions.dart';
 import 'package:recruiter_app/features/job_post/model/job_post_model.dart';
+import 'package:recruiter_app/features/job_post/viewmodel.dart/job_posting_provider.dart';
 import 'package:recruiter_app/features/resdex/model/email_template_model.dart';
 import 'package:recruiter_app/features/resdex/provider/email_template_provider.dart';
 import 'package:recruiter_app/viewmodels/job_viewmodel.dart';
@@ -231,100 +231,173 @@ class _EmailTemplateFormState extends State<EmailTemplateForm> {
   }
 
   Widget _buildSelectJob() {
-    return BlocConsumer<JobBloc, JobsState>(
-        listener: (context, state) {},
-        builder: (context, state) {
-          if (state is JobFetchFailure) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 15),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "Failed to fetch jobs",
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyMedium!
-                        .copyWith(color: Colors.red),
-                  ),
-                ],
+    return Consumer<JobPostingProvider>(builder: (context, provider, child) {
+      List<String> _jobTitleLists = provider.jobLists != null
+          ? provider.jobLists!.map((job) {
+              return job.title ?? '';
+            }).toList()
+          : [];
+      return Container(
+        constraints: BoxConstraints(
+          maxHeight: 55.h,
+        ),
+        child: DropdownSearch<String>(
+          validator: (_) {
+            if (selectedJob == '') {
+              return "This field is required";
+            }
+            return null;
+          },
+          decoratorProps: DropDownDecoratorProps(
+            expands: false,
+            decoration: InputDecoration(
+              labelText: "Select job",
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: const BorderSide(color: borderColor),
               ),
-            );
-          }
-          if (state is JobFetchSuccess) {
-            List<String> _jobTitleLists =
-                state.jobs.map((job) => job.title ?? '').toList();
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: const BorderSide(color: borderColor),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: const BorderSide(color: borderColor),
+              ),
+            ),
+          ),
+          items: (filter, infiniteScrollProps) => _jobTitleLists,
+          selectedItem: selectedJob.isEmpty ? null : selectedJob,
+          onChanged: (selectedTitle) {
+            if (selectedTitle != null && provider.jobLists != null) {
+              final selectedJobModel = provider.jobLists!.firstWhere(
+                (job) => job.title == selectedTitle,
+                orElse: () => JobPostModel(),
+              );
 
-            return Container(
-              constraints: BoxConstraints(
-                maxHeight: 55.h,
-              ),
-              child: DropdownSearch<String>(
-                validator: (_) {
-                  if (selectedJob == '') {
-                    return "This field is required";
-                  }
-                  return null;
-                },
-                decoratorProps: DropDownDecoratorProps(
-                  expands: false,
-                  decoration: InputDecoration(
-                    labelText: "Select job",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: borderColor),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: borderColor),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: borderColor),
-                    ),
-                  ),
+              if (selectedJobModel.id != null) {
+                setState(() {
+                  selectedJob = selectedTitle;
+                  selectedJobId = selectedJobModel.id!;
+                });
+              }
+
+              FocusScope.of(context).unfocus();
+            }
+          },
+          popupProps: PopupProps.menu(
+            showSearchBox: true,
+            searchFieldProps: TextFieldProps(
+              decoration: InputDecoration(
+                hintText: "Search job",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: borderColor),
                 ),
-                items: (filter, infiniteScrollProps) => _jobTitleLists,
-                selectedItem: selectedJob.isEmpty ? null : selectedJob,
-                onChanged: (selectedTitle) {
-                  print(widget.isEdit);
-                  if (selectedTitle != null) {
-                    final selectedJobModel = state.jobs.firstWhere(
-                      (job) => job.title == selectedTitle,
-                      orElse: () => JobPostModel(),
-                    );
-
-                    if (selectedJobModel.id != null) {
-                      setState(() {
-                        selectedJob = selectedTitle;
-                        selectedJobId = selectedJobModel.id!;
-                      });
-                    }
-
-                    FocusScope.of(context).unfocus();
-                  }
-                },
-                popupProps: PopupProps.menu(
-                  showSearchBox: true,
-                  searchFieldProps: TextFieldProps(
-                    decoration: InputDecoration(
-                      hintText: "Search job",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(color: borderColor),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(color: borderColor),
-                      ),
-                    ),
-                  ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: borderColor),
                 ),
               ),
-            );
-          }
-          return Container(); // Return an empty container for other states
-        });
+            ),
+          ),
+        ),
+      );
+    });
+    // return BlocConsumer<JobBloc, JobsState>(
+    //     listener: (context, state) {},
+    //     builder: (context, state) {
+    //       if (state is JobFetchFailure) {
+    //         return Padding(
+    //           padding: const EdgeInsets.symmetric(vertical: 15),
+    //           child: Row(
+    //             mainAxisAlignment: MainAxisAlignment.center,
+    //             children: [
+    //               Text(
+    //                 "Failed to fetch jobs",
+    //                 style: Theme.of(context)
+    //                     .textTheme
+    //                     .bodyMedium!
+    //                     .copyWith(color: Colors.red),
+    //               ),
+    //             ],
+    //           ),
+    //         );
+    //       }
+    //       if (state is JobFetchSuccess) {
+    //         List<String> _jobTitleLists =
+    //             state.jobs.map((job) => job.title ?? '').toList();
+
+    //         return Container(
+    //           constraints: BoxConstraints(
+    //             maxHeight: 55.h,
+    //           ),
+    //           child: DropdownSearch<String>(
+    //             validator: (_) {
+    //               if (selectedJob == '') {
+    //                 return "This field is required";
+    //               }
+    //               return null;
+    //             },
+    //             decoratorProps: DropDownDecoratorProps(
+    //               expands: false,
+    //               decoration: InputDecoration(
+    //                 labelText: "Select job",
+    //                 border: OutlineInputBorder(
+    //                   borderRadius: BorderRadius.circular(10),
+    //                   borderSide: const BorderSide(color: borderColor),
+    //                 ),
+    //                 focusedBorder: OutlineInputBorder(
+    //                   borderRadius: BorderRadius.circular(10),
+    //                   borderSide: const BorderSide(color: borderColor),
+    //                 ),
+    //                 enabledBorder: OutlineInputBorder(
+    //                   borderRadius: BorderRadius.circular(10),
+    //                   borderSide: const BorderSide(color: borderColor),
+    //                 ),
+    //               ),
+    //             ),
+    //             items: (filter, infiniteScrollProps) => _jobTitleLists,
+    //             selectedItem: selectedJob.isEmpty ? null : selectedJob,
+    //             onChanged: (selectedTitle) {
+    //               print(widget.isEdit);
+    //               if (selectedTitle != null) {
+    //                 final selectedJobModel = state.jobs.firstWhere(
+    //                   (job) => job.title == selectedTitle,
+    //                   orElse: () => JobPostModel(),
+    //                 );
+
+    //                 if (selectedJobModel.id != null) {
+    //                   setState(() {
+    //                     selectedJob = selectedTitle;
+    //                     selectedJobId = selectedJobModel.id!;
+    //                   });
+    //                 }
+
+    //                 FocusScope.of(context).unfocus();
+    //               }
+    //             },
+    //             popupProps: PopupProps.menu(
+    //               showSearchBox: true,
+    //               searchFieldProps: TextFieldProps(
+    //                 decoration: InputDecoration(
+    //                   hintText: "Search job",
+    //                   border: OutlineInputBorder(
+    //                     borderRadius: BorderRadius.circular(10),
+    //                     borderSide: const BorderSide(color: borderColor),
+    //                   ),
+    //                   focusedBorder: OutlineInputBorder(
+    //                     borderRadius: BorderRadius.circular(10),
+    //                     borderSide: const BorderSide(color: borderColor),
+    //                   ),
+    //                 ),
+    //               ),
+    //             ),
+    //           ),
+    //         );
+    //       }
+    //       return Container(); // Return an empty container for other states
+    //     });
   }
 
   Widget _buildSalaryToggle() {

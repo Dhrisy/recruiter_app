@@ -38,4 +38,6 @@ class ApiLists {
 
 
        static String updateJobPostEndPoint = "$baseUrl/jobs/edit";
+       static String fetchScheduleInterviewEndpoint =
+      "$baseUrl/recruiter_actions/interviews_scheduled";
 }

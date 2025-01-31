@@ -236,8 +236,10 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             BlocConsumer<AuthBloc, AuthState>(listener: (context, state) {
               if (state is AuthSuccess) {
-                Navigator.push(context,
-                    AnimatedNavigation().fadeAnimation(const WelcomeScreen()));
+                Navigator.pushAndRemoveUntil(context,
+                    AnimatedNavigation().fadeAnimation(const WelcomeScreen()),
+                    (Route<dynamic> route) => false
+                    );
                 CommonSnackbar.show(context, message: "Successfully logged in");
               } else if (state is AuthFailure) {
                 CommonSnackbar.show(context, message: state.error);

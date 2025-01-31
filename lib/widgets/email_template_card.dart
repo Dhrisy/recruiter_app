@@ -13,11 +13,14 @@ import 'package:recruiter_app/features/resdex/provider/email_template_provider.d
 import 'package:recruiter_app/features/resdex/widgets/email_template_details.dart';
 import 'package:recruiter_app/widgets/common_alertdialogue.dart';
 import 'package:recruiter_app/widgets/common_snackbar.dart';
-import 'package:recruiter_app/widgets/reusable_button.dart';
+
 
 class EmailTemplateCard extends StatelessWidget {
   final EmailTemplateModel template;
-  const EmailTemplateCard({Key? key, required this.template}) : super(key: key);
+  final bool? check;
+  final Function(bool?)? onChanged;
+  final bool? value;
+  const EmailTemplateCard({Key? key, required this.template, this.check, this.onChanged, this.value}) : super(key: key);
 
   String formatDate(String date) {
     print(date);
@@ -64,6 +67,11 @@ class EmailTemplateCard extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+                      check == true
+                      ? Checkbox(value: value ?? false, 
+                      onChanged: onChanged ?? (_){}
+                      ): const SizedBox.shrink(),
+
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [

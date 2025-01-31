@@ -34,7 +34,6 @@ class SeekerService {
       'Content-Type': 'application/json',
     });
 
-
     return response;
   }
 
@@ -68,7 +67,6 @@ class SeekerService {
 
   // fetch invited candidates
   static Future<http.Response> fetchInvitedCandidates({int? jobId}) async {
-    
     String _url = "";
 
     if (jobId != null) {
@@ -143,6 +141,23 @@ class SeekerService {
     return response;
   }
 
+  static Future<http.Response> fetchInterviewScheduled({int? jobId}) async {
+    String _url = "";
 
+    if (jobId != null) {
+      _url = "${ApiLists.fetchScheduleInterviewEndpoint}?job_id=$jobId";
+    } else {
+      _url = ApiLists.fetchScheduleInterviewEndpoint;
+    }
 
+    final url = Uri.parse(_url);
+
+    final token = await CustomFunctions().retrieveCredentials("access_token");
+    final response = await http.get(url, headers: {
+      'Authorization': 'Bearer ${token.toString()}',
+      'Content-Type': 'application/json',
+    });
+
+    return response;
+  }
 }

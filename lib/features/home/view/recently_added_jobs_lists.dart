@@ -105,7 +105,7 @@ class _RecentlyAddedJobsListsState extends State<RecentlyAddedJobsLists> {
                   ),
             );
           } else {
-            return Text("null");
+            return CommonErrorWidget();
           }
         })
 
