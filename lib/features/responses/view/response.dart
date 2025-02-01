@@ -31,7 +31,7 @@ class _ResponseState extends State<Response>
   late Animation<Offset> _listItemAnimation;
   bool _isLoading = true;
   Future<List<JobResponseModel>?>? _seekerLists;
-
+final TextEditingController _searchCont = TextEditingController();
   String _searchQuery = '';
 
   @override
@@ -155,7 +155,7 @@ class _ResponseState extends State<Response>
                             child: Consumer<SeekerProvider>(
                                 builder: (context, provider, child) {
                               return CommonSearchWidget(
-                                controller: TextEditingController(),
+                                controller: _searchCont,
                                 onChanged: (query) {
                                   provider.setSearchQuery(query);
                                 },

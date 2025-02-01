@@ -78,12 +78,12 @@ class SeekerRepository {
   }
 
   Future<List<JobResponseModel>?> fetchAllAppliedSeekers({
-    int? jobId,
+   
     int retryCount = 0,
     int maxRetries = 3,
   }) async {
     try {
-      final response = await SeekerService.fetchRespondedSeeker(jobId: jobId);
+      final response = await SeekerService.fetchRespondedSeeker();
       print(
           "Response of applied seeker ${response.statusCode}, ${response.body}");
 
@@ -102,7 +102,6 @@ class SeekerRepository {
       } else if (response.statusCode == 401) {
         await RefreshTokenService.refreshToken();
         return fetchAllAppliedSeekers(
-          jobId: jobId,
           retryCount: retryCount + 1,
           maxRetries: maxRetries,
         );
@@ -316,7 +315,7 @@ class SeekerRepository {
       {int retryCount = 0, int maxRetries = 3}) async {
     try {
       final response = await SeekerService.fetchInterviewScheduled();
-      log("Response of interview scheduled ${response.body}");
+      print("Response of interview scheduled ${response.body}");
 
       if (response.statusCode == 200) {
         List<dynamic> lists = jsonDecode(response.body);
@@ -326,9 +325,7 @@ class SeekerRepository {
 
           final _it = JobResponseModel.fromJson(item);
 
-          print("Parsed Model - created_on: ${item["created_on"]}");
-          print("Parsed Model - viewed: ${item["viewed"]}");
-          print("Parsed Model - status: ${item["status"]}");
+        
           return _it;
         }).toList();
         print(seekerLists);

@@ -7,6 +7,7 @@ import 'package:recruiter_app/core/utils/custom_functions.dart';
 import 'package:recruiter_app/core/utils/navigation_animation.dart';
 import 'package:recruiter_app/features/details/job_details.dart';
 import 'package:recruiter_app/features/job_post/model/job_post_model.dart';
+import 'package:recruiter_app/features/resdex/model/invite_seeker_model.dart';
 import 'package:recruiter_app/features/resdex/model/job_response_model.dart';
 import 'package:recruiter_app/features/resdex/model/seeker_model.dart';
 import 'package:recruiter_app/features/resdex/provider/search_seeker_provider.dart';
@@ -25,6 +26,7 @@ class SeekerCard extends StatefulWidget {
   final bool? fromResponse;
   final bool? fromINterview;
   final JobResponseModel? responseData;
+  final InvitedSeekerWithJob? invitedModel;
   const SeekerCard(
       {Key? key,
       required this.seekerData,
@@ -35,7 +37,8 @@ class SeekerCard extends StatefulWidget {
       this.isInvited,
       this.fromINterview,
       this.responseData,
-      this.fromResponse})
+      this.fromResponse,
+      this.invitedModel})
       : super(key: key);
 
   @override
@@ -116,12 +119,20 @@ class _SeekerCardState extends State<SeekerCard>
                             style: theme.textTheme.bodyMedium!
                                 .copyWith(color: greyTextColor),
                           ),
-                          Text(
-                            widget.jobData != null
-                                ? widget.jobData!.title.toString().toUpperCase()
-                                : "N/A",
-                            style: theme.textTheme.titleMedium!.copyWith(
-                                fontWeight: FontWeight.bold, fontSize: 12.sp),
+                          InkWell(
+                            onTap: (){
+                              if(widget.jobData != null){
+                              Navigator.push(context, AnimatedNavigation().fadeAnimation(JobDetails(jobData: widget.jobData!)));
+
+                              }
+                            },
+                            child: Text(
+                              widget.jobData != null
+                                  ? widget.jobData!.title.toString().toUpperCase()
+                                  : "N/A",
+                              style: theme.textTheme.titleMedium!.copyWith(
+                                  fontWeight: FontWeight.bold, fontSize: 12.sp, color: Colors.blue),
+                            ),
                           ),
                         ],
                       )
@@ -373,16 +384,17 @@ class _SeekerCardState extends State<SeekerCard>
                                           subTitle:
                                               "Are you sure want to withraw the invitation for ${CustomFunctions.toSentenceCase(widget.seekerData.personalData!.user.name.toString())}",
                                           message:
-                                              "If you withdraw the invitation for [Candidate Name], you will need to re-invite them by visiting the job or seeker details. Please confirm your action.",
+                                              "If you withdraw the invitation for ${CustomFunctions.toSentenceCase(widget.seekerData.personalData!.user.name.toString())}, you will need to re-invite them by visiting the job or seeker details. Please confirm your action.",
                                           onConfirm: () async {
-                                            if (widget.jobData != null &&
-                                                widget.jobData!.id != null) {
+                                            if (widget.invitedModel != null && widget.invitedModel!.id != null) {
+
+                                                  print(widget.jobData!.title.toString());
                                               final result = await Provider.of<
                                                           SearchSeekerProvider>(
                                                       context,
                                                       listen: false)
                                                   .deleteInvitedSeeker(
-                                                      id: widget.jobData!.id!);
+                                                      id: widget.invitedModel!.id!);
 
                                               if (result == true) {
                                                 Navigator.pop(context);

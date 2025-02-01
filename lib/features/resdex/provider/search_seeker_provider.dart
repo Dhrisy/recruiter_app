@@ -17,6 +17,7 @@ class SearchSeekerProvider extends ChangeNotifier {
   Future<List<SeekerModel>?>? lists;
 
   Future<List<InvitedSeekerWithJob>?>? invitedLists;
+  List<InvitedSeekerWithJob>?  invitedCandidateLists;
 
   /// Fetch all seekers list and initialize bookmarked states
   Future<void> fetchAllSeekersLists() async {
@@ -45,6 +46,7 @@ class SearchSeekerProvider extends ChangeNotifier {
     try {
       final result = SeekerRepository().fetchAllInvitedSeekers();
       invitedLists = result;
+      notifyListeners();
     } catch (e) {
       throw Exception(e);
     }
@@ -55,6 +57,7 @@ class SearchSeekerProvider extends ChangeNotifier {
     try {
       final result = await SeekerRepository().deleteInvitedSeeker(id: id);
       if (result != null && result == "success") {
+        fetchInvitedCandidates();
         return true;
       } else {
         error = result.toString();

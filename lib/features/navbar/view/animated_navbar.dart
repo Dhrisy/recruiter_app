@@ -12,6 +12,9 @@ import 'package:recruiter_app/features/resdex/resedex.dart';
 import 'package:recruiter_app/features/responses/view/response.dart';
 
 class CustomBottomNavBar extends StatefulWidget {
+  final int? index;
+
+  const CustomBottomNavBar({super.key, this.index});
   @override
   _CustomBottomNavBarState createState() => _CustomBottomNavBarState();
 }
@@ -47,6 +50,19 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
   List<Widget> screens = [HomeScreen(), Resedex(), Response(), Account()];
 
   @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.index != null) {
+        setState(() {
+          _activeIndex = widget.index!;
+        });
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Material(
       child: Scaffold(
@@ -56,11 +72,12 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
           heroTag: "add_fab",
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
-          onPressed: () async{
-            final token = await CustomFunctions().retrieveCredentials("access_token");
+          onPressed: () async {
+            final token =
+                await CustomFunctions().retrieveCredentials("access_token");
             print(token);
-            Navigator.push(context,
-                AnimatedNavigation().fadeAnimation(const JobForm()));
+            Navigator.push(
+                context, AnimatedNavigation().fadeAnimation(const JobForm()));
           },
           backgroundColor: secondaryColor,
           child: const Icon(
@@ -81,7 +98,7 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
               //   Icons.home,
               //   color: color,
               // ),
-               Container(
+              Container(
                 height: 30,
                 width: 30,
                 child: SvgPicture.asset(
@@ -108,7 +125,7 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
                   color: color,
                 ),
               ),
-               Container(
+              Container(
                 height: 30,
                 width: 30,
                 child: SvgPicture.asset(

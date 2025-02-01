@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:recruiter_app/core/constants.dart';
@@ -15,6 +16,7 @@ import 'package:recruiter_app/core/utils/navigation_animation.dart';
 import 'package:recruiter_app/features/details/job_details_provider.dart';
 import 'package:recruiter_app/features/details/widgets/send_email_widget.dart';
 import 'package:recruiter_app/features/job_post/model/job_post_model.dart';
+import 'package:recruiter_app/features/navbar/view/animated_navbar.dart';
 import 'package:recruiter_app/features/resdex/email_template_form.dart';
 import 'package:recruiter_app/features/resdex/model/interview_model.dart';
 import 'package:recruiter_app/features/resdex/model/invite_seeker_model.dart';
@@ -96,6 +98,9 @@ class _AdditionalDetailsWidgetState extends State<AdditionalDetailsWidget> {
             _isLoading = false;
           });
         });
+
+        Provider.of<JobDetailsProvider>(context, listen: false)
+            .fetchSeekersInvitedToJob(jobId: widget.jobId);
 
         Provider.of<JobDetailsProvider>(context, listen: false)
             .fetchSeekersInvitedToJob(jobId: widget.jobId)
@@ -198,6 +203,43 @@ class _AdditionalDetailsWidgetState extends State<AdditionalDetailsWidget> {
             ],
           ),
         ),
+        Align(
+          alignment: Alignment.bottomRight,
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 20, right: 20),
+            child: SpeedDial(
+              activeBackgroundColor: secondaryColor,
+              backgroundColor: secondaryColor,
+              activeChild: const Icon(
+                Icons.close,
+                color: Colors.white,
+              ),
+              children: <SpeedDialChild>[
+                SpeedDialChild(
+                  child: const Icon(
+                    Icons.person,
+                    color: Colors.white,
+                  ),
+                  foregroundColor: Colors.white,
+                  backgroundColor: buttonColor,
+                  label: "Invite  for job",
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        AnimatedNavigation()
+                            .slideAnimation(const CustomBottomNavBar(
+                          index: 1,
+                        )));
+                  },
+                ),
+              ],
+              child: const Icon(
+                Icons.menu,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        )
       ],
     );
   }
@@ -749,39 +791,65 @@ class _AdditionalDetailsWidgetState extends State<AdditionalDetailsWidget> {
                                       },
                                       openBuilder: (BuildContext context,
                                           VoidCallback closeContainer) {
-
                                         if (seekerData != null) {
                                           return SendEmailWidget(
                                             seekerData: seekerData!,
                                           );
-                                          
                                         } else {
-                                         return const Center(
+                                          return const Center(
                                             child: CommonErrorWidget(),
                                           );
                                         }
                                       },
                                     ),
-                                    ElevatedButton.icon(
-                                      onPressed: () {
-                                        if (seekerData != null &&
-                                            seekerData.personalData != null) {
-                                          _showInterviewScheduleSheet(
-                                              name: seekerData
-                                                  .personalData!.user.name
-                                                  .toString(),
-                                              seekerData: seekerData,
-                                              seekerId: seekerData
-                                                  .personalData!.personal.id,
-                                              theme: theme);
-                                        }
+                                    Consumer<InterviewProvider>(
+                                      builder:
+                                          (context, interviewProvider, child) {
+                                        bool isSeekerInList =
+                                            interviewProvider.seekerLists !=
+                                                    null
+                                                ? interviewProvider.seekerLists!
+                                                    .any((item) {
+                                                    return item
+                                                            .seeker
+                                                            .personalData
+                                                            ?.personal
+                                                            .id ==
+                                                        widget
+                                                            .seekerData
+                                                            ?.personalData
+                                                            ?.personal
+                                                            .id;
+                                                  })
+                                                : false;
+
+                                        return ElevatedButton.icon(
+                                          onPressed: () {
+                                            if (seekerData != null &&
+                                                seekerData.personalData !=
+                                                    null) {
+                                              _showInterviewScheduleSheet(
+                                                name: seekerData
+                                                    .personalData!.user.name
+                                                    .toString(),
+                                                seekerData: seekerData,
+                                                seekerId: seekerData
+                                                    .personalData!.personal.id,
+                                                theme: theme,
+                                              );
+                                            }
+                                          },
+                                          icon: Icon(Icons.calendar_month),
+                                          label: Text(
+                                            isSeekerInList
+                                                ? "Schedule Interview"
+                                                : "Already Scheduled",
+                                            style: theme.textTheme.bodyMedium!
+                                                .copyWith(
+                                                    color: secondaryColor),
+                                          ),
+                                        );
                                       },
-                                      icon: Icon(Icons.calendar_month),
-                                      label: Text(
-                                        "Schedule Interview",
-                                        style: theme.textTheme.bodyMedium!
-                                            .copyWith(color: secondaryColor),
-                                      ),
                                     ),
                                     ElevatedButton.icon(
                                       onPressed: () {
@@ -803,7 +871,7 @@ class _AdditionalDetailsWidgetState extends State<AdditionalDetailsWidget> {
                                                   .fadeAnimation(SeekerDetails(
                                                       // jobData: widget.jobData,
                                                       // responseData: responseData,
-                                                      // fromResponse: true,
+                                                      fromResponse: true,
                                                       seekerData: seekerData)));
                                         }
                                       },
@@ -1415,6 +1483,227 @@ class _AdditionalDetailsWidgetState extends State<AdditionalDetailsWidget> {
   }
 
   void _showInterviewScheduleSheet(
+      {required ThemeData theme,
+      required String name,
+      required int seekerId,
+      required SeekerModel seekerData}) {
+    DateTime? selectedDate;
+    TimeOfDay? selectedTime;
+
+    showModalBottomSheet(
+        context: context,
+        builder: (context) => StatefulBuilder(
+                builder: (BuildContext context, StateSetter setModalState) {
+              return Container(
+                height: 330.h,
+                width: double.infinity,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          Container(
+                            height: 2,
+                            width: 90,
+                            decoration: BoxDecoration(color: borderColor),
+                          ),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Schedule interview with ",
+                                style: theme.textTheme.titleMedium!.copyWith(),
+                              ),
+                              Text(
+                                " ${CustomFunctions.toSentenceCase(seekerData.personalData!.user.name.toString())}",
+                                style: theme.textTheme.titleMedium!.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: buttonColor),
+                              )
+                            ],
+                          )
+                              .animate()
+                              .fadeIn(duration: 400.ms)
+                              .slideX(begin: -0.3, end: 0),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Text(
+                            "Select a job from the list below to schedule interview with the candidate and match them with the right opportunity",
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium!
+                                .copyWith(color: greyTextColor),
+                          )
+                              .animate()
+                              .fadeIn(duration: 700.ms)
+                              .slideX(begin: -0.4, end: 0),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          Text(
+                            "Schedule inter for", //  "Select job from below:",
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium!
+                                .copyWith(color: greyTextColor),
+                          )
+                              .animate()
+                              .fadeIn(duration: 700.ms)
+                              .slideX(begin: -0.4, end: 0),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          Text(
+                            CustomFunctions.toSentenceCase(
+                                widget.jobData.title.toString()),
+                            style: theme.textTheme.titleMedium!
+                                .copyWith(fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          Text(
+                            "Please select the date and time for the interview schedule",
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium!
+                                .copyWith(color: greyTextColor),
+                          )
+                              .animate()
+                              .fadeIn(duration: 700.ms)
+                              .slideX(begin: -0.4, end: 0),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(selectedDate == null
+                                  ? "Select Date"
+                                  : "${selectedDate!.toLocal()}".split(' ')[0]),
+                              InkWell(
+                                  onTap: () async {
+                                    final DateTime? pickedDate =
+                                        await showDatePicker(
+                                      context: context,
+                                      initialDate: DateTime.now(),
+                                      firstDate: DateTime(2000),
+                                      lastDate: DateTime(2100),
+                                    );
+                                    if (pickedDate != null) {
+                                      setModalState(() {
+                                        selectedDate = pickedDate;
+                                      });
+                                    }
+                                  },
+                                  child: const Icon(
+                                    Icons.calendar_month,
+                                    color: buttonColor,
+                                  )),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                selectedTime == null
+                                    ? "Select Time"
+                                    : "Time : ${selectedTime!.format(context)}",
+                              ),
+                              InkWell(
+                                  onTap: () async {
+                                    final TimeOfDay? pickedTime =
+                                        await showTimePicker(
+                                      context: context,
+                                      initialTime: TimeOfDay.now(),
+                                    );
+                                    if (pickedTime != null) {
+                                      setModalState(() {
+                                        selectedTime = pickedTime;
+                                      });
+                                    }
+                                  },
+                                  child: const Icon(
+                                    Icons.alarm,
+                                    color: buttonColor,
+                                  )),
+                            ],
+                          )
+                        ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 15),
+                        child: Consumer<InterviewProvider>(
+                            builder: (context, provider, child) {
+                          return ReusableButton(
+                                  textColor: Colors.white,
+                                  buttonColor: selectedTime != null &&
+                                          selectedDate != null
+                                      ? secondaryColor
+                                      : secondaryColor.withValues(alpha: 0.6),
+                                  action: () async {
+                                    if (widget.jobId != null &&
+                                        seekerData.personalData != null) {
+                                      final DateTime combinedDateTime =
+                                          DateTime(
+                                        selectedDate!.year,
+                                        selectedDate!.month,
+                                        selectedDate!.day,
+                                        selectedTime!.hour,
+                                        selectedTime!.minute,
+                                      );
+
+                                      // Format the date-time
+                                      final formattedDateTime = DateFormat(
+                                              "yyyy-MM-ddTHH:mm:ss.SSS'Z'")
+                                          .format(combinedDateTime);
+
+                                      final result =
+                                          await provider.scheduleInterview(
+                                              candidateId: seekerData
+                                                  .personalData!.personal.id,
+                                              jobId: widget.jobId!,
+                                              date: formattedDateTime);
+
+                                      if (result == true) {
+                                        Navigator.pop(context);
+
+                                        CommonSnackbar.show(context,
+                                            message:
+                                                "Invitation to seeker sent successfully!");
+                                      } else {
+                                        Navigator.pop(context);
+                                        CommonSnackbar.show(context,
+                                            message: "${provider.message}!");
+                                      }
+                                    } else {
+                                      print("llllllllllllllllllllll");
+                                    }
+                                  },
+                                  text: "Schedule Interview")
+                              .animate()
+                              .fadeIn(duration: 500.ms)
+                              .slideY(begin: 0.5, end: 0);
+                        }),
+                      )
+                    ],
+                  ),
+                ),
+              );
+            }));
+  }
+
+  void _showInviteSheet(
       {required ThemeData theme,
       required String name,
       required int seekerId,

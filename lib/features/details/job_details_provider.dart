@@ -101,7 +101,7 @@ class JobDetailsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> fetchInterviewScheduledSeekers({required int? jobId}) async {
+  Future<void> fetchInterviewScheduledSeekers({ int? jobId}) async {
     try {
       final result =
           await JobDetailsRepository().fetchInterviewScheduledSeekers(jobId: jobId);

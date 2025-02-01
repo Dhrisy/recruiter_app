@@ -235,7 +235,7 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
                                     title: "Invited Candidate", index: 1)),
                             Expanded(
                                 child: _buildOptionContainer(
-                                    title: "Schedule Interview ", index: 2))
+                                    title: "Interview Scheduled ", index: 2))
                           ],
                         ),
                         Row(

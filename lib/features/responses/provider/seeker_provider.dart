@@ -92,11 +92,13 @@ class SeekerProvider extends ChangeNotifier {
         final name = seeker.seeker.personalData?.user.name?.toLowerCase() ?? '';
         final email = seeker.seeker.personalData?.user.email?.toLowerCase() ?? '';
         final phone = seeker.seeker.personalData?.user.phoneNumber?.toLowerCase() ?? '';
+        final job = seeker.job.title?.toLowerCase() ?? '';
         final query = _searchQuery.toLowerCase();
 
         return name.contains(query) ||
             email.contains(query) ||
-            phone.contains(query);
+            phone.contains(query)||
+            job.contains(query);
       }).toList();
     }
   }
@@ -106,7 +108,7 @@ class SeekerProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final result = await SeekerRepository().fetchAllAppliedSeekers(jobId: jobId);
+      final result = await SeekerRepository().fetchAllAppliedSeekers();
       if (result != null) {
         _allSeekers = result;
         _filterSeekers(); // Apply initial filtering

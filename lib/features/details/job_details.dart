@@ -242,7 +242,7 @@ class _JobDetailsState extends State<JobDetails> with TickerProviderStateMixin {
                               text: "Job Details",
                             ),
                             Tab(
-                              text: "Additional",
+                              text: "Responses",
                             )
                           ],
                         ),

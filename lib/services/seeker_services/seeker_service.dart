@@ -19,6 +19,7 @@ class SeekerService {
   }
 
   static Future<http.Response> fetchRespondedSeeker({int? jobId}) async {
+    print("oooooooooooooooooooooo $jobId");
     String _url = "";
     if (jobId != null) {
       _url = "${ApiLists.respondedSeekerEndPoint}?job_id=$jobId";

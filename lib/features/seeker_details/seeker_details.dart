@@ -10,9 +10,13 @@ import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/core/utils/custom_functions.dart';
 import 'package:recruiter_app/core/utils/navigation_animation.dart';
 import 'package:recruiter_app/features/details/job_details.dart';
+import 'package:recruiter_app/features/details/job_details_provider.dart';
+import 'package:recruiter_app/features/details/widgets/send_email_widget.dart';
 import 'package:recruiter_app/features/job_post/model/job_post_model.dart';
 import 'package:recruiter_app/features/job_post/view/job_form.dart';
 import 'package:recruiter_app/features/job_post/viewmodel.dart/job_posting_provider.dart';
+import 'package:recruiter_app/features/resdex/model/interview_model.dart';
+import 'package:recruiter_app/features/resdex/model/invite_seeker_model.dart';
 import 'package:recruiter_app/features/resdex/model/job_response_model.dart';
 import 'package:recruiter_app/features/resdex/model/seeker_model.dart';
 import 'package:recruiter_app/features/resdex/provider/interview_provider.dart';
@@ -66,7 +70,12 @@ class _SeekerDetailsState extends State<SeekerDetails>
     );
     _controller.forward();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {});
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<InterviewProvider>(context, listen: false)
+          .fetchScheduleInterview();
+      Provider.of<JobDetailsProvider>(context, listen: false)
+          .fetchInterviewScheduledSeekers();
+    });
   }
 
   @override
@@ -82,69 +91,114 @@ class _SeekerDetailsState extends State<SeekerDetails>
 
     return Material(
       child: Scaffold(
-        floatingActionButton: SpeedDial(
-          activeBackgroundColor: secondaryColor,
-          backgroundColor: secondaryColor,
-          activeChild: const Icon(
-            Icons.close,
-            color: Colors.white,
-          ),
-          children: <SpeedDialChild>[
-            SpeedDialChild(
-              child: const Icon(
-                Icons.person,
-                color: Colors.white,
-              ),
-              foregroundColor: Colors.white,
-              backgroundColor: buttonColor,
-              label: "Invite $seekerName for job",
-              onTap: () {
-                _showInviteSheet(theme: theme);
-              },
+        floatingActionButton: Consumer<InterviewProvider>(
+            builder: (context, interviewProvider, child) {
+          bool isSeekerInList = interviewProvider.seekerLists != null
+              ? interviewProvider.seekerLists!.any((item) {
+                  return item.seeker.personalData?.personal.id ==
+                      widget.seekerData.personalData?.personal.id;
+                })
+              : false;
+
+          final _provider =
+              Provider.of<JobDetailsProvider>(context, listen: false);
+              final inviteProvider =
+              Provider.of<SearchSeekerProvider>(context, listen: false);
+
+          InterviewModel? model = (_provider.interviewedSeekerLists != null &&
+                  _provider.interviewedSeekerLists!.isNotEmpty)
+              ? _provider.interviewedSeekerLists!.firstWhere(
+                  (item) =>
+                      item.seekerData.personalData?.personal.id ==
+                      widget.seekerData.personalData?.personal.id,
+                  orElse: () => InterviewModel(
+                      seekerData: widget
+                          .seekerData), // ✅ Provide a default InterviewModel instance
+                )
+              : null;
+
+  // InvitedSeekerWithJob? invitedModel = (inviteProvider.invitedCandidateLists != null &&
+  //                 inviteProvider.invitedCandidateLists!.isNotEmpty)
+  //             ? inviteProvider.invitedCandidateLists!.firstWhere(
+  //                 (item) =>
+  //                     item.seeker.personalData?.personal.id ==
+  //                     widget.seekerData.personalData?.personal.id,
+  //                 orElse: () => InvitedSeekerWithJob(
+  //                   job: JobPostModel(),
+  //                   read: false,
+  //                     seeker: widget.seekerData), // ✅ Provide a default InterviewModel instance
+  //               )
+  //             : null;
+
+
+          return SpeedDial(
+            activeBackgroundColor: secondaryColor,
+            backgroundColor: secondaryColor,
+            activeChild: const Icon(
+              Icons.close,
+              color: Colors.white,
             ),
-            if (widget.fromResponse == true)
+            children: <SpeedDialChild>[
+              SpeedDialChild(
+                child: const Icon(
+                  Icons.person,
+                  color: Colors.white,
+                ),
+                foregroundColor: Colors.white,
+                backgroundColor: buttonColor,
+                label: "Invite $seekerName for job",
+                onTap: () {
+                  _showInviteSheet(theme: theme);
+                },
+              ),
+              if (widget.fromResponse == true)
+                SpeedDialChild(
+                  child: Icon(
+                    isSeekerInList == true
+                        ? Icons.visibility
+                        : Icons.calendar_month,
+                    color: Colors.white,
+                  ),
+                  foregroundColor: Colors.black,
+                  backgroundColor: buttonColor,
+                  label: isSeekerInList == true
+                      ? "Already scheduled interview"
+                      : 'Schedule Interview',
+                  onTap: () {
+                    if (widget.seekerData.personalData != null) {
+                      // _showInterviewScheduleSheet(
+                      //     interviewModel: model,
+                      //     isScheduled: isSeekerInList,
+                      //     theme: theme,
+                      //     name: seekerName,
+                      //     seekerId:
+                      //         widget.seekerData.personalData!.personal.id);
+                    }
+                  },
+                ),
               SpeedDialChild(
                 child: Icon(
-                  widget.fromInterview == true
-                      ? Icons.delete
-                      : Icons.calendar_month,
+                  widget.fromInterview == true ? Icons.delete : Icons.email,
                   color: Colors.white,
                 ),
                 foregroundColor: Colors.black,
                 backgroundColor: buttonColor,
-                label: widget.fromInterview == true
-                    ? "Delete scheduled interview"
-                    : 'Schedule Interview',
+                label: "Email",
                 onTap: () {
-                  if (widget.seekerData.personalData != null) {
-                    if (widget.fromInterview == true) {
-                    } else {
-                      _showInterviewScheduleSheet(
-                          theme: theme,
-                          name: seekerName,
-                          seekerId:
-                              widget.seekerData.personalData!.personal.id);
-                    }
-                  }
+                  Navigator.push(
+                      context,
+                      AnimatedNavigation().fadeAnimation(
+                          SendEmailWidget(seekerData: widget.seekerData)));
                 },
               ),
-            SpeedDialChild(
-              child: Icon(
-                widget.fromInterview == true ? Icons.delete : Icons.email,
-                color: Colors.white,
-              ),
-              foregroundColor: Colors.black,
-              backgroundColor: buttonColor,
-              label: "Email",
-              onTap: () {},
+              //  Your other SpeedDialChildren go here.
+            ],
+            child: Icon(
+              Icons.menu,
+              color: Colors.white,
             ),
-            //  Your other SpeedDialChildren go here.
-          ],
-          child: Icon(
-            Icons.menu,
-            color: Colors.white,
-          ),
-        ),
+          );
+        }),
         body: Stack(
           children: [
             // Background SVG
@@ -157,192 +211,190 @@ class _SeekerDetailsState extends State<SeekerDetails>
               ),
             ),
             SafeArea(
-                child: widget.fromResponse == true ||
-                        widget.fromInterview == true
-                    ? DefaultTabController(
-                        length: 2,
-                        child: SizedBox(
-                          width: double.infinity,
-                          height: double.infinity,
-                          child: Column(
-                            children: [
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 15),
-                                child: Consumer<SearchSeekerProvider>(
-                                    builder: (context, provider, child) {
-                                  return Row(
-                                    children: [
-                                      Expanded(
-                                        child: CommonAppbarWidget(
-                                          isBackArrow: true,
-                                          icon: provider.bookmarkedStates[widget
-                                                      .seekerData
-                                                      .personalData!
-                                                      .personal
-                                                      .id] ==
-                                                  true
-                                              ? Icons.bookmark
-                                              : Icons.bookmark_outline,
-                                          action: () {
-                                            provider.toggleBookmark(
-                                                widget.seekerData, context);
-                                          },
-                                          title: CustomFunctions.toSentenceCase(
-                                              seekerName),
-                                        ),
-                                      ),
-                                      PopupMenuButton<String>(
-                                          icon: const Icon(
-                                            Icons.more_vert,
-                                            color: secondaryColor,
-                                          ),
-                                          position: PopupMenuPosition.under,
-                                          color: secondaryColor,
-                                          onSelected: (value) {
-                                            switch (value) {
-                                              case "edit":
-                                              case "delete":
-                                                print("delete");
-                                              case "share":
-                                                print("share");
-                                            }
-                                          },
-                                          itemBuilder: (BuildContext context) =>
-                                              <PopupMenuEntry<String>>[
-                                                PopupMenuItem<String>(
-                                                  value: 'edit',
-                                                  child: Row(
-                                                    children: [
-                                                      Icon(
-                                                        Icons.edit,
-                                                        size: 20,
-                                                        color: buttonColor,
-                                                      ),
-                                                      SizedBox(width: 8),
-                                                      Text(
-                                                        'Edit Job',
-                                                        style: theme.textTheme
-                                                            .bodyMedium!
-                                                            .copyWith(
-                                                                color: Colors
-                                                                    .white),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                PopupMenuItem<String>(
-                                                  value: 'delete',
-                                                  child: Row(
-                                                    children: [
-                                                      Icon(
-                                                        Icons.delete,
-                                                        size: 20,
-                                                        color: buttonColor,
-                                                      ),
-                                                      SizedBox(width: 8),
-                                                      Text(
-                                                        'Delete Job',
-                                                        style: theme.textTheme
-                                                            .bodyMedium!
-                                                            .copyWith(
-                                                                color: Colors
-                                                                    .white),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                //   PopupMenuItem<String>(
-                                              ])
-                                    ],
-                                  );
-                                }),
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Text(widget.fromResponse.toString()),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 15),
-                                child: _buildProfileCard(
-                                    theme: theme,
-                                    seekerData: widget.seekerData),
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              TabBar(
-                                  indicatorColor: secondaryColor,
-                                  indicatorSize: TabBarIndicatorSize.tab,
-                                  unselectedLabelStyle: theme
-                                      .textTheme.bodyLarge!
-                                      .copyWith(color: greyTextColor),
-                                  labelStyle: theme.textTheme.bodyLarge!
-                                      .copyWith(
-                                          color: buttonColor,
-                                          fontWeight: FontWeight.bold),
-                                  indicator: CustomTabIndicator(
-                                    color:
-                                        secondaryColor.withValues(alpha: 0.7),
-                                    radius: 15,
-                                    indicatorHeight: 2.h,
-                                  ),
-                                  tabs: [
-                                    Tab(
-                                      text: "Profile Details ",
-                                    ),
-                                    Tab(
-                                      text: "Job Activity",
-                                    )
-                                  ]),
-                              Expanded(
-                                child: TabBarView(children: [
-                                  _profileTabWidget(theme: theme),
-                                  JobActivityTab(
-                                    responseData: widget.responseData,
-                                    isInterview: widget.fromInterview,
-                                    jobData: widget.jobData,
-                                  )
-                                ]),
-                              )
-                            ],
-                          ),
-                        ),
-                      )
-                    : SingleChildScrollView(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 15),
-                          child: Column(
-                            spacing: 20,
-                            children: [
-                              Consumer<SearchSeekerProvider>(
-                                  builder: (context, provider, child) {
-                                return CommonAppbarWidget(
-                                  isBackArrow: true,
-                                  icon: provider.bookmarkedStates[widget
-                                              .seekerData
-                                              .personalData!
-                                              .personal
-                                              .id] ==
-                                          true
-                                      ? Icons.bookmark
-                                      : Icons.bookmark_outline,
-                                  action: () {
-                                    provider.toggleBookmark(
-                                        widget.seekerData, context);
-                                  },
-                                  title: CustomFunctions.toSentenceCase(
-                                      seekerName),
-                                );
-                              }),
-                              _buildProfileCard(
-                                  theme: theme, seekerData: widget.seekerData),
-                              DetailsTabWidget(seekerData: widget.seekerData),
-                            ],
-                          ),
-                        ),
-                      )),
+                child:
+                    //  widget.fromResponse == true ||
+                    //         widget.fromInterview == true
+                    //     ? DefaultTabController(
+                    //         length: 2,
+                    //         child: SizedBox(
+                    //           width: double.infinity,
+                    //           height: double.infinity,
+                    //           child: Column(
+                    //             children: [
+                    //               Padding(
+                    //                 padding:
+                    //                     const EdgeInsets.symmetric(horizontal: 15),
+                    //                 child: Consumer<SearchSeekerProvider>(
+                    //                     builder: (context, provider, child) {
+                    //                   return Row(
+                    //                     children: [
+                    //                       Expanded(
+                    //                         child: CommonAppbarWidget(
+                    //                           isBackArrow: true,
+                    //                           icon: provider.bookmarkedStates[widget
+                    //                                       .seekerData
+                    //                                       .personalData!
+                    //                                       .personal
+                    //                                       .id] ==
+                    //                                   true
+                    //                               ? Icons.bookmark
+                    //                               : Icons.bookmark_outline,
+                    //                           action: () {
+                    //                             provider.toggleBookmark(
+                    //                                 widget.seekerData, context);
+                    //                           },
+                    //                           title: CustomFunctions.toSentenceCase(
+                    //                               seekerName),
+                    //                         ),
+                    //                       ),
+                    //                       PopupMenuButton<String>(
+                    //                           icon: const Icon(
+                    //                             Icons.more_vert,
+                    //                             color: secondaryColor,
+                    //                           ),
+                    //                           position: PopupMenuPosition.under,
+                    //                           color: secondaryColor,
+                    //                           onSelected: (value) {
+                    //                             switch (value) {
+                    //                               case "edit":
+                    //                               case "delete":
+                    //                                 print("delete");
+                    //                               case "share":
+                    //                                 print("share");
+                    //                             }
+                    //                           },
+                    //                           itemBuilder: (BuildContext context) =>
+                    //                               <PopupMenuEntry<String>>[
+                    //                                 PopupMenuItem<String>(
+                    //                                   value: 'edit',
+                    //                                   child: Row(
+                    //                                     children: [
+                    //                                       Icon(
+                    //                                         Icons.edit,
+                    //                                         size: 20,
+                    //                                         color: buttonColor,
+                    //                                       ),
+                    //                                       SizedBox(width: 8),
+                    //                                       Text(
+                    //                                         'Edit Job',
+                    //                                         style: theme.textTheme
+                    //                                             .bodyMedium!
+                    //                                             .copyWith(
+                    //                                                 color: Colors
+                    //                                                     .white),
+                    //                                       ),
+                    //                                     ],
+                    //                                   ),
+                    //                                 ),
+                    //                                 PopupMenuItem<String>(
+                    //                                   value: 'delete',
+                    //                                   child: Row(
+                    //                                     children: [
+                    //                                       Icon(
+                    //                                         Icons.delete,
+                    //                                         size: 20,
+                    //                                         color: buttonColor,
+                    //                                       ),
+                    //                                       SizedBox(width: 8),
+                    //                                       Text(
+                    //                                         'Delete Job',
+                    //                                         style: theme.textTheme
+                    //                                             .bodyMedium!
+                    //                                             .copyWith(
+                    //                                                 color: Colors
+                    //                                                     .white),
+                    //                                       ),
+                    //                                     ],
+                    //                                   ),
+                    //                                 ),
+                    //                                 //   PopupMenuItem<String>(
+                    //                               ])
+                    //                     ],
+                    //                   );
+                    //                 }),
+                    //               ),
+                    //               const SizedBox(
+                    //                 height: 10,
+                    //               ),
+                    //               Text(widget.fromResponse.toString()),
+                    //               Padding(
+                    //                 padding:
+                    //                     const EdgeInsets.symmetric(horizontal: 15),
+                    //                 child: _buildProfileCard(
+                    //                     theme: theme,
+                    //                     seekerData: widget.seekerData),
+                    //               ),
+                    //               const SizedBox(
+                    //                 height: 10,
+                    //               ),
+                    //               TabBar(
+                    //                   indicatorColor: secondaryColor,
+                    //                   indicatorSize: TabBarIndicatorSize.tab,
+                    //                   unselectedLabelStyle: theme
+                    //                       .textTheme.bodyLarge!
+                    //                       .copyWith(color: greyTextColor),
+                    //                   labelStyle: theme.textTheme.bodyLarge!
+                    //                       .copyWith(
+                    //                           color: buttonColor,
+                    //                           fontWeight: FontWeight.bold),
+                    //                   indicator: CustomTabIndicator(
+                    //                     color:
+                    //                         secondaryColor.withValues(alpha: 0.7),
+                    //                     radius: 15,
+                    //                     indicatorHeight: 2.h,
+                    //                   ),
+                    //                   tabs: [
+                    //                     Tab(
+                    //                       text: "Profile Details ",
+                    //                     ),
+                    //                     Tab(
+                    //                       text: "Job Activity",
+                    //                     )
+                    //                   ]),
+                    //               Expanded(
+                    //                 child: TabBarView(children: [
+                    //                   _profileTabWidget(theme: theme),
+                    //                   JobActivityTab(
+                    //                     responseData: widget.responseData,
+                    //                     isInterview: widget.fromInterview,
+                    //                     jobData: widget.jobData,
+                    //                   )
+                    //                 ]),
+                    //               )
+                    //             ],
+                    //           ),
+                    //         ),
+                    //       )
+                    //     :
+
+                    SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                child: Column(
+                  spacing: 20,
+                  children: [
+                    Consumer<SearchSeekerProvider>(
+                        builder: (context, provider, child) {
+                      return CommonAppbarWidget(
+                        isBackArrow: true,
+                        icon: provider.bookmarkedStates[widget
+                                    .seekerData.personalData!.personal.id] ==
+                                true
+                            ? Icons.bookmark
+                            : Icons.bookmark_outline,
+                        action: () {
+                          provider.toggleBookmark(widget.seekerData, context);
+                        },
+                        title: CustomFunctions.toSentenceCase(seekerName),
+                      );
+                    }),
+                    _buildProfileCard(
+                        theme: theme, seekerData: widget.seekerData),
+                    DetailsTabWidget(seekerData: widget.seekerData),
+                  ],
+                ),
+              ),
+            )),
           ],
         ),
       ),
@@ -387,7 +439,11 @@ class _SeekerDetailsState extends State<SeekerDetails>
   }
 
   void _showInterviewScheduleSheet(
-      {required ThemeData theme, required String name, required int seekerId}) {
+      {required ThemeData theme,
+      required String name,
+      required int seekerId,
+      required bool isScheduled,
+      InterviewModel? interviewModel}) {
     DateTime? selectedDate;
     TimeOfDay? selectedTime;
 
@@ -395,6 +451,14 @@ class _SeekerDetailsState extends State<SeekerDetails>
         context: context,
         builder: (context) => StatefulBuilder(
                 builder: (BuildContext context, StateSetter setModalState) {
+              if (isScheduled == true) {
+                return Container(
+                    child: Column(
+                  children: [
+                    Text("Sche"),
+                  ],
+                ));
+              }
               return Container(
                 height: 330.h,
                 width: double.infinity,
@@ -737,7 +801,7 @@ class _SeekerDetailsState extends State<SeekerDetails>
                         child: Consumer<InviteSeekerProvider>(
                             builder: (context, provider, child) {
                           return ReusableButton(
-                            isLoading: isLoading,
+                                  isLoading: isLoading,
                                   textColor: Colors.white,
                                   buttonColor: _selectedJob == ''
                                       ? secondaryColor.withValues(alpha: 0.6)

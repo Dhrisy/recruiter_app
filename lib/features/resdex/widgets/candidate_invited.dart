@@ -61,7 +61,7 @@ class _CandidateInvitedState extends State<CandidateInvited> {
             }
 
             return FutureBuilder<List<InvitedSeekerWithJob> ?>(
-                future: _seekerLists,
+                future: provider.invitedLists,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return ShimmerListLoading();
@@ -84,7 +84,7 @@ class _CandidateInvitedState extends State<CandidateInvited> {
                               ] ??
                           false;
                       return SeekerCard(
-                      
+                      invitedModel: snapshot.data![index],
                         jobData: snapshot.data![index].job,
                           isInvited: true,
                           seekerData: seekerData,
