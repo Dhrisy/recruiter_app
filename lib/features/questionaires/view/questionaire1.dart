@@ -7,6 +7,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:linear_progress_bar/linear_progress_bar.dart';
+import 'package:provider/provider.dart';
 import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/core/utils/city_lists.dart';
 import 'package:recruiter_app/core/utils/country_lists.dart';
@@ -14,15 +15,19 @@ import 'package:recruiter_app/core/utils/functional_area_lists.dart';
 import 'package:recruiter_app/core/utils/industry_lists.dart';
 import 'package:recruiter_app/core/utils/navigation_animation.dart';
 import 'package:recruiter_app/features/account/account_data.dart';
+import 'package:recruiter_app/features/account/account_provider.dart';
+import 'package:recruiter_app/features/navbar/view/animated_navbar.dart';
 import 'package:recruiter_app/features/questionaires/bloc/questionaire_bloc.dart';
 import 'package:recruiter_app/features/questionaires/bloc/questionaire_event.dart';
 import 'package:recruiter_app/features/questionaires/bloc/questionaire_state.dart';
 import 'package:recruiter_app/features/questionaires/data/questionaire_repository.dart';
 import 'package:recruiter_app/features/questionaires/model/questionaire_model.dart';
 import 'package:recruiter_app/features/questionaires/view/successfully_registered_screen.dart';
+import 'package:recruiter_app/services/account/account_service.dart';
 import 'package:recruiter_app/widgets/common_snackbar.dart';
 import 'package:recruiter_app/widgets/reusable_button.dart';
 import 'package:recruiter_app/widgets/reusable_textfield.dart';
+import 'package:path/path.dart' as path;
 
 class Questionaire1 extends StatefulWidget {
   final bool? isFromHome;
@@ -47,6 +52,7 @@ class _Questionaire1State extends State<Questionaire1> {
   bool countryError = false;
 
   final TextEditingController _companyWesiteCont = TextEditingController();
+  final TextEditingController _companyNameCont = TextEditingController();
   final TextEditingController _aboutCont = TextEditingController();
   final TextEditingController _addressCont = TextEditingController();
   final TextEditingController _postalCodeCont = TextEditingController();
@@ -104,9 +110,13 @@ class _Questionaire1State extends State<Questionaire1> {
             widget.accountData!.contactMobileNumber.toString();
         _personNameCont.text = widget.accountData!.name.toString();
         _postalCodeCont.text = widget.accountData!.postalCode.toString();
-        _addressCont.text = widget.accountData!.address.toString();
+        _addressCont.text = widget.accountData!.address != null
+            ? widget.accountData!.address!.map((item) => item).join(", ")
+            : "N/A";
+
         _aboutCont.text = widget.accountData!.about.toString();
         _companyWesiteCont.text = widget.accountData!.website.toString();
+        _companyNameCont.text = widget.accountData!.name.toString();
 
         _selectedCountry = widget.accountData!.country.toString();
         _selectedCity = widget.accountData!.city.toString();
@@ -266,10 +276,25 @@ class _Questionaire1State extends State<Questionaire1> {
             const SizedBox(
               height: 40,
             ),
+            widget.isEdit == true
+                ? ReusableTextfield(
+                    controller: _companyNameCont,
+                    hintText: "Company name",
+                    labelText: "Compnay name",
+                    validation: (_) {
+                      if (_companyNameCont.text.trim().isEmpty) {
+                        return "This field is required";
+                      }
+                      return null;
+                    },
+                  )
+                : const SizedBox.shrink(),
+            const SizedBox(
+              height: 15,
+            ),
             ReusableTextfield(
               controller: _companyWesiteCont,
               labelText: "Company website",
-              isRequired: true,
               validation: (_) {
                 // final websiteRegex =
                 //     "^(https?:\/\/)?([\w\-]+\.)+[\w\-]+(\/[\w\-._~:\/?#[\]@!&'()*+,;=]*)?";
@@ -293,7 +318,6 @@ class _Questionaire1State extends State<Questionaire1> {
               controller: _aboutCont,
               labelText: "About your company",
               maxLines: 4,
-              isRequired: true,
               validation: (_) {
                 if (_aboutCont.text.trim().isEmpty) {
                   return "This field id required";
@@ -441,35 +465,35 @@ class _Questionaire1State extends State<Questionaire1> {
               height: 35,
             ),
             ReusableButton(
-                action: () {
-                  if (_comapnyFormKey.currentState!.validate()) {
-                    if (_selectedIndustry == '') {
-                      setState(() {
-                        industryError = true;
-                      });
-                    } else if (_selectedFunctionalArea == '') {
-                      setState(() {
-                        areaError = true;
-                        industryError = false;
-                      });
-                    } else {
-                      setState(() {
-                        industryError = false;
-                        areaError = false;
-                      });
-                      _pageController.nextPage(
-                          duration: Duration(milliseconds: 500),
-                          curve: Curves.easeInOut);
-                    }
+              action: () {
+                if (_comapnyFormKey.currentState!.validate()) {
+                  if (_selectedIndustry == '') {
+                    setState(() {
+                      industryError = true;
+                    });
+                  } else if (_selectedFunctionalArea == '') {
+                    setState(() {
+                      areaError = true;
+                      industryError = false;
+                    });
+                  } else {
+                    setState(() {
+                      industryError = false;
+                      areaError = false;
+                    });
+                    _pageController.nextPage(
+                        duration: Duration(milliseconds: 500),
+                        curve: Curves.easeInOut);
                   }
+                }
 
-                  FocusScope.of(context).unfocus();
-                },
-                text: "Next",
-                textSize: 16.sp,
-                textColor: Colors.white,
-                height: 40.h,
-              ),
+                FocusScope.of(context).unfocus();
+              },
+              text: "Next",
+              textSize: 16.sp,
+              textColor: Colors.white,
+              height: 40.h,
+            ),
             const SizedBox(
               height: 35,
             ),
@@ -513,7 +537,6 @@ class _Questionaire1State extends State<Questionaire1> {
                           controller: _addressCont,
                           labelText: "Address",
                           maxLines: 3,
-                          isRequired: true,
                           validation: (_) {
                             if (_addressCont.text.trim().isEmpty) {
                               return "This field is required";
@@ -678,33 +701,33 @@ class _Questionaire1State extends State<Questionaire1> {
                   height: 45,
                 ),
                 ReusableButton(
-                    action: () {
-                      if (_locationFormKey.currentState!.validate()) {
-                        if (_selectedCity == '') {
-                          setState(() {
-                            cityError = true;
-                          });
-                        } else if (_selectedCountry == '') {
-                          setState(() {
-                            countryError = true;
-                          });
-                        } else {
-                          setState(() {
-                            cityError = false;
-                            countryError = false;
-                          });
-                          _pageController.nextPage(
-                              duration: Duration(milliseconds: 500),
-                              curve: Curves.easeInOut);
-                          FocusScope.of(context).unfocus();
-                        }
+                  action: () {
+                    if (_locationFormKey.currentState!.validate()) {
+                      if (_selectedCity == '') {
+                        setState(() {
+                          cityError = true;
+                        });
+                      } else if (_selectedCountry == '') {
+                        setState(() {
+                          countryError = true;
+                        });
+                      } else {
+                        setState(() {
+                          cityError = false;
+                          countryError = false;
+                        });
+                        _pageController.nextPage(
+                            duration: Duration(milliseconds: 500),
+                            curve: Curves.easeInOut);
+                        FocusScope.of(context).unfocus();
                       }
-                    },
-                    textSize: 18.sp,
-                    height: 40.h,
-                    text: "Next",
-                    textColor: Colors.white,
-                    )
+                    }
+                  },
+                  textSize: 18.sp,
+                  height: 40.h,
+                  text: "Next",
+                  textColor: Colors.white,
+                )
               ],
             ),
           ),
@@ -760,7 +783,6 @@ class _Questionaire1State extends State<Questionaire1> {
                     }
                     return null;
                   },
-                  isRequired: true,
                 ),
                 const SizedBox(
                   height: 15,
@@ -774,7 +796,6 @@ class _Questionaire1State extends State<Questionaire1> {
                     }
                     return null;
                   },
-                  isRequired: true,
                 ),
                 const SizedBox(
                   height: 15,
@@ -796,7 +817,6 @@ class _Questionaire1State extends State<Questionaire1> {
                     }
                     return null;
                   },
-                  isRequired: true,
                 ),
                 const SizedBox(
                   height: 55,
@@ -815,9 +835,61 @@ class _Questionaire1State extends State<Questionaire1> {
                     }
                   }
                 }, builder: (context, state) {
-                  return ReusableButton(
+                  return Consumer<AccountProvider>(
+                      builder: (context, provider, child) {
+                    return ReusableButton(
+                      isLoading: provider.isLoading,
                       action: () async {
-                        if (widget.isEdit == true) {
+                        if (widget.isEdit == true &&
+                            widget.accountData != null) {
+                          print(_selectedImage != null
+                              ? _selectedImage!.path.toString()
+                              : "kkkkk");
+                          String fullPath =
+                              _selectedImage !=null ? _selectedImage!.path.toString() : "";
+                          String fileName = path.basename(fullPath);
+
+                         
+
+                          final account = AccountData(
+                              logo: fileName,
+                              id: widget.accountData!.id,
+                              contactLandNumber: _landlineNumberCont.text,
+                              about: _aboutCont.text,
+                              address: [_addressCont.text],
+                              city: _selectedCity,
+                              contactMobileNumber: _mobileNumberCont.text,
+                              contactName: _personNameCont.text,
+                              country: _selectedCountry,
+                              designation: _designationCont.text,
+                              functionalArea: _selectedFunctionalArea,
+                              industry: _selectedIndustry,
+                              name: "Emergio games",
+                              website: _companyWesiteCont.text,
+                              postalCode: _postalCodeCont.text);
+
+                          final result = await Provider.of<AccountProvider>(
+                                  context,
+                                  listen: false)
+                              .editCompanyDetails(account: account);
+
+                          if (result == "success") {
+                            Navigator.pushAndRemoveUntil(
+                                context,
+                                AnimatedNavigation()
+                                    .fadeAnimation(CustomBottomNavBar(
+                                  index: 3,
+                                )),
+                                (Route<dynamic> route) => false);
+
+                            Provider.of<AccountProvider>(context, listen: false)
+                                .fetchAccountData();
+                            CommonSnackbar.show(context,
+                                message: "Chnage saved successfully");
+                          } else {
+                            CommonSnackbar.show(context,
+                                message: result.toString());
+                          }
                         } else {
                           if (_contactFormKey.currentState!.validate()) {
                             context.read<QuestionaireBloc>().add(
@@ -834,19 +906,19 @@ class _Questionaire1State extends State<Questionaire1> {
                                     postalCode: _postalCodeCont.text,
                                     website: _companyWesiteCont.text));
                           }
+                          Navigator.pushAndRemoveUntil(
+                              context,
+                              AnimatedNavigation().scaleAnimation(
+                                  SuccessfullyRegisteredScreen()),
+                              (Route<dynamic> route) => false);
                         }
-
-                        Navigator.pushAndRemoveUntil(
-                            context,
-                            AnimatedNavigation()
-                                .scaleAnimation(SuccessfullyRegisteredScreen()),
-                            (Route<dynamic> route) => false);
                       },
                       textSize: 18.sp,
                       height: 40.h,
                       text: widget.isEdit == true ? "Save changes" : "Save",
                       textColor: Colors.white,
-                      );
+                    );
+                  });
                 })
               ],
             ),

@@ -65,7 +65,7 @@ import 'package:recruiter_app/features/resdex/model/seeker_model.dart';
 class SeekerProvider extends ChangeNotifier {
   bool isLoading = false;
   Future<List<JobResponseModel>?>? seekerLists;
-  List<JobResponseModel> _allSeekers = [];
+  List<JobResponseModel> allSeekers = [];
   List<JobResponseModel> _filteredSeekers = [];
   String message = '';
   String _searchQuery = '';
@@ -86,9 +86,9 @@ class SeekerProvider extends ChangeNotifier {
 
   void _filterSeekers() {
     if (_searchQuery.isEmpty) {
-      _filteredSeekers = List.from(_allSeekers);
+      _filteredSeekers = List.from(allSeekers);
     } else {
-      _filteredSeekers = _allSeekers.where((seeker) {
+      _filteredSeekers = allSeekers.where((seeker) {
         final name = seeker.seeker.personalData?.user.name?.toLowerCase() ?? '';
         final email = seeker.seeker.personalData?.user.email?.toLowerCase() ?? '';
         final phone = seeker.seeker.personalData?.user.phoneNumber?.toLowerCase() ?? '';
@@ -110,8 +110,9 @@ class SeekerProvider extends ChangeNotifier {
     try {
       final result = await SeekerRepository().fetchAllAppliedSeekers();
       if (result != null) {
-        _allSeekers = result;
-        _filterSeekers(); // Apply initial filtering
+        allSeekers = result;
+        _filterSeekers(); 
+        notifyListeners();
       }
       seekerLists = Future.value(result);
       isLoading = false;

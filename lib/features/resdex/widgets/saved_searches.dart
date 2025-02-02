@@ -63,21 +63,34 @@ class _SavedSearchesState extends State<SavedSearches> {
             }
 
             return Column(
-              spacing: 10,
-              children:
-                  List.generate(provider.bookMarkedLists!.length, (index) {
-                final seekerData = provider.bookMarkedLists![index];
-                final isBookmarked = provider.bookmarkedStates[
-                        seekerData.personalData?.personal.id] ??
-                    false;
-
-                return SeekerCard(
-                    seekerData: seekerData,
-                    isBookmarked: isBookmarked,
-                    onBookmarkToggle: () {
-                      provider.toggleBookmark(seekerData, context);
-                    });
-              }),
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                 Text("(Saved seekeres count :  ${provider.bookMarkedLists!.length} )",
+                          style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                            fontWeight:FontWeight.bold,
+                            color: secondaryColor
+                          ),),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                Column(
+                  spacing: 10,
+                  children:
+                      List.generate(provider.bookMarkedLists!.length, (index) {
+                    final seekerData = provider.bookMarkedLists![index];
+                    final isBookmarked = provider.bookmarkedStates[
+                            seekerData.personalData?.personal.id] ??
+                        false;
+                
+                    return SeekerCard(
+                        seekerData: seekerData,
+                        isBookmarked: isBookmarked,
+                        onBookmarkToggle: () {
+                          provider.toggleBookmark(seekerData, context);
+                        });
+                  }),
+                ),
+              ],
             );
           }),
         ),

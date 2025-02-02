@@ -6,9 +6,11 @@ import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/core/theme.dart';
 import 'package:recruiter_app/core/utils/app_theme_data.dart';
 import 'package:recruiter_app/features/plans/widgets/plan_card_widget.dart';
+import 'package:recruiter_app/widgets/common_appbar_widget.dart';
 
 class PlansScreen extends StatefulWidget {
-  const PlansScreen({Key? key}) : super(key: key);
+  final bool? fromSettings;
+  const PlansScreen({Key? key, this.fromSettings}) : super(key: key);
 
   @override
   _PlansScreenState createState() => _PlansScreenState();
@@ -17,7 +19,7 @@ class PlansScreen extends StatefulWidget {
 class _PlansScreenState extends State<PlansScreen> {
   int _currentIndex = 0;
 
-  final List<Map<String, dynamic>> _stdLists =  [
+  final List<Map<String, dynamic>> _stdLists = [
     {
       "title": "Upto 250 character job description",
       "is_applicable": true,
@@ -67,7 +69,7 @@ class _PlansScreenState extends State<PlansScreen> {
       "rupees": "400"
     },
   ];
- final List<Map<String, dynamic>> _classicLists = [
+  final List<Map<String, dynamic>> _classicLists = [
     {
       "title": "Upto 250 character job description",
       "is_applicable": true,
@@ -117,7 +119,7 @@ class _PlansScreenState extends State<PlansScreen> {
       "rupees": "800"
     },
   ];
-final  List<Map<String, dynamic>> _premiumLists = [
+  final List<Map<String, dynamic>> _premiumLists = [
     {
       "title": "Upto 250 character job description",
       "is_applicable": true,
@@ -168,7 +170,7 @@ final  List<Map<String, dynamic>> _premiumLists = [
     },
   ];
 
- final List<Map<String, dynamic>> _resdexLiteLists = [
+  final List<Map<String, dynamic>> _resdexLiteLists = [
     {
       "title": "100 CV views per requirement",
       "is_applicable": true,
@@ -219,7 +221,7 @@ final  List<Map<String, dynamic>> _premiumLists = [
     },
   ];
 
-final  List<Map<String, dynamic>> _resdexPremiumLists = [
+  final List<Map<String, dynamic>> _resdexPremiumLists = [
     {
       "title": "100 CV views per requirement",
       "is_applicable": true,
@@ -273,12 +275,12 @@ final  List<Map<String, dynamic>> _resdexPremiumLists = [
   List<List<Map<String, dynamic>>> jobPostingPlans = [];
   List<List<Map<String, dynamic>>> resdexPlans = [];
 
-   late AppThemeDataBloc _themeBloc;
+  late AppThemeDataBloc _themeBloc;
 
   @override
   void initState() {
     super.initState();
-     _themeBloc = AppThemeDataBloc();
+    _themeBloc = AppThemeDataBloc();
     setState(() {
       jobPostingPlans.add(_stdLists);
       jobPostingPlans.add(_classicLists);
@@ -293,8 +295,8 @@ final  List<Map<String, dynamic>> _resdexPremiumLists = [
 
   @override
   Widget build(BuildContext context) {
-     final theme = Theme.of(context);
-     final _themeBloc = context.read<AppThemeDataBloc>();
+    final theme = Theme.of(context);
+    final _themeBloc = context.read<AppThemeDataBloc>();
     return Material(
       child: SafeArea(
         child: Scaffold(
@@ -306,20 +308,26 @@ final  List<Map<String, dynamic>> _resdexPremiumLists = [
                 const SizedBox(
                   height: 10,
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Planning prices",
-                      style: theme.textTheme.headlineMedium,
-                    ),
-                  ],
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: widget.fromSettings == true
+                      ? Expanded(
+                          child: CommonAppbarWidget(
+                              isBackArrow: true, title: "Plans Screen"))
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "Planning prices",
+                              style: theme.textTheme.headlineMedium,
+                            ),
+                          ],
+                        ),
                 ),
                 Text(
                   "Hire skilled candidates for your business",
-                  style: theme.textTheme.bodyMedium!.copyWith(
-                    color: greyTextColor
-                  ),
+                  style: theme.textTheme.bodyMedium!
+                      .copyWith(color: greyTextColor),
                 ),
                 const SizedBox(height: 20),
                 TabBar(
@@ -333,7 +341,9 @@ final  List<Map<String, dynamic>> _resdexPremiumLists = [
                       text: "Resdex",
                     ),
                   ],
-                  labelColor: _themeBloc.state.isDarkMode  ? darkTextColor : lightTextColor,
+                  labelColor: _themeBloc.state.isDarkMode
+                      ? darkTextColor
+                      : lightTextColor,
                   labelStyle: theme.textTheme.bodyLarge,
                   unselectedLabelColor: Colors.grey,
                   indicatorColor: buttonColor,

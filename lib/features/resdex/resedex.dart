@@ -14,6 +14,7 @@ import 'package:recruiter_app/features/resdex/provider/search_seeker_provider.da
 import 'package:recruiter_app/features/resdex/widgets/candidate_invited.dart';
 import 'package:recruiter_app/features/resdex/widgets/email_template_widget.dart';
 import 'package:recruiter_app/features/resdex/widgets/interview_scheduled_widget.dart';
+import 'package:recruiter_app/features/resdex/widgets/saved_cv_widget.dart';
 import 'package:recruiter_app/features/resdex/widgets/saved_searches.dart';
 import 'package:recruiter_app/features/resdex/widgets/search_cv_form_widget.dart';
 import 'package:recruiter_app/widgets/common_appbar_widget.dart';
@@ -274,6 +275,9 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
 
                         currentScreenIndex == 2
                         ? InterviewScheduledWidget()
+                        : SizedBox.shrink(),
+ currentScreenIndex == 3
+                        ? SavedCvWidget()
                         : SizedBox.shrink(),
 
 

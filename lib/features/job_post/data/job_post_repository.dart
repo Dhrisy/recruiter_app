@@ -87,4 +87,26 @@ class JobPostRepository {
       rethrow;
     }
   }
+
+  Future<String?> deleteJobPostRepository(
+      {required int jobId, int retryCount = 0, int maxRetries = 3}) async {
+    try {
+      var response = await JobsService.deleteJob(jobId: jobId);
+      print("Response of delete job ${response.body}");
+      if (response.statusCode == 200) {
+        return "success";
+      } else if (response.statusCode == 401) {
+        await RefreshTokenService.refreshToken();
+        return deleteJobPostRepository(
+            jobId: jobId, retryCount: retryCount + 1, maxRetries: maxRetries);
+      } else {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+
+        return responseData["message"];
+      }
+    } catch (e) {
+      print("Error indelete job: $e");
+      rethrow;
+    }
+  }
 }

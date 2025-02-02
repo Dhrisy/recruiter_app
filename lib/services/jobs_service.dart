@@ -2,9 +2,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:recruiter_app/core/utils/custom_functions.dart';
-import 'package:recruiter_app/core/utils/skills.dart';
 import 'package:recruiter_app/features/job_post/model/job_post_model.dart';
-import 'package:recruiter_app/features/responses/view/response.dart';
 import 'package:recruiter_app/services/api_lists.dart';
 
 class JobsService {
@@ -46,7 +44,6 @@ class JobsService {
             'Authorization': 'Bearer ${accessToken.toString()}',
             'Content-Type': 'application/json',
           });
-
 
       return response;
     } catch (e) {
@@ -98,15 +95,26 @@ class JobsService {
           "roles": "",
           "currency": job.currency
         }),
-         headers: {
-            'Authorization': 'Bearer ${token.toString()}',
-            'Content-Type': 'application/json',
-          }
-        );
+        headers: {
+          'Authorization': 'Bearer ${token.toString()}',
+          'Content-Type': 'application/json',
+        });
 
     return response;
   }
 
+  static Future<http.Response> deleteJob({required int jobId}) async {
+    final url = Uri.parse("${ApiLists.deleteJobPostEndPoint}?id=$jobId");
 
-  // static Future<http.Response>  deleteJob({})
+    print(jobId);
+
+    final accessToken =
+        await CustomFunctions().retrieveCredentials("access_token");
+
+    final response = await http.delete(url, headers: {
+      'Authorization': 'Bearer ${accessToken.toString()}',
+    });
+
+    return response;
+  }
 }

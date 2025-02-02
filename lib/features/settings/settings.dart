@@ -5,13 +5,19 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/core/utils/navigation_animation.dart';
+import 'package:recruiter_app/features/account/account_data.dart';
 import 'package:recruiter_app/features/faqs/faq.dart';
+import 'package:recruiter_app/features/plans/plans_screen.dart';
+import 'package:recruiter_app/features/questionaires/view/questionaire1.dart';
+import 'package:recruiter_app/features/settings/closed_jobs.dart';
+import 'package:recruiter_app/features/settings/suggestion_screen.dart';
 import 'package:recruiter_app/features/splash_screen/splash_screen.dart';
 import 'package:recruiter_app/widgets/common_appbar_widget.dart';
 import 'package:recruiter_app/widgets/reusable_button.dart';
 
 class SettingsScreen extends StatefulWidget {
-  SettingsScreen({super.key});
+  final AccountData accountData;
+  SettingsScreen({super.key, required this.accountData});
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -56,24 +62,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                   _buildSettingsItem(
-                    context,
-                    'Account Preference',
-                    () => Navigator.push(
                       context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              const SimplePage(title: 'Account Preference')),
-                    ),
-                  ),
+                      'Edit Account',
+                      () => Navigator.push(
+                          context,
+                          AnimatedNavigation().slideAnimation(Questionaire1(
+                            isEdit: true,
+                            accountData: widget.accountData,
+                          )))),
                   _buildSettingsItem(
                     context,
                     'See Plans',
-                    () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              const SimplePage(title: 'Plans')),
-                    ),
+                    () => Navigator.push(context,
+                        AnimatedNavigation().slideAnimation(PlansScreen(fromSettings: true,))),
                   ),
                   _buildSettingsItem(
                     context,
@@ -85,24 +86,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               const SimplePage(title: 'Change Password')),
                     ),
                   ),
-                  _buildSettingsItem(
-                    context,
-                    'Saved Candidates',
-                    () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              const SimplePage(title: 'Saved Candidates')),
-                    ),
-                  ),
+                 
                   _buildSettingsItem(
                     context,
                     'Closed Jobs',
                     () => Navigator.push(
                       context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              const SimplePage(title: 'Closed Jobs')),
+                     AnimatedNavigation().slideAnimation(ClosedJobs())
                     ),
                   ),
                   _buildSettingsItem(
@@ -110,21 +100,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     'Suggestions',
                     () => Navigator.push(
                       context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              const SimplePage(title: 'Suggestions')),
+                      AnimatedNavigation().slideAnimation(SuggestionScreen())
                     ),
                   ),
-                  _buildSettingsItem(
-                    context,
-                    'Feedbacks',
-                    () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              const SimplePage(title: 'Feedbacks')),
-                    ),
-                  ),
+                 
                   _buildSettingsItem(
                     context,
                     'FAQ',

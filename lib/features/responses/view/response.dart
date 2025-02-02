@@ -30,8 +30,8 @@ class _ResponseState extends State<Response>
   late Animation<Offset> _listsAnimation;
   late Animation<Offset> _listItemAnimation;
   bool _isLoading = true;
-  Future<List<JobResponseModel>?>? _seekerLists;
-final TextEditingController _searchCont = TextEditingController();
+  List<JobResponseModel>? _seekerLists;
+  final TextEditingController _searchCont = TextEditingController();
   String _searchQuery = '';
 
   @override
@@ -43,7 +43,7 @@ final TextEditingController _searchCont = TextEditingController();
     );
     _controller.forward();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       Provider.of<SeekerProvider>(context, listen: false)
           .fetchAllAppliedSeekers()
           .then((_) {
@@ -51,7 +51,8 @@ final TextEditingController _searchCont = TextEditingController();
           setState(() {
             _isLoading = false;
             _seekerLists =
-                Provider.of<SeekerProvider>(context, listen: false).seekerLists;
+                Provider.of<SeekerProvider>(context, listen: false).allSeekers;
+                print(_seekerLists != null ? _seekerLists!.length : "gggggggggggggg");
           });
         }
       });
@@ -139,11 +140,26 @@ final TextEditingController _searchCont = TextEditingController();
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SlideTransition(
-                      position: _animation,
-                      child: CommonAppbarWidget(
-                        title: "Responses",
-                      )),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: CommonAppbarWidget(
+                          title: "Responses",
+                        ),
+                      ),
+                      Consumer<SeekerProvider>(
+                          builder: (context, provider, child) {
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 15),
+                          child: Text("( ${_seekerLists?.length} )",
+                          style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                            fontWeight:FontWeight.bold,
+                            color: secondaryColor
+                          ),),
+                        );
+                      })
+                    ],
+                  ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15),
                     child: Column(

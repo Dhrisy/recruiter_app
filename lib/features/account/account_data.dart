@@ -2,7 +2,7 @@ import 'package:recruiter_app/core/utils/custom_functions.dart';
 import 'package:recruiter_app/services/api_lists.dart';
 
 class AccountData {
-  final String ? id;
+  final int ? id;
   final String ? name;
   final String ? logo;
   final String ? about;
@@ -50,7 +50,7 @@ class AccountData {
       contactName: json["contact_name"] ?? "n/a",
       country: json["country"] ?? "n/a",
       designation: json["designation"] ?? "n/a",
-      id: json["id"].toString(),
+      id: json["id"],
       logo: CustomFunctions.validateUrl(json["logo"] ?? ""),
       name: json["name"] ?? "n/a",
       postalCode: json["postal_code"] ?? "n/a",

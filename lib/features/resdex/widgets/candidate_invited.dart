@@ -42,7 +42,7 @@ class _CandidateInvitedState extends State<CandidateInvited> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      spacing: 20,
+      spacing: 0,
       children: [
         Text(
           "Manage and track the candidates you’ve invited. Review their details, status, and take necessary actions to move forward",
@@ -51,6 +51,7 @@ class _CandidateInvitedState extends State<CandidateInvited> {
               .bodyMedium!
               .copyWith(color: greyTextColor),
         ),
+       
         Container(
           width: double.infinity,
           decoration: BoxDecoration(),
@@ -76,23 +77,36 @@ class _CandidateInvitedState extends State<CandidateInvited> {
                   }
 
                   return Column(
-                    spacing: 10,
-                    children: List.generate(snapshot.data!.length, (index) {
-                      final seekerData = snapshot.data![index].seeker;
-                      final isBookmarked = provider.bookmarkedStates[seekerData
-                              .personalData?.personal.id
-                              ] ??
-                          false;
-                      return SeekerCard(
-                      invitedModel: snapshot.data![index],
-                        jobData: snapshot.data![index].job,
-                          isInvited: true,
-                          seekerData: seekerData,
-                          isBookmarked: isBookmarked,
-                          onBookmarkToggle: () {
-                            provider.toggleBookmark(seekerData, context);
-                          });
-                    }),
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("(Invited count ${snapshot.data!.length} )",
+                          style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                            fontWeight:FontWeight.bold,
+                            color: secondaryColor
+                          ),),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                      Column(
+                        spacing: 10,
+                        children: List.generate(snapshot.data!.length, (index) {
+                          final seekerData = snapshot.data![index].seeker;
+                          final isBookmarked = provider.bookmarkedStates[seekerData
+                                  .personalData?.personal.id
+                                  ] ??
+                              false;
+                          return SeekerCard(
+                          invitedModel: snapshot.data![index],
+                            jobData: snapshot.data![index].job,
+                              isInvited: true,
+                              seekerData: seekerData,
+                              isBookmarked: isBookmarked,
+                              onBookmarkToggle: () {
+                                provider.toggleBookmark(seekerData, context);
+                              });
+                        }),
+                      ),
+                    ],
                   );
                 });
           }),

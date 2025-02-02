@@ -248,13 +248,16 @@ class _SeekerCardState extends State<SeekerCard>
                                                 .employed ==
                                             false
                                         ? Text("Fresher")
-                                        : Text(
-                                            "${CustomFunctions.toSentenceCase(widget.seekerData.personalData!.personal.introduction.toString())}",
-                                            style: theme.textTheme.bodyMedium!
-                                                .copyWith(
-                                              color: greyTextColor,
+                                        : Expanded(
+                                          child: Text(
+                                              "${CustomFunctions.toSentenceCase(widget.seekerData.personalData!.personal.introduction.toString())}",
+                                              overflow: TextOverflow.ellipsis,
+                                              style: theme.textTheme.bodyMedium!
+                                                  .copyWith(
+                                                color: greyTextColor,
+                                              ),
                                             ),
-                                          ),
+                                        ),
                                   ],
                                 ),
                               ),

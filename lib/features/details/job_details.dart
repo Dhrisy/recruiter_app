@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/core/theme.dart';
 import 'package:recruiter_app/core/utils/custom_functions.dart';
@@ -12,11 +13,14 @@ import 'package:recruiter_app/features/details/widgets/additional_details_widget
 import 'package:recruiter_app/features/details/widgets/job_details_widget.dart';
 import 'package:recruiter_app/features/job_post/model/job_post_model.dart';
 import 'package:recruiter_app/features/job_post/view/job_form.dart';
+import 'package:recruiter_app/features/job_post/viewmodel.dart/job_posting_provider.dart';
 import 'package:recruiter_app/viewmodels/job_viewmodel.dart';
 import 'package:recruiter_app/widgets/chip_container_widget.dart';
+import 'package:recruiter_app/widgets/common_alertdialogue.dart';
 import 'dart:math' as math;
 
 import 'package:recruiter_app/widgets/common_appbar_widget.dart';
+import 'package:recruiter_app/widgets/common_snackbar.dart';
 
 class CustomTabIndicator extends Decoration {
   final Color color;
@@ -135,7 +139,6 @@ class _JobDetailsState extends State<JobDetails> with TickerProviderStateMixin {
               child: BlocConsumer<JobBloc, JobsState>(
                   listener: (context, state) {},
                   builder: (context, state) {
-
                     return Column(
                       spacing: 20,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -147,7 +150,7 @@ class _JobDetailsState extends State<JobDetails> with TickerProviderStateMixin {
                               child: CommonAppbarWidget(
                                 // fromJobDetails: true,
                                 isBackArrow: true,
-                                title: widget.jobData.title.toString(),
+                                title: CustomFunctions.toSentenceCase(widget.jobData.title.toString())
                               ),
                             ),
                             PopupMenuButton<String>(
@@ -168,6 +171,42 @@ class _JobDetailsState extends State<JobDetails> with TickerProviderStateMixin {
                                             jobData: widget.jobData,
                                           )));
                                     case "delete":
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return CommonAlertDialog(
+                                              title: "Delete?",
+                                              message:
+                                                  "Dou you want to delete this job ${widget.jobData.title}",
+                                              onConfirm: () async {
+                                                if (widget.jobData.id != null) {
+                                                  final result = await Provider
+                                                          .of<JobPostingProvider>(
+                                                              context,
+                                                              listen: false)
+                                                      .deleteJobPost(
+                                                          jobId: widget
+                                                              .jobData.id!);
+
+                                                  if (result == "success") {
+                                                    Navigator.pop(context);
+                                                    CommonSnackbar.show(context,
+                                                        message:
+                                                            "${widget.jobData.title} deleted successfully");
+                                                  } else {
+                                                    Navigator.pop(context);
+                                                    CommonSnackbar.show(context,
+                                                        message: "$result");
+                                                  }
+                                                }
+                                              },
+                                              onCancel: () {
+                                                Navigator.pop(context);
+                                              },
+                                              height: 100);
+                                        },
+                                      );
+
                                       print("delete");
                                     case "share":
                                       print("share");
@@ -213,11 +252,27 @@ class _JobDetailsState extends State<JobDetails> with TickerProviderStateMixin {
                                           ],
                                         ),
                                       ),
+                                       PopupMenuItem<String>(
+                                        value: 'close',
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              Icons.check_circle,
+                                              size: 20,
+                                              color: buttonColor,
+                                            ),
+                                            SizedBox(width: 8),
+                                            Text(
+                                              'Close Job',
+                                              style: theme.textTheme.bodyMedium!
+                                                  .copyWith(
+                                                      color: Colors.white),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                       //   PopupMenuItem<String>(
                                     ])
-                          
-                          
-                          
                           ],
                         ),
                         _buildHeaderWidget(
@@ -249,15 +304,16 @@ class _JobDetailsState extends State<JobDetails> with TickerProviderStateMixin {
                         Expanded(
                             child: TabBarView(children: [
                           JobDetailsWidget(jobData: widget.jobData),
-                          AdditionalDetailsWidget(jobId: widget.jobData.id, jobData: widget.jobData,)
+                          AdditionalDetailsWidget(
+                            jobId: widget.jobData.id,
+                            jobData: widget.jobData,
+                          )
                         ]))
                       ],
                     );
                   }),
             ),
           ),
-
-         
         ],
       ),
     );
@@ -286,7 +342,8 @@ class _JobDetailsState extends State<JobDetails> with TickerProviderStateMixin {
               child: CircleAvatar(
                 radius: 40.r,
                 backgroundColor: Colors.white,
-                backgroundImage: AssetImage("assets/images/default_company_logo.png"),
+                backgroundImage:
+                    AssetImage("assets/images/default_company_logo.png"),
               ),
             ),
             SizedBox(width: 12.w),

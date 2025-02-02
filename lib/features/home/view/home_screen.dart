@@ -7,14 +7,17 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/core/utils/app_theme_data.dart';
 import 'package:recruiter_app/core/utils/navigation_animation.dart';
 import 'package:recruiter_app/features/home/view/banner_widget.dart';
 import 'package:recruiter_app/features/home/view/job_credit_meter.dart';
 import 'package:recruiter_app/features/home/view/recently_added_jobs_lists.dart';
+import 'package:recruiter_app/features/home/viewmodel/home_provider.dart';
 import 'package:recruiter_app/features/job_post/viewmodel.dart/jobpost_provider.dart';
 import 'package:recruiter_app/features/splash_screen/splash_screen.dart';
+import 'package:recruiter_app/services/one_signal_service.dart';
 import 'package:recruiter_app/viewmodels/job_viewmodel.dart';
 import 'package:recruiter_app/widgets/profile_completion_card.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -31,6 +34,15 @@ class _HomeScreenState extends State<HomeScreen> {
       CarouselSliderController();
   final PageController _pageController = PageController();
   int activeIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<HomeProvider>(context, listen: false).fetchRecruiterCounts();
+      OneSignalService().oneSIgnalIdSetToApi();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -241,9 +253,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Row(
                 children: [
                   InkWell(
-                      onTap: () async {
-                       
-                      },
+                      onTap: () async {},
                       child: Icon(
                         Icons.logout,
                         color: Colors.white,
@@ -335,7 +345,7 @@ class _HomeScreenState extends State<HomeScreen> {
             dotWidth: 15.w,
           ),
           onDotClicked: (index) {
-            _carouselController.animateToPage(index); 
+            _carouselController.animateToPage(index);
           },
         ),
       ],

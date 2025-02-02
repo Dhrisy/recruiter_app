@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/core/theme.dart';
 import 'package:recruiter_app/core/utils/custom_functions.dart';
 import 'package:recruiter_app/core/utils/navigation_animation.dart';
 import 'package:recruiter_app/features/details/job_details.dart';
 import 'package:recruiter_app/features/job_post/model/job_post_model.dart';
+import 'package:recruiter_app/features/job_post/viewmodel.dart/job_posting_provider.dart';
 import 'package:recruiter_app/widgets/common_alertdialogue.dart';
+import 'package:recruiter_app/widgets/common_snackbar.dart';
 
 class JobCardWidget extends StatefulWidget {
   final String? name;
@@ -162,7 +165,27 @@ class _JobCardWidgetState extends State<JobCardWidget> {
                                   title: "Delete?",
                                   message:
                                       "Dou you want to delete this job ${widget.job.title}",
-                                  onConfirm: () {},
+                                  onConfirm: () async {
+                                    if (widget.job.id != null) {
+                                      final result =
+                                          await Provider.of<JobPostingProvider>(
+                                                  context,
+                                                  listen: false)
+                                              .deleteJobPost(
+                                                  jobId: widget.job.id!);
+
+                                      if (result == "success") {
+                                        Navigator.pop(context);
+                                        CommonSnackbar.show(context,
+                                            message:
+                                                "${widget.job.title} deleted successfully");
+                                      } else {
+                                        Navigator.pop(context);
+                                        CommonSnackbar.show(context,
+                                            message: "$result");
+                                      }
+                                    }
+                                  },
                                   onCancel: () {
                                     Navigator.pop(context);
                                   },

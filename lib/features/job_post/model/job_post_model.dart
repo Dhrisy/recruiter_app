@@ -22,6 +22,7 @@ class JobPostModel {
    String? currency;
    int? id;
    String? createdOn;
+   bool? status;
 
   JobPostModel(
       {this.candidateLocation,
@@ -46,7 +47,8 @@ class JobPostModel {
       this.skills,
       this.currency,
       this.id,
-      this.createdOn
+      this.createdOn,
+      this.status
       });
 
    
@@ -74,7 +76,8 @@ class JobPostModel {
       customQuestions: json["custon_qns"],
       currency: json["currency"],
       id: json["id"],
-      createdOn: json["created_on"]
+      createdOn: json["created_on"],
+      status: json["active"]
     );
   }
 

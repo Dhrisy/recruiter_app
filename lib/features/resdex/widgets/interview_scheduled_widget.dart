@@ -39,27 +39,40 @@ class _InterviewScheduledWidgetState extends State<InterviewScheduledWidget> {
             ),
             provider.seekerLists != null
                 ? Column(
-                    children:
-                        List.generate(provider.seekerLists!.length, (index) {
-                      final seekerData = provider.seekerLists![index];
-                      return Consumer<SearchSeekerProvider>(
-                          builder: (context, provider, child) {
-                        final isBookmarked = provider.bookmarkedStates[
-                                seekerData.seeker.personalData?.personal.id] ??
-                            false;
-                        return SeekerCard(
-                          responseData: seekerData,
-                            fromINterview: true,
-                            jobData: seekerData.job,
-                            seekerData: seekerData.seeker,
-                            isBookmarked: isBookmarked,
-                            onBookmarkToggle: () {
-                              provider.toggleBookmark(
-                                  seekerData.seeker, context);
-                            });
-                      });
-                    }),
-                  )
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                     Text("(Interview scheduled count : ${provider.seekerLists!.length} )",
+                          style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                            fontWeight:FontWeight.bold,
+                            color: secondaryColor
+                          ),),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                    Column(
+                        children:
+                            List.generate(provider.seekerLists!.length, (index) {
+                          final seekerData = provider.seekerLists![index];
+                          return Consumer<SearchSeekerProvider>(
+                              builder: (context, provider, child) {
+                            final isBookmarked = provider.bookmarkedStates[
+                                    seekerData.seeker.personalData?.personal.id] ??
+                                false;
+                            return SeekerCard(
+                              responseData: seekerData,
+                                fromINterview: true,
+                                jobData: seekerData.job,
+                                seekerData: seekerData.seeker,
+                                isBookmarked: isBookmarked,
+                                onBookmarkToggle: () {
+                                  provider.toggleBookmark(
+                                      seekerData.seeker, context);
+                                });
+                          });
+                        }),
+                      ),
+                  ],
+                )
                 : const SizedBox.shrink()
           ],
         );

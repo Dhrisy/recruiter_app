@@ -80,4 +80,21 @@ class JobPostingProvider extends ChangeNotifier {
       return null;
     }
   }
+
+  Future<String?> deleteJobPost({required int jobId}) async {
+    isLoading = true;
+    notifyListeners();
+    try {
+      final result = await JobPostRepository().deleteJobPostRepository(jobId: jobId);
+      isLoading = false;
+      notifyListeners();
+      fetchJobLists();
+      return result;
+    } catch (e) {
+      print(e);
+      isLoading = false;
+      notifyListeners();
+      return null;
+    }
+  }
 }
