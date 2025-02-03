@@ -70,6 +70,9 @@ class _AllJobsState extends State<AllJobs> {
                             );
                           },
                         ),
+                        const SizedBox(
+                          height: 10,
+                        ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 15),
                           child: CommonSearchWidget(
@@ -79,14 +82,12 @@ class _AllJobsState extends State<AllJobs> {
                             },
                           ),
                         ),
-                        const SizedBox(
-                          height: 20,
-                        ),
+                      
                         provider.jobLists != null && _searchCont.text.isEmpty
                             ? SingleChildScrollView(
                                 child: Padding(
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 15),
+                                      horizontal: 15, vertical: 20),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,

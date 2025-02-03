@@ -48,4 +48,14 @@ class AccountService {
     print(response.body);
     return response;
   }
+
+   static Future<http.Response> fetchRecruiterCounts() async {
+    final token = await CustomFunctions().retrieveCredentials("access_token");
+    final url = Uri.parse(ApiLists.recruiterCountsEndPoint);
+    final response = await http.get(url, headers: {
+      'Authorization': 'Bearer ${token.toString()}',
+    });
+
+    return response;
+  }
 }

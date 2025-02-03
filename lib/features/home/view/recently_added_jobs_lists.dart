@@ -82,8 +82,10 @@ class _RecentlyAddedJobsListsState extends State<RecentlyAddedJobsLists> {
 
         Consumer<JobPostingProvider>(builder: (context, provider, child) {
           if (provider.jobLists != null) {
+
+
+            
             return SizedBox(
-              height: 290.h,
               child: ListView.separated(
                   physics: const NeverScrollableScrollPhysics(),
                   itemBuilder: (context, index) {
@@ -100,7 +102,7 @@ class _RecentlyAddedJobsListsState extends State<RecentlyAddedJobsLists> {
                       height: 10,
                     );
                   },
-                  itemCount: provider.jobLists!.length
+                  itemCount: provider.jobLists!.length >=3 ? 3 : provider.jobLists!.length
                   // state.jobs.length >= 3 ? 3 : state.jobs.length
                   ),
             );

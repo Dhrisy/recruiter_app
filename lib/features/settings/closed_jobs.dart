@@ -16,17 +16,14 @@ class ClosedJobs extends StatefulWidget {
 }
 
 class _ClosedJobsState extends State<ClosedJobs> {
-
-
-@override
+  @override
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance.addPostFrameCallback((_){
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<SettingsProvider>(context, listen: false).fetchClosedJobs();
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -48,21 +45,24 @@ class _ClosedJobsState extends State<ClosedJobs> {
                 padding: const EdgeInsets.symmetric(horizontal: 15),
                 child: Column(
                   children: [
-                    CommonAppbarWidget(
-                      isBackArrow: true,
-                      title: "Closed Jobs"),
+                    CommonAppbarWidget(isBackArrow: true, title: "Closed Jobs"),
+                    const SizedBox(
+                      height: 20,
+                    ),
                     Consumer<SettingsProvider>(
                         builder: (context, provider, child) {
                       if (provider.message != '') {
+                        return CommonErrorWidget();
+                      } else if (provider.jobsLists == null) {
                         return CommonErrorWidget();
                       } else if (provider.jobsLists != null &&
                           provider.jobsLists!.isEmpty) {
                         return CommonNodatafoundWidget();
                       } else {
                         return Column(
-                          children:
-                              List.generate(provider.jobsLists!.length, (index) {
-                                final jobData = provider.jobsLists![index];
+                          children: List.generate(provider.jobsLists!.length,
+                              (index) {
+                            final jobData = provider.jobsLists![index];
                             return JobCardWidget(job: jobData);
                           }),
                         );

@@ -23,7 +23,6 @@ class _JobActivityTabState extends State<JobActivityTab> {
   
   @override
   Widget build(BuildContext context) {
-    print("mmmmmmmmmmmmmmmmmmmmmm ${widget.responseData}");
     
     final theme = Theme.of(context);
     return Padding(

@@ -9,6 +9,7 @@ class SettingsProvider with ChangeNotifier {
 
   List<JobPostModel>? jobsLists;
   String message = '';
+  Map<String, dynamic>? subcription;
 
   Future<void> submitFeedback(String suggestion, BuildContext context) async {
     try {
@@ -41,4 +42,12 @@ class SettingsProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+
+
+
+Future<Map<String, dynamic>?>   fetchSubscriptions() async{
+  
+}
+
+
 }

@@ -10,12 +10,16 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/core/utils/app_theme_data.dart';
+import 'package:recruiter_app/core/utils/custom_functions.dart';
 import 'package:recruiter_app/core/utils/navigation_animation.dart';
+import 'package:recruiter_app/features/account/account_provider.dart';
 import 'package:recruiter_app/features/home/view/banner_widget.dart';
 import 'package:recruiter_app/features/home/view/job_credit_meter.dart';
 import 'package:recruiter_app/features/home/view/recently_added_jobs_lists.dart';
 import 'package:recruiter_app/features/home/viewmodel/home_provider.dart';
 import 'package:recruiter_app/features/job_post/viewmodel.dart/jobpost_provider.dart';
+import 'package:recruiter_app/features/navbar/view/animated_navbar.dart';
+import 'package:recruiter_app/features/notifications/notification_page.dart';
 import 'package:recruiter_app/features/splash_screen/splash_screen.dart';
 import 'package:recruiter_app/services/one_signal_service.dart';
 import 'package:recruiter_app/viewmodels/job_viewmodel.dart';
@@ -35,14 +39,22 @@ class _HomeScreenState extends State<HomeScreen> {
   final PageController _pageController = PageController();
   int activeIndex = 0;
 
+  String _name = 'Name';
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<HomeProvider>(context, listen: false).fetchRecruiterCounts();
       OneSignalService().oneSIgnalIdSetToApi();
+
+      Provider.of<AccountProvider>(context, listen: false).fetchAccountData();
     });
   }
+
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -105,39 +117,54 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
-                      child: Row(
-                        spacing: 10,
-                        children: [
-                          _countContainer(
-                            theme: theme,
-                            color: secondaryColor,
-                            count: "29",
-                            title: "New",
-                            subtitle: "Application",
-                          ),
-                          _countContainer(
-                            theme: theme,
-                            color: buttonColor,
-                            count: "29",
-                            title: "New",
-                            subtitle: "Application",
-                          ),
-                          _countContainer(
-                            theme: theme,
-                            color: secondaryColor,
-                            count: "29",
-                            title: "New",
-                            subtitle: "Application",
-                          ),
-                          _countContainer(
-                            theme: theme,
-                            color: buttonColor,
-                            count: "29",
-                            title: "New",
-                            subtitle: "Application",
-                          )
-                        ],
-                      ),
+                      child: Consumer<HomeProvider>(
+                          builder: (context, provider, child) {
+                        return Row(
+                          spacing: 10,
+                          children: [
+                            _countContainer(
+                              theme: theme,
+                              color: secondaryColor,
+                              count: provider.countData != null
+                                  ? provider.countData!.applicationCount
+                                      .toString()
+                                  : "0",
+                              title: "New",
+                              subtitle: "Application",
+                            ),
+                            _countContainer(
+                              theme: theme,
+                              color: buttonColor,
+                              count: provider.countData != null
+                                  ? provider.countData!.interviewScheduledCount
+                                      .toString()
+                                  : "0",
+                              title: "Interview",
+                              subtitle: "Scheduled",
+                            ),
+                            _countContainer(
+                              theme: theme,
+                              color: secondaryColor,
+                              count: provider.countData != null
+                                  ? provider.countData!.activeJobsCount
+                                      .toString()
+                                  : "0",
+                              title: "Active",
+                              subtitle: "Job Count",
+                            ),
+                            _countContainer(
+                              theme: theme,
+                              color: buttonColor,
+                              count: provider.countData != null
+                                  ? provider.countData!.inactiveJobsCount
+                                      .toString()
+                                  : "0",
+                              title: "Closed",
+                              subtitle: "Job",
+                            )
+                          ],
+                        );
+                      }),
                     ),
                     const SizedBox(
                       height: 10,
@@ -215,96 +242,113 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildAppBarWidget(
       {required AppThemeDataBloc themeBloc, required ThemeData theme}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15),
-      child: Column(
-        children: [
-          const SizedBox(
-            height: 30,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Consumer<AccountProvider>(
+      builder: (context, provider, child) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15),
+          child: Column(
             children: [
+              const SizedBox(
+                height: 30,
+              ),
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  CircleAvatar(
-                    radius: 25.r,
-                  ).animate().fadeIn(duration: 500.ms).scale(),
-                  const SizedBox(
-                    width: 20,
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  Row(
                     children: [
-                      Text(
-                        "Hello ",
-                        style: theme.textTheme.bodyLarge!.copyWith(
-                            color: Colors.white, fontWeight: FontWeight.bold),
+                      CircleAvatar(
+                        radius: 25.r,
+                        backgroundColor: Colors.white,
+                        backgroundImage: const AssetImage("assets/images/default_logo.webp"),
+                        // backgroundImage: provider.accountData != null
+                        // ? NetworkImage(provider.accountData!.logo.toString())
+                        // : AssetImage("assets/images/default_logo.webp"),
                       ).animate().fadeIn(duration: 500.ms).scale(),
-                      Text(
-                        "Good morning...!",
-                        style: theme.textTheme.bodyMedium!
-                            .copyWith(color: Colors.white),
-                      ).animate().fadeIn(duration: 600.ms).scale(),
+                      const SizedBox(
+                        width: 20,
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Hello ${provider.accountData != null ? provider.accountData!.name : ""}",
+                            style: theme.textTheme.bodyLarge!.copyWith(
+                                color: Colors.white, fontWeight: FontWeight.bold),
+                          ).animate().fadeIn(duration: 500.ms).scale(),
+                          Text(
+                            "Begin your quest for discovery!",
+                            style: theme.textTheme.bodyMedium!
+                                .copyWith(color: Colors.white),
+                          ).animate().fadeIn(duration: 600.ms).scale(),
+                        ],
+                      ),
                     ],
                   ),
+                  Row(
+                    children: [
+                      InkWell(
+                        onTap: (){
+                          Navigator.push(context, AnimatedNavigation().slideAnimation(NotificationPage()));
+                        },
+                        child: SizedBox(
+                            child: SvgPicture.asset(
+                          "assets/svgs/notification_icon.svg",
+                        )).animate().fadeIn(duration: 500.ms).scale(),
+                      )
+                    ],
+                  )
                 ],
               ),
-              Row(
-                children: [
-                  InkWell(
-                      onTap: () async {},
-                      child: Icon(
-                        Icons.logout,
-                        color: Colors.white,
-                      )),
-                  const SizedBox(
-                    width: 15,
+              const SizedBox(
+                height: 25,
+              ),
+              InkWell(
+                onTap: (){
+                  Navigator.push(context, 
+                  AnimatedNavigation().slideAnimation(CustomBottomNavBar(index: 1,)));
+                },
+                child: Container(
+                  width: double.infinity,
+                  height: 40.h,
+                  decoration: BoxDecoration(
+                    color: themeBloc.state.isDarkMode
+                        ? darkContainerColor
+                        : lightContainerColor,
+                    borderRadius: BorderRadius.circular(15.r),
+                    // border: Border.all(color: secondaryColor),
                   ),
-                  SizedBox(
-                      child: SvgPicture.asset(
-                    "assets/svgs/notification_icon.svg",
-                  )).animate().fadeIn(duration: 500.ms).scale()
-                ],
+                  child: AbsorbPointer(
+                    child: TextFormField(
+                      decoration: InputDecoration(
+                        hintText: "Search",
+                        hintStyle: GoogleFonts.wixMadeforDisplay(),
+                        filled: true,
+                        fillColor: themeBloc.state.isDarkMode
+                            ? darkContainerColor
+                            : lightContainerColor,
+                        suffixIcon: const Icon(CupertinoIcons.search),
+                        enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15.r),
+                            borderSide: const BorderSide(color: secondaryColor)),
+                        focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15.r),
+                            borderSide: const BorderSide(color: secondaryColor)),
+                        disabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15.r),
+                            borderSide: const BorderSide(color: secondaryColor)),
+                      ),
+                    ),
+                  ),
+                ),
               )
+           
+           
+           
+           
             ],
           ),
-          const SizedBox(
-            height: 25,
-          ),
-          Container(
-            width: double.infinity,
-            height: 40.h,
-            decoration: BoxDecoration(
-              color: themeBloc.state.isDarkMode
-                  ? darkContainerColor
-                  : lightContainerColor,
-              borderRadius: BorderRadius.circular(15.r),
-              // border: Border.all(color: secondaryColor),
-            ),
-            child: TextFormField(
-              decoration: InputDecoration(
-                hintText: "Search",
-                hintStyle: GoogleFonts.wixMadeforDisplay(),
-                filled: true,
-                fillColor: themeBloc.state.isDarkMode
-                    ? darkContainerColor
-                    : lightContainerColor,
-                suffixIcon: const Icon(CupertinoIcons.search),
-                enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15.r),
-                    borderSide: const BorderSide(color: secondaryColor)),
-                focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15.r),
-                    borderSide: const BorderSide(color: secondaryColor)),
-                disabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15.r),
-                    borderSide: const BorderSide(color: secondaryColor)),
-              ),
-            ),
-          )
-        ],
-      ),
+        );
+      }
     );
   }
 

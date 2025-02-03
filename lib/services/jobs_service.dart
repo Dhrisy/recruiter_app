@@ -34,7 +34,7 @@ class JobsService {
             "salary_min": job.minimumSalary,
             "salary_max": job.maximumSalary,
             "skills": job.skills,
-            "custom-qns": job.customQuestions,
+            "custom_qns": job.customQuestions,
             "requirements": "job.requirements",
             "benefits": "job.benefits",
             "roles": "",
@@ -93,7 +93,8 @@ class JobsService {
           "requirements": "job.requirements",
           "benefits": "job.benefits",
           "roles": "",
-          "currency": job.currency
+          "currency": job.currency,
+          "active": job.status
         }),
         headers: {
           'Authorization': 'Bearer ${token.toString()}',

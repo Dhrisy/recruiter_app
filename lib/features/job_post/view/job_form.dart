@@ -41,6 +41,9 @@ class _JobFormState extends State<JobForm> {
   final TextEditingController _maxSalaryCont = TextEditingController();
   final TextEditingController _skillCont = TextEditingController();
   final TextEditingController _roleDescriptionCont = TextEditingController();
+  final TextEditingController _questionCont = TextEditingController();
+  bool addQuestion = false;
+  List<String> customQuestionSLists = [];
 
   String _selectedIndustry = '';
   String _selectedFunctionalArea = '';
@@ -63,6 +66,7 @@ class _JobFormState extends State<JobForm> {
   final _jobDetailsForm = GlobalKey<FormState>();
   final _candidateDetailsForm = GlobalKey<FormState>();
   final _salaryDetailsForm = GlobalKey<FormState>();
+  final _questionsForm = GlobalKey<FormState>();
 
   int _currentStep = 0;
 
@@ -114,8 +118,11 @@ class _JobFormState extends State<JobForm> {
         if (widget.jobData!.skills != null) {
           selectedSkills = List<String>.from(widget.jobData!.skills!);
         }
+        if (widget.jobData!.customQuestions != null) {
+          customQuestionSLists =
+              List<String>.from(widget.jobData!.customQuestions!);
+        }
 
-        print(selectedSkills);
         if (widget.jobData!.candidateLocation != null) {
           selectedLocations =
               List<String>.from(widget.jobData!.candidateLocation!);
@@ -138,6 +145,8 @@ class _JobFormState extends State<JobForm> {
         return _candidateDetailsForm.currentState?.validate() ?? false;
       case 2:
         return _salaryDetailsForm.currentState?.validate() ?? false;
+      case 3:
+        return _questionsForm.currentState?.validate() ?? false;
       default:
         return false;
     }
@@ -153,6 +162,8 @@ class _JobFormState extends State<JobForm> {
         }
       });
     }
+
+    print(validateCurrentStep());
   }
 
   void submitForm() async {
@@ -178,7 +189,7 @@ class _JobFormState extends State<JobForm> {
           vaccancy: int.parse(_vaccancyCont.text),
           requirements: "nnnnnnnnn",
           benefits: "benefits",
-          customQuestions: ["jsdkadd", "sdfghjk"],
+          customQuestions: customQuestionSLists,
           currency: _selectedCurrency,
           skills: selectedSkills);
       final result =
@@ -214,10 +225,9 @@ class _JobFormState extends State<JobForm> {
             vaccancy: int.parse(_vaccancyCont.text),
             requirements: "nnnnnnnnn",
             benefits: "benefits",
-            customQuestions: ["jsdkadd", "sdfghjk"],
+            customQuestions: customQuestionSLists,
             currency: _selectedCurrency,
-            skills: selectedLocations
-            );
+            skills: selectedLocations);
         final result =
             await Provider.of<JobPostingProvider>(context, listen: false)
                 .postJob(jobData: job);
@@ -225,6 +235,7 @@ class _JobFormState extends State<JobForm> {
           Provider.of<JobPostingProvider>(context, listen: false)
               .fetchJobLists();
           Navigator.pop(context);
+          CommonSnackbar.show(context, message: "Job posted successfuly!");
         } else {
           CommonSnackbar.show(context, message: result.toString());
         }
@@ -253,6 +264,11 @@ class _JobFormState extends State<JobForm> {
         content: _buildSalaryDetailsForm(theme: theme),
         isActive: _currentStep >= 2,
       ),
+      Step(
+        title: const Text('Confirm'),
+        content: _buildCustomQuestions(theme: theme),
+        isActive: _currentStep >= 3,
+      ),
     ];
   }
 
@@ -277,7 +293,7 @@ class _JobFormState extends State<JobForm> {
                     ),
             ),
           ),
-          if (index < 2) _buildDivider(), // Don't add divider after last step
+          if (index < 3) _buildDivider(), // Don't add divider after last step
         ],
       ),
     );
@@ -318,14 +334,19 @@ class _JobFormState extends State<JobForm> {
                       padding: const EdgeInsets.symmetric(vertical: 20),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(3, (index) {
+                        children: List.generate(4, (index) {
                           bool isActive = _currentStep >= index;
                           StepState state = _currentStep > index
                               ? StepState.complete
                               : StepState.indexed;
                           return _buildStep(
                             index,
-                            ['Personal', 'Address', 'Confirm'][index],
+                            [
+                              'Personal',
+                              'Address',
+                              'Confirm',
+                              'Questions'
+                            ][index],
                             isActive,
                             state,
                           );
@@ -358,6 +379,7 @@ class _JobFormState extends State<JobForm> {
                                 child: ReusableButton(
                                   // isLoading: ,
                                   action: () async {
+                                    print("pppppppppppppppp");
                                     handleNext(theme);
                                   },
                                   text:
@@ -957,6 +979,105 @@ class _JobFormState extends State<JobForm> {
                         return null;
                       },
                     ),
+                  )
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCustomQuestions({required ThemeData theme}) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+          color: Colors.white, borderRadius: BorderRadius.circular(15.r)),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Form(
+          key: _questionsForm,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: 15,
+            children: [
+              _buildHeadingWidget(
+                  theme: theme,
+                  heading: "Questions",
+                  subHeading:
+                      "Add relevant questions to assess candidates' qualifications and suitability for the role"),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  customQuestionSLists.isNotEmpty
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          spacing: 10,
+                          children: List.generate(customQuestionSLists.length,
+                              (index) {
+                            return Text(
+                                "${index + 1}. ${customQuestionSLists[index]}?");
+                          }),
+                        )
+                      : const SizedBox.shrink(),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  addQuestion == true
+                      ? Form(
+                          key: _questionsForm,
+                          child: ReusableTextfield(
+                            controller: _questionCont,
+                            validation: (_) {
+                              if (_questionCont.text.trim().isEmpty) {
+                                return "This field is required";
+                              }
+                              return null;
+                            },
+                            maxLines: 3,
+                            hintText: "Enter your question here...",
+                            labelText: "Question",
+                            float: FloatingLabelBehavior.never,
+                          ),
+                        )
+                      : const SizedBox.shrink(),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      addQuestion == true
+                          ? InkWell(
+                              onTap: () {
+                                // if (_questionsForm.currentState!.validate()) {
+                                setState(() {
+                                  addQuestion = false;
+                                  customQuestionSLists.add(_questionCont.text);
+                                  _questionCont.clear();
+                                });
+                                // }
+                              },
+                              child: Text(
+                                "Add",
+                                style: theme.textTheme.bodyMedium!
+                                    .copyWith(color: Colors.blue),
+                              ),
+                            )
+                          : InkWell(
+                              onTap: () {
+                                setState(() {
+                                  addQuestion = true;
+                                });
+                              },
+                              child: Text(
+                                "+Add questions",
+                                style: theme.textTheme.bodyMedium!
+                                    .copyWith(color: Colors.blue),
+                              ),
+                            ),
+                    ],
                   )
                 ],
               ),
