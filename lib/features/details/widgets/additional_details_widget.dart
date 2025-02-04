@@ -253,7 +253,7 @@ class _AdditionalDetailsWidgetState extends State<AdditionalDetailsWidget> {
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15),
           child: Column(
-            spacing: 15,
+            // spacing: 15,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ShimmerWidget(
@@ -318,7 +318,7 @@ class _AdditionalDetailsWidgetState extends State<AdditionalDetailsWidget> {
             selectedValue == "Job Responses"
                 ? Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    spacing: 15,
+                    // spacing: 15,
                     children: [
                       Text(
                         "Job applications received to this job",
@@ -399,7 +399,7 @@ class _AdditionalDetailsWidgetState extends State<AdditionalDetailsWidget> {
                 : const SizedBox.shrink(),
             selectedValue == "Interview Scheduled"
                 ? Column(
-                    spacing: 10,
+                    // spacing: 10,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
@@ -450,7 +450,7 @@ class _AdditionalDetailsWidgetState extends State<AdditionalDetailsWidget> {
                 : const SizedBox.shrink(),
             selectedValue == "Invitation Sent"
                 ? Column(
-                    spacing: 10,
+                    // spacing: 10,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
@@ -604,7 +604,7 @@ class _AdditionalDetailsWidgetState extends State<AdditionalDetailsWidget> {
                       ),
                     ),
                     Row(
-                      spacing: 15,
+                      // spacing: 15,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
@@ -642,7 +642,7 @@ class _AdditionalDetailsWidgetState extends State<AdditionalDetailsWidget> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
-                          spacing: 10,
+                          // spacing: 10,
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Column(
@@ -711,7 +711,7 @@ class _AdditionalDetailsWidgetState extends State<AdditionalDetailsWidget> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 15, vertical: 8),
                             child: Wrap(
-                              spacing: 15,
+                              // spacing: 15,
                               children: [
                                 ElevatedButton.icon(
                                   onPressed: () {
@@ -980,7 +980,7 @@ class _AdditionalDetailsWidgetState extends State<AdditionalDetailsWidget> {
                       padding: const EdgeInsets.all(15),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        spacing: 15,
+                        // spacing: 15,
                         children: [
                           _buildBottomsheetItem(
                               theme: theme,
@@ -1059,7 +1059,7 @@ class _AdditionalDetailsWidgetState extends State<AdditionalDetailsWidget> {
                               theme: theme, text: "Experience"),
 
                           Row(
-                            spacing: 15,
+                            // spacing: 15,
                             children: [
                               Expanded(
                                   child: ReusableTextfield(
@@ -1125,7 +1125,7 @@ class _AdditionalDetailsWidgetState extends State<AdditionalDetailsWidget> {
                             children: [
                               Expanded(
                                 child: Column(
-                                  spacing: 5,
+                                  // spacing: 5,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     // _buildBottomsheetTitle(
@@ -1151,7 +1151,7 @@ class _AdditionalDetailsWidgetState extends State<AdditionalDetailsWidget> {
                               ),
                               Expanded(
                                 child: Column(
-                                  spacing: 5,
+                                  // spacing: 5,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     // _buildBottomsheetTitle(
@@ -1177,7 +1177,7 @@ class _AdditionalDetailsWidgetState extends State<AdditionalDetailsWidget> {
 
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            spacing: 5,
+                            // spacing: 5,
                             children: [
                               // _buildBottomsheetTitle(
                               //     theme: theme, text: "Gender"),
@@ -1235,7 +1235,7 @@ class _AdditionalDetailsWidgetState extends State<AdditionalDetailsWidget> {
                               horizontal: 15, vertical: 15),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            spacing: 10,
+                            // spacing: 10,
                             children: [
                               Text(
                                 "Additional filters",
@@ -1286,7 +1286,7 @@ class _AdditionalDetailsWidgetState extends State<AdditionalDetailsWidget> {
                       },
                       child: Container(
                         decoration: BoxDecoration(
-                            color: buttonColor.withValues(alpha: 0.3),
+                            color: buttonColor,
                             borderRadius:
                                 BorderRadiusDirectional.circular(8.r)),
                         child: Padding(
@@ -1309,7 +1309,7 @@ class _AdditionalDetailsWidgetState extends State<AdditionalDetailsWidget> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Row(
-                      spacing: 15,
+                      // spacing: 15,
                       children: [
                         Expanded(
                           child: _buildBottomsheetBtn(
@@ -1468,7 +1468,7 @@ class _AdditionalDetailsWidgetState extends State<AdditionalDetailsWidget> {
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 4,
+      // spacing: 4,
       children: [
         Text(
           text,
@@ -1650,7 +1650,7 @@ class _AdditionalDetailsWidgetState extends State<AdditionalDetailsWidget> {
                                   buttonColor: selectedTime != null &&
                                           selectedDate != null
                                       ? secondaryColor
-                                      : secondaryColor.withValues(alpha: 0.6),
+                                      : secondaryColor,
                                   action: () async {
                                     if (widget.jobId != null &&
                                         seekerData.personalData != null) {
@@ -1871,7 +1871,7 @@ class _AdditionalDetailsWidgetState extends State<AdditionalDetailsWidget> {
                                   buttonColor: selectedTime != null &&
                                           selectedDate != null
                                       ? secondaryColor
-                                      : secondaryColor.withValues(alpha: 0.6),
+                                      : secondaryColor,
                                   action: () async {
                                     if (widget.jobId != null &&
                                         seekerData.personalData != null) {

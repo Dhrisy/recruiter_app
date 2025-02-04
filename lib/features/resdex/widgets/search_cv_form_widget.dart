@@ -47,7 +47,7 @@ class _SearchCvFormWidgetState extends State<SearchCvFormWidget> {
       return SizedBox(
         width: double.infinity,
         child: Column(
-          spacing: 15,
+          // spacing: 15,
           children: [
             Text(
               "Browse through the list of candidates and manage their details efficiently. Use filters to narrow down your search and find the right candidate quickly.",
@@ -79,7 +79,7 @@ class _SearchCvFormWidgetState extends State<SearchCvFormWidget> {
                         return CommonEmptyList();
                       } else {
                         return Column(
-                          spacing: 10,
+                          // spacing: 10,
                           children:
                               List.generate(snapshot.data!.length, (index) {
                             final seekerData = snapshot.data![index];

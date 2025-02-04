@@ -371,7 +371,7 @@ class _SeekerDetailsState extends State<SeekerDetails>
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15),
                 child: Column(
-                  spacing: 20,
+                  // spacing: 20,
                   children: [
                     Consumer<SearchSeekerProvider>(
                         builder: (context, provider, child) {
@@ -408,7 +408,7 @@ class _SeekerDetailsState extends State<SeekerDetails>
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15),
         child: Column(
-          spacing: 15,
+          // spacing: 15,
           children: [
             const SizedBox(
               height: 5,
@@ -648,7 +648,7 @@ class _SeekerDetailsState extends State<SeekerDetails>
                                   buttonColor: selectedTime != null &&
                                           selectedDate != null
                                       ? secondaryColor
-                                      : secondaryColor.withValues(alpha: 0.6),
+                                      : secondaryColor,
                                   action: () async {
                                     if (widget.jobData != null &&
                                         widget.jobData!.id != null &&
@@ -804,7 +804,7 @@ class _SeekerDetailsState extends State<SeekerDetails>
                                   isLoading: isLoading,
                                   textColor: Colors.white,
                                   buttonColor: _selectedJob == ''
-                                      ? secondaryColor.withValues(alpha: 0.6)
+                                      ? secondaryColor
                                       : secondaryColor,
                                   action: () async {
                                     if (jobId != null) {
@@ -864,7 +864,7 @@ class _SeekerDetailsState extends State<SeekerDetails>
       child: Padding(
         padding: const EdgeInsets.all(10.0),
         child: Row(
-          spacing: 15,
+          // spacing: 15,
           children: [
             Container(
               height: 100.h,
@@ -878,7 +878,7 @@ class _SeekerDetailsState extends State<SeekerDetails>
                 child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
-              spacing: 10,
+              // spacing: 10,
               children: [
                 Text(
                   CustomFunctions.toSentenceCase(
@@ -906,7 +906,7 @@ class _SeekerDetailsState extends State<SeekerDetails>
                   TextSpan(text: "m"),
                 ])),
                 Row(
-                  spacing: 10,
+                  // spacing: 10,
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -917,7 +917,7 @@ class _SeekerDetailsState extends State<SeekerDetails>
                   ],
                 ),
                 Row(
-                  spacing: 10,
+                  // spacing: 10,
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -955,7 +955,7 @@ class _SeekerDetailsState extends State<SeekerDetails>
       {required ThemeData theme, required SeekerModel seekerData}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 10,
+      // spacing: 10,
       children: [
         Text(
           "Summary",
@@ -1004,7 +1004,7 @@ class _SeekerDetailsState extends State<SeekerDetails>
       children: [
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 20,
+          // spacing: 20,
           children: [
             Text(
               "Skills",
@@ -1013,7 +1013,7 @@ class _SeekerDetailsState extends State<SeekerDetails>
             ),
             skills.isNotEmpty
                 ? Wrap(
-                    spacing: 10,
+                    // spacing: 10,
                     children: skills.asMap().entries.map((entry) {
                       int index = entry.key;
                       String item = entry.value;
@@ -1051,7 +1051,7 @@ class _SeekerDetailsState extends State<SeekerDetails>
           style: theme.textTheme.titleLarge!
               .copyWith(fontWeight: FontWeight.bold, color: secondaryColor),
         ),
-        SizedBox(height: 20), // Replace spacing parameter
+        // SizedBox(height: 20), // Replace spacing parameter
         seekerData.employmentData != null &&
                 seekerData.employmentData!.isNotEmpty
             ? Column(
@@ -1080,7 +1080,7 @@ class _SeekerDetailsState extends State<SeekerDetails>
                         padding: const EdgeInsets.all(10),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          spacing: 8,
+                          // spacing: 8,
                           children: [
                             _buildItemWidget(
                                 theme: theme,
@@ -1176,7 +1176,7 @@ class _SeekerDetailsState extends State<SeekerDetails>
       {required ThemeData theme, required SeekerModel seekerData}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 20,
+      // spacing: 20,
       children: [
         Text(
           "Qualifications",
@@ -1212,7 +1212,7 @@ class _SeekerDetailsState extends State<SeekerDetails>
                         padding: const EdgeInsets.all(8),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          spacing: 10,
+                          // spacing: 10,
                           children: [
                             _buildQualificationItemWIdget(
                                 theme: theme,
@@ -1278,7 +1278,7 @@ class _SeekerDetailsState extends State<SeekerDetails>
     }
 
     return Column(
-      spacing: 20,
+      // spacing: 20,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -1307,7 +1307,7 @@ class _SeekerDetailsState extends State<SeekerDetails>
                       child: Padding(
                         padding: const EdgeInsets.all(10),
                         child: Column(
-                          spacing: 10,
+                          // spacing: 10,
                           children: [
                             _buildQualificationItemWIdget(
                                 theme: theme,
@@ -1346,11 +1346,11 @@ class _SeekerDetailsState extends State<SeekerDetails>
                                             .personalData!.personal.address !=
                                         null
                                     ? Row(
-                                        spacing: 8,
+                                        // spacing: 8,
                                         children: [
                                           Flexible(
                                             child: Row(
-                                                spacing: 8,
+                                                // spacing: 8,
                                                 children: List.generate(
                                                     seekerData
                                                         .personalData!
@@ -1526,7 +1526,7 @@ class _SeekerDetailsState extends State<SeekerDetails>
     double? fontSize,
   }) {
     return Row(
-      spacing: 10,
+      // spacing: 10,
       children: [
         icon ?? const SizedBox.shrink(),
         Expanded(
@@ -1557,7 +1557,7 @@ class _SeekerDetailsState extends State<SeekerDetails>
       child: Padding(
         padding: const EdgeInsets.all(10),
         child: Row(
-          spacing: 10,
+          // spacing: 10,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(

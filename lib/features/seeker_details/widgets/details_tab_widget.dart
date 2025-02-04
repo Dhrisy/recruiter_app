@@ -30,7 +30,7 @@ class _DetailsTabWidgetState extends State<DetailsTabWidget> {
             .bookmarkedStates[id] ??
         false;
     return Column(
-      spacing: 15,
+      // spacing: 15,
       children: [
         _buildSkillWidget(theme: theme, skills: []),
         _buildBasicDetailsWidget(theme: theme, seekerData: widget.seekerData),
@@ -44,7 +44,7 @@ class _DetailsTabWidgetState extends State<DetailsTabWidget> {
       {required ThemeData theme, required SeekerModel seekerData}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 10,
+      // spacing: 10,
       children: [
         Text(
           "Summary",
@@ -93,7 +93,7 @@ class _DetailsTabWidgetState extends State<DetailsTabWidget> {
       children: [
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 20,
+          // spacing: 20,
           children: [
             Text(
               "Skills",
@@ -102,7 +102,7 @@ class _DetailsTabWidgetState extends State<DetailsTabWidget> {
             ),
             skills.isNotEmpty
                 ? Wrap(
-                    spacing: 10,
+                    // spacing: 10,
                     children: skills.asMap().entries.map((entry) {
                       int index = entry.key;
                       String item = entry.value;
@@ -140,7 +140,7 @@ class _DetailsTabWidgetState extends State<DetailsTabWidget> {
           style: theme.textTheme.titleLarge!
               .copyWith(fontWeight: FontWeight.bold, color: secondaryColor),
         ),
-        SizedBox(height: 20), // Replace spacing parameter
+        // SizedBox(height: 20), // Replace spacing parameter
         seekerData.employmentData != null &&
                 seekerData.employmentData!.isNotEmpty
             ? Column(
@@ -169,7 +169,7 @@ class _DetailsTabWidgetState extends State<DetailsTabWidget> {
                         padding: const EdgeInsets.all(10),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          spacing: 8,
+                          // spacing: 8,
                           children: [
                             _buildItemWidget(
                                 theme: theme,
@@ -265,7 +265,7 @@ class _DetailsTabWidgetState extends State<DetailsTabWidget> {
       {required ThemeData theme, required SeekerModel seekerData}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 20,
+      // spacing: 20,
       children: [
         Text(
           "Qualifications",
@@ -301,7 +301,7 @@ class _DetailsTabWidgetState extends State<DetailsTabWidget> {
                         padding: const EdgeInsets.all(8),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          spacing: 10,
+                          // spacing: 10,
                           children: [
                             _buildQualificationItemWIdget(
                                 theme: theme,
@@ -367,7 +367,7 @@ class _DetailsTabWidgetState extends State<DetailsTabWidget> {
     }
 
     return Column(
-      spacing: 20,
+      // spacing: 20,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -396,7 +396,7 @@ class _DetailsTabWidgetState extends State<DetailsTabWidget> {
                       child: Padding(
                         padding: const EdgeInsets.all(10),
                         child: Column(
-                          spacing: 10,
+                          // spacing: 10,
                           children: [
                             _buildQualificationItemWIdget(
                                 theme: theme,
@@ -435,11 +435,11 @@ class _DetailsTabWidgetState extends State<DetailsTabWidget> {
                                             .personalData!.personal.address !=
                                         null
                                     ? Row(
-                                        spacing: 8,
+                                        // spacing: 8,
                                         children: [
                                           Flexible(
                                             child: Row(
-                                                spacing: 8,
+                                                // spacing: 8,
                                                 children: List.generate(
                                                     seekerData
                                                         .personalData!
@@ -615,7 +615,7 @@ class _DetailsTabWidgetState extends State<DetailsTabWidget> {
     double? fontSize,
   }) {
     return Row(
-      spacing: 10,
+      // spacing: 10,
       children: [
         icon ?? const SizedBox.shrink(),
         Expanded(
@@ -646,7 +646,7 @@ class _DetailsTabWidgetState extends State<DetailsTabWidget> {
       child: Padding(
         padding: const EdgeInsets.all(10),
         child: Row(
-          spacing: 10,
+          // spacing: 10,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(

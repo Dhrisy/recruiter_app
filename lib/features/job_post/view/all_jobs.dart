@@ -90,7 +90,7 @@ class _AllJobsState extends State<AllJobs> {
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
-                                    spacing: 15,
+                                    // spacing: 15,
                                     children: List.generate(
                                         provider.jobLists!.length, (index) {
                                       // final job = widget.jobLists[index];
@@ -116,7 +116,7 @@ class _AllJobsState extends State<AllJobs> {
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
-                                    spacing: 15,
+                                    // spacing: 15,
                                     children: List.generate(
                                         provider.filteredJobs.length, (index) {
                                       // final job = widget.jobLists[index];

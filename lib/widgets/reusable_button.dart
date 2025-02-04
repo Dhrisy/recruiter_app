@@ -56,7 +56,7 @@ class _ReusableButtonState extends State<ReusableButton> {
             :   LinearGradient(colors: [buttonColor, Color(0xffFF582B)])
             ),
         child: Row(
-          spacing: 15,
+          // spacing: 15,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             widget.isLoading == true

@@ -29,7 +29,7 @@ class _JobActivityTabState extends State<JobActivityTab> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: Column(
-        spacing: 15,
+        // spacing: 15,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(

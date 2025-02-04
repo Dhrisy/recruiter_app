@@ -26,7 +26,7 @@ class JobDetailsWidget extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 10,
+          // spacing: 10,
           children: [
             Text(
               "Job Description",
@@ -87,7 +87,7 @@ class JobDetailsWidget extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 15,
+          // spacing: 15,
           children: [
             _buildItemWIdget(
                 theme: theme,
@@ -161,10 +161,10 @@ class JobDetailsWidget extends StatelessWidget {
       children: [
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 5,
+          // spacing: 5,
           children: [
             Row(
-              spacing: 5,
+              // spacing: 5,
               children: [
                 Text("🧠"),
                 Text(
@@ -225,7 +225,7 @@ class JobDetailsWidget extends StatelessWidget {
 
   Widget _proffesionalDetails({required BuildContext context}) {
     return Column(
-      spacing: 10,
+      // spacing: 10,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -238,7 +238,7 @@ class JobDetailsWidget extends StatelessWidget {
         Container(
           width: double.infinity,
           decoration: BoxDecoration(
-            color: buttonColor.withValues(alpha: 0.1),
+            color: buttonColor,
             borderRadius: BorderRadius.circular(16.0),
             border: Border.all(color: Colors.transparent),
           ),
@@ -274,7 +274,7 @@ class JobDetailsWidget extends StatelessWidget {
   }) {
     final theme = Theme.of(context);
     return Column(
-      spacing: 10,
+      // spacing: 10,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -301,7 +301,7 @@ class JobDetailsWidget extends StatelessWidget {
             padding: const EdgeInsets.all(10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: 10,
+              // spacing: 10,
               children: [
                 _buildItemWIdget(
                     theme: theme,
@@ -347,7 +347,7 @@ class JobDetailsWidget extends StatelessWidget {
     if (jobData.customQuestions == null) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: 10,
+        // spacing: 10,
         children: [
           Text(
             "Custom Questions",
@@ -363,7 +363,7 @@ class JobDetailsWidget extends StatelessWidget {
                 borderRadius: BorderRadius.circular(15.r),
                 border: Border.all(color: borderColor)),
             child: Row(
-              spacing: 10,
+              // spacing: 10,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Icon(
@@ -384,7 +384,7 @@ class JobDetailsWidget extends StatelessWidget {
     if (jobData.customQuestions!.isEmpty) {
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: 10,
+        // spacing: 10,
         children: [
           Text(
             "Custom Questions",
@@ -400,7 +400,7 @@ class JobDetailsWidget extends StatelessWidget {
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 10,
+      // spacing: 10,
       children: [
         Text(
           "Custom Questions",
@@ -410,7 +410,7 @@ class JobDetailsWidget extends StatelessWidget {
               .copyWith(fontWeight: FontWeight.bold),
         ),
         Column(
-          spacing: 10,
+          // spacing: 10,
           children: List.generate(jobData.customQuestions!.length, (index) {
             final question = jobData.customQuestions![index];
             return Row(

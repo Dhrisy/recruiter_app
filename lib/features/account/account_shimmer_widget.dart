@@ -14,7 +14,7 @@ class AccountShimmerWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              spacing: 15,
+              // spacing: 15,
               children: [
                 ShimmerWidget(
                   width: 100.w,
@@ -22,7 +22,7 @@ class AccountShimmerWidget extends StatelessWidget {
                   isCircle: true,
                 ),
                 Column(
-                  spacing: 10,
+                  // spacing: 10,
                   children: [
                     ShimmerWidget(
                       width: 150.w,
@@ -50,7 +50,6 @@ class AccountShimmerWidget extends StatelessWidget {
               height: 40,
             ),
             Column(
-              spacing: 15,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 ShimmerWidget(

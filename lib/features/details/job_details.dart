@@ -140,7 +140,7 @@ class _JobDetailsState extends State<JobDetails> with TickerProviderStateMixin {
                   listener: (context, state) {},
                   builder: (context, state) {
                     return Column(
-                      spacing: 20,
+                      // spacing: 20,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
@@ -288,7 +288,7 @@ class _JobDetailsState extends State<JobDetails> with TickerProviderStateMixin {
                           labelStyle: theme.textTheme.bodyLarge!.copyWith(
                               color: buttonColor, fontWeight: FontWeight.bold),
                           indicator: CustomTabIndicator(
-                            color: secondaryColor.withValues(alpha: 0.7),
+                            color: secondaryColor,
                             radius: 15,
                             indicatorHeight: 2.h,
                           ),

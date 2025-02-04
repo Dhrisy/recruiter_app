@@ -45,7 +45,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           SafeArea(
             child: SingleChildScrollView(
               child: Column(
-                spacing: 10,
+                // spacing: 10,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const CommonAppbarWidget(

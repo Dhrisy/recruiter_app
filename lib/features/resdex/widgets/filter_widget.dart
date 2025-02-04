@@ -180,7 +180,7 @@ class _FilterWidgetState extends State<FilterWidget> {
                         padding: const EdgeInsets.all(15),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          spacing: 15,
+                          // spacing: 15,
                           children: [
                             _buildBottomsheetItem(
                                 theme: theme,
@@ -210,8 +210,8 @@ class _FilterWidgetState extends State<FilterWidget> {
                                     ),
                                     SizedBox(height: 8.h),
                                     Wrap(
-                                      spacing: 8.w,
-                                      runSpacing: 8.h,
+                                      // spacing: 8.w,
+                                      // runSpacing: 8.h,
                                       children:
                                           selectedKeywords.map((location) {
                                         return Container(
@@ -260,7 +260,7 @@ class _FilterWidgetState extends State<FilterWidget> {
                                 theme: theme, text: "Experience"),
 
                             Row(
-                              spacing: 15,
+                              // spacing: 15,
                               children: [
                                 Expanded(
                                     child: ReusableTextfield(
@@ -327,7 +327,7 @@ class _FilterWidgetState extends State<FilterWidget> {
                               children: [
                                 Expanded(
                                   child: Column(
-                                    spacing: 5,
+                                    // spacing: 5,
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
@@ -354,7 +354,7 @@ class _FilterWidgetState extends State<FilterWidget> {
                                 ),
                                 Expanded(
                                   child: Column(
-                                    spacing: 5,
+                                    // spacing: 5,
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
@@ -382,7 +382,7 @@ class _FilterWidgetState extends State<FilterWidget> {
 
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              spacing: 5,
+                              // spacing: 5,
                               children: [
                                 // _buildBottomsheetTitle(
                                 //     theme: theme, text: "Gender"),
@@ -440,7 +440,7 @@ class _FilterWidgetState extends State<FilterWidget> {
                                 horizontal: 15, vertical: 15),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              spacing: 10,
+                              // spacing: 10,
                               children: [
                                 Text(
                                   "Additional filters",
@@ -491,7 +491,7 @@ class _FilterWidgetState extends State<FilterWidget> {
                         },
                         child: Container(
                           decoration: BoxDecoration(
-                              color: buttonColor.withValues(alpha: 0.3),
+                              color: buttonColor,
                               borderRadius:
                                   BorderRadiusDirectional.circular(8.r)),
                           child: Padding(
@@ -514,7 +514,7 @@ class _FilterWidgetState extends State<FilterWidget> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Row(
-                        spacing: 15,
+                        // spacing: 15,
                         children: [
                           Expanded(
                             child: _buildBottomsheetBtn(
@@ -726,7 +726,7 @@ class _FilterWidgetState extends State<FilterWidget> {
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 4,
+      // spacing: 4,
       children: [
         Text(
           text,

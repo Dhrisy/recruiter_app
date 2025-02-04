@@ -223,10 +223,10 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
                       height: 25,
                     ),
                     Column(
-                      spacing: 15,
+                      // spacing: 15,
                       children: [
                         Row(
-                          spacing: 10.w,
+                          // spacing: 10.w,
                           children: [
                             Expanded(
                                 child: _buildOptionContainer(
@@ -240,7 +240,7 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
                           ],
                         ),
                         Row(
-                          spacing: 10.w,
+                          // spacing: 10.w,
                           children: [
                             Expanded(
                                 child: _buildOptionContainer(
@@ -366,7 +366,7 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
                         padding: const EdgeInsets.all(15),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          spacing: 15,
+                          // spacing: 15,
                           children: [
                             _buildBottomsheetItem(
                                 theme: theme,
@@ -396,8 +396,8 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
                                     ),
                                     SizedBox(height: 8.h),
                                     Wrap(
-                                      spacing: 8.w,
-                                      runSpacing: 8.h,
+                                      // spacing: 8.w,
+                                      // runSpacing: 8.h,
                                       children:
                                           selectedKeywords.map((location) {
                                         return Container(
@@ -446,7 +446,7 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
                                 theme: theme, text: "Experience"),
 
                             Row(
-                              spacing: 15,
+                              // spacing: 15,
                               children: [
                                 Expanded(
                                     child: ReusableTextfield(
@@ -513,7 +513,7 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
                               children: [
                                 Expanded(
                                   child: Column(
-                                    spacing: 5,
+                                    // spacing: 5,
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
@@ -540,7 +540,7 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
                                 ),
                                 Expanded(
                                   child: Column(
-                                    spacing: 5,
+                                    // spacing: 5,
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
@@ -568,7 +568,7 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
 
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              spacing: 5,
+                              // spacing: 5,
                               children: [
                                 // _buildBottomsheetTitle(
                                 //     theme: theme, text: "Gender"),
@@ -626,7 +626,7 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
                                 horizontal: 15, vertical: 15),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              spacing: 10,
+                              // spacing: 10,
                               children: [
                                 Text(
                                   "Additional filters",
@@ -677,7 +677,7 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
                         },
                         child: Container(
                           decoration: BoxDecoration(
-                              color: buttonColor.withValues(alpha: 0.3),
+                              color: buttonColor,
                               borderRadius:
                                   BorderRadiusDirectional.circular(8.r)),
                           child: Padding(
@@ -700,7 +700,7 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Row(
-                        spacing: 15,
+                        // spacing: 15,
                         children: [
                           Expanded(
                             child: _buildBottomsheetBtn(
@@ -911,7 +911,7 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 4,
+      // spacing: 4,
       children: [
         Text(
           text,

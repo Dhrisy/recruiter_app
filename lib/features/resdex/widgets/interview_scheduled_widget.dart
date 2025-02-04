@@ -29,7 +29,7 @@ class _InterviewScheduledWidgetState extends State<InterviewScheduledWidget> {
     return Container(
       child: Consumer<InterviewProvider>(builder: (context, provider, child) {
         return Column(
-          spacing: 15,
+          // spacing: 15,
           children: [
             Text(
               "Schedule an interview with the seekers who have applied to the jobs. You can review their applications and select the candidates for the next step",

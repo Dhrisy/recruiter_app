@@ -106,7 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Row(
-                        spacing: 10,
+                        // spacing: 10,
                         children: [
                           _countContainer(
                             theme: theme,

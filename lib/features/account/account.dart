@@ -144,7 +144,7 @@ class _AccountState extends State<Account> with SingleTickerProviderStateMixin {
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 15),
             child: Column(
-              spacing: 20,
+              // spacing: 20,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
@@ -188,7 +188,7 @@ class _AccountState extends State<Account> with SingleTickerProviderStateMixin {
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.center,
-                                spacing: 15,
+                                // spacing: 15,
                                 children: [
                                   CircleAvatar(
                                     radius: 45.r,
@@ -206,7 +206,7 @@ class _AccountState extends State<Account> with SingleTickerProviderStateMixin {
                                           MainAxisAlignment.center,
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
-                                      spacing: 5,
+                                      // spacing: 5,
                                       children: [
                                         Text(
                                           "👤 ${CustomFunctions.toSentenceCase(provider.accountData!.name ?? "N/A")}",
@@ -289,7 +289,7 @@ class _AccountState extends State<Account> with SingleTickerProviderStateMixin {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
-          spacing: 15,
+          // spacing: 15,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildTitleWidget(theme: theme, text: "About company"),
@@ -405,7 +405,7 @@ class _AccountState extends State<Account> with SingleTickerProviderStateMixin {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
-          spacing: 15,
+          // spacing: 15,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildTitleWidget(theme: theme, text: "Additional Information"),

@@ -469,7 +469,7 @@ class _EmailTemplateFormState extends State<EmailTemplateForm> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Column(
-                      spacing: 16,
+                      // spacing: 16,
                       children: [
                         _buildInputField(
                           controller: _salaryController,
@@ -495,7 +495,7 @@ class _EmailTemplateFormState extends State<EmailTemplateForm> {
 
   Widget _buildBasicFields() {
     return Column(
-      spacing: 16,
+      // spacing: 16,
       children: [
         _buildInputField(
           controller: _templateNameController,

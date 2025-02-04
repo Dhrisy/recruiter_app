@@ -28,7 +28,7 @@ class CommonAppbarWidget extends StatelessWidget {
         children: [
           Expanded(
             child: Row(
-              spacing: 20,
+              // spacing: 20,
               children: [
                 isBackArrow == true
                     ? InkWell(

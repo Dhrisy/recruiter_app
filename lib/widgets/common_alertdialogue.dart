@@ -54,7 +54,7 @@ class CommonAlertDialog extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Column(
-              spacing: 10,
+              // spacing: 10,
               children: [
 
             subTitle != null ?   Text(subTitle!,
@@ -69,7 +69,7 @@ class CommonAlertDialog extends StatelessWidget {
               ],
             ),
             Row(
-              spacing: 15,
+              // spacing: 15,
               children: [
                 Expanded(
                   child: ReusableButton(

@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/core/theme.dart';
+import 'package:recruiter_app/features/plans/plans_screen.dart';
 
 class BannerWidget extends StatelessWidget {
   const BannerWidget({Key? key}) : super(key: key);
@@ -27,37 +28,40 @@ class BannerWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  "Get 1k+ featured Jobs",
-                  style:
-                      theme.textTheme.bodySmall!.copyWith(color: Colors.white),
-                ),
-                Container(
-                  height: screenHeight * 0.025,
-                  width: screenWidth * 0.2,
-                  decoration: BoxDecoration(
-                      color: buttonColor,
-                      borderRadius: BorderRadius.circular(20.r)),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          "Upgrade now",
-                          textAlign: TextAlign.center,
-                          overflow: TextOverflow.ellipsis,
-                          style: theme.textTheme.bodySmall!
-                              .copyWith(color: Colors.white, fontSize: 8.sp),
-                        ),
-                      )
-                    ],
+                Padding(
+                  padding: EdgeInsets.only(left: 10.w),
+                  child: Text(
+                    "Get 1k+ Featured Jobs",
+                    style: AppTheme.titleText(darkTextColor)
+                        .copyWith(fontSize: 14.sp),
                   ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(right: 10.w),
+                  child: Container(
+                      height: 30.h,
+                      width: 120.w,
+                      child: ElevatedButton(
+                          style: const ButtonStyle(
+                              backgroundColor:
+                                  WidgetStatePropertyAll(buttonColor)),
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => PlansScreen()));
+                          },
+                          child: Text(
+                            "Upgrade Pro",
+                            style: AppTheme.smallText(lightTextColor)
+                                .copyWith(fontSize: 10.sp),
+                          ))),
                 )
               ],
-            )
+            ),
           ],
         ),
       ),

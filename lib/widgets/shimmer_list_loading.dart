@@ -41,7 +41,7 @@ const RowListShimmerLoadingWidget({ Key? key }) : super(key: key);
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
-          spacing: 15,
+          // spacing: 15,
           children: List.generate(6, (index){
             return ShimmerWidget(width: 200.w,
         height: 100.h,

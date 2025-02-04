@@ -83,7 +83,7 @@ class _SendEmailWidgetState extends State<SendEmailWidget> {
                   builder: (context, provider, child) {
                 return Form(
                   child: Column(
-                    spacing: 20,
+                    // spacing: 20,
                     children: [
                       CommonAppbarWidget(
                           isBackArrow: true, title: "Send Email"),
@@ -267,7 +267,7 @@ class _SendEmailWidgetState extends State<SendEmailWidget> {
         children: [
           SingleChildScrollView(
             child: Column(
-              spacing: 15,
+              // spacing: 15,
               children: [
                 isTemplate == true
                     ? Column(
@@ -349,7 +349,7 @@ class _SendEmailWidgetState extends State<SendEmailWidget> {
                         child: Form(
                           key: _formKey,
                           child: Column(
-                            spacing: 8,
+                            // spacing: 8,
                             children: [
 
                               _buildSelectJob(),

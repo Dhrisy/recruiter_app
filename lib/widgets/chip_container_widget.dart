@@ -23,12 +23,12 @@ class ChipContainerWidget extends StatelessWidget {
         vertical: 4.h,
       ),
       decoration: BoxDecoration(
-        color: color != null ?  color!.withValues(alpha: 0.8) : buttonColor.withValues(alpha: 0.1),
+        color: color != null ?  color! : buttonColor,
         borderRadius: BorderRadius.circular(4.r),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
-        spacing: 4.w,
+        // spacing: 4.w,
         children: [
           Text(
             text,

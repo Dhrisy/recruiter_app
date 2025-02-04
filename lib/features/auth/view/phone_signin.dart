@@ -135,7 +135,7 @@ class _PhoneSigninState extends State<PhoneSignin> {
                                   ? Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
-                                      spacing: 10,
+                                      // spacing: 10,
                                       children: [
                                         _buildOtpField(context),
                                         const SizedBox(

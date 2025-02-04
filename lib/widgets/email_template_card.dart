@@ -91,7 +91,7 @@ class EmailTemplateCard extends StatelessWidget {
                         ],
                       ),
                       Row(
-                        spacing: 8,
+                        // spacing: 8,
                         children: [
                           InkWell(
                             onTap: () {

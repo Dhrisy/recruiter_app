@@ -37,7 +37,7 @@ class _SavedSearchesState extends State<SavedSearches> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      spacing: 20,
+      // spacing: 20,
       children: [
         Text(
           "View and manage the candidates you’ve saved for future reference. Easily access their profiles and keep track of potential prospects",
@@ -74,7 +74,7 @@ class _SavedSearchesState extends State<SavedSearches> {
                             height: 10,
                           ),
                 Column(
-                  spacing: 10,
+                  // spacing: 10,
                   children:
                       List.generate(provider.bookMarkedLists!.length, (index) {
                     final seekerData = provider.bookMarkedLists![index];

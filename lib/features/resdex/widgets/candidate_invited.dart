@@ -42,7 +42,7 @@ class _CandidateInvitedState extends State<CandidateInvited> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      spacing: 0,
+      // spacing: 0,
       children: [
         Text(
           "Manage and track the candidates you’ve invited. Review their details, status, and take necessary actions to move forward",
@@ -88,7 +88,7 @@ class _CandidateInvitedState extends State<CandidateInvited> {
                             height: 10,
                           ),
                       Column(
-                        spacing: 10,
+                        // spacing: 10,
                         children: List.generate(snapshot.data!.length, (index) {
                           final seekerData = snapshot.data![index].seeker;
                           final isBookmarked = provider.bookmarkedStates[seekerData

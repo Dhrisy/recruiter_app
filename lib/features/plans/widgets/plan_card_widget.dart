@@ -29,11 +29,13 @@ class PlanCardWidget extends StatelessWidget {
                 children: [
                   Text(
                     lists[0]["plan_name"],
-                    style: theme.textTheme.headlineMedium!.copyWith(color: Colors.white),
+                    style: theme.textTheme.headlineMedium!
+                        .copyWith(color: Colors.white),
                   ),
                   Text(
                     '₹ ${lists[0]["rupees"]}',
-                    style: theme.textTheme.headlineMedium!.copyWith(color: Colors.white),
+                    style: theme.textTheme.headlineMedium!
+                        .copyWith(color: Colors.white),
                   ),
                 ],
               ),
@@ -44,10 +46,8 @@ class PlanCardWidget extends StatelessWidget {
                 children: [
                   Text(
                     "KEY FEATURES",
-                    style: theme.textTheme.titleLarge!.copyWith(
-                      fontSize: 15.sp,
-                      color: greyTextColor
-                    ),
+                    style: theme.textTheme.titleLarge!
+                        .copyWith(fontSize: 15.sp, color: greyTextColor),
                   ),
                 ],
               ),
@@ -56,12 +56,13 @@ class PlanCardWidget extends StatelessWidget {
                 height: 30,
               ),
               ReusableButton(
-                  action: () {
-                    Navigator.push(context, AnimatedNavigation().slideAnimation(LoginScreen()));
-                  },
-                  text: "Buy now",
-                  textColor: Colors.white,
-                  textSize: 20.sp,
+                action: () {
+                  Navigator.push(context,
+                      AnimatedNavigation().slideAnimation(LoginScreen()));
+                },
+                text: "Buy now",
+                textColor: Colors.white,
+                textSize: 20.sp,
               )
             ],
           ),
@@ -94,13 +95,9 @@ class PlanCardWidget extends StatelessWidget {
                 width: 10,
               ),
               Expanded(
-                child: Text(
-                  "${stdData["title"]}",
-                  style: theme.textTheme.bodyMedium!.copyWith(
-                    fontSize: 13.sp,
-                    color: Colors.white
-                  )
-                ),
+                child: Text("${stdData["title"]}",
+                    style: theme.textTheme.bodyMedium!
+                        .copyWith(fontSize: 13.sp, color: Colors.white)),
               )
             ],
           ),

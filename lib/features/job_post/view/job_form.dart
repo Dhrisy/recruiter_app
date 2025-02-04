@@ -409,7 +409,7 @@ class _JobFormState extends State<JobForm> {
                 height: 10,
               ),
               Column(
-                spacing: 15,
+                // spacing: 15,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ReusableTextfield(
@@ -614,7 +614,7 @@ class _JobFormState extends State<JobForm> {
 
   Widget _buildDescriptionWidget({required ThemeData theme}) {
     return Column(
-      spacing: 10,
+      // spacing: 10,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildTitleWidget(
@@ -631,7 +631,7 @@ class _JobFormState extends State<JobForm> {
             padding: const EdgeInsets.all(8.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: 10,
+              // spacing: 10,
               children: [
                 Text("Roles and Responsibilities",
                     style: theme.textTheme.titleLarge!
@@ -690,7 +690,7 @@ class _JobFormState extends State<JobForm> {
           key: _candidateDetailsForm,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: 15,
+            // spacing: 15,
             children: [
               _buildHeadingWidget(
                   theme: theme,
@@ -733,7 +733,7 @@ class _JobFormState extends State<JobForm> {
                 ),
               ),
               Row(
-                spacing: 10.w,
+                // spacing: 10.w,
                 children: [
                   Expanded(
                     child: ReusableTextfield(
@@ -884,7 +884,7 @@ class _JobFormState extends State<JobForm> {
           key: _salaryDetailsForm,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: 15,
+            // spacing: 15,
             children: [
               _buildHeadingWidget(
                   theme: theme,
@@ -976,7 +976,7 @@ class _JobFormState extends State<JobForm> {
         padding: const EdgeInsets.all(8.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 15,
+          // spacing: 15,
           children: [
             _buildTitleWidget(
                 theme: theme,
@@ -1017,7 +1017,7 @@ class _JobFormState extends State<JobForm> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
-          spacing: 3,
+          // spacing: 3,
           children: [
             Text(title,
                 style: theme.textTheme.titleLarge!

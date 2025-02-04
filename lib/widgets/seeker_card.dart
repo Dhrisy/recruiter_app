@@ -223,7 +223,7 @@ class _SeekerCardState extends State<SeekerCard>
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        spacing: 4,
+                        // spacing: 4,
                         children: [
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
