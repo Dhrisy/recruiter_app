@@ -6,6 +6,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/core/utils/navigation_animation.dart';
 import 'package:recruiter_app/features/account/account_data.dart';
+import 'package:recruiter_app/features/auth/view/change_pw.dart';
 import 'package:recruiter_app/features/faqs/faq.dart';
 import 'package:recruiter_app/features/plans/plans_screen.dart';
 import 'package:recruiter_app/features/questionaires/view/questionaire1.dart';
@@ -81,9 +82,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     'Change Password',
                     () => Navigator.push(
                       context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              const SimplePage(title: 'Change Password')),
+                     AnimatedNavigation().slideAnimation(ChangePw())
                     ),
                   ),
                  

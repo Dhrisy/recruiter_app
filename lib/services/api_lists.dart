@@ -51,4 +51,8 @@ class ApiLists {
   static String updateJobApplications =
       "$baseUrl/job-actions/update_job_applications";
   static String fetchSubscriptions = "$baseUrl/common/subscriptions";
+  static String editUser = "$baseUrl/user/";
+    static String changePassword = "$baseUrl/user/change_password";
+
+    static String banners = "$baseUrl/common/banners";
 }

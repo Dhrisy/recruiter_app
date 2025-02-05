@@ -125,7 +125,7 @@ class Personal {
         nationality: json["nationality"] ?? "N/A",
         preferedSalaryPackage: json["prefered_salary_pa"].toString(),
         preferedWorkLocations: json["prefered_work_loc"] ?? [],
-        profileImage: CustomFunctions.validateUrl(json["profile_image"] ?? ""),
+        profileImage: CustomFunctions().validateUrl(json["profile_image"] ?? ""),
         projects: json["projects"] ?? [],
         skills: json["skills"] ?? [],
         address: json["address"] ?? [],

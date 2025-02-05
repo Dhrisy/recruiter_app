@@ -27,7 +27,7 @@ class AccountService {
         body: jsonEncode({
           "id": account.id,
           "name": account.name,
-          "logo":  account.logo,
+          // "logo":  account.logo,
           "about": account.about,
           "website": account.website,
           "functional_area": account.functionalArea,

@@ -11,29 +11,33 @@ class LoginProvider extends ChangeNotifier {
   bool isLoading = false;
   String error = '';
 
-  Future<bool?> mobileLogin({required String phone}) async {
-    try {
-      final result = await authRepository.phoneLogin(phone: phone);
-      print(result);
-      // Handle success
-      if (result == "Otp send successfully") {
-        otpSuccess = true;
-        notifyListeners();
-        return true;
-      }else{
-         return false;
-      }
-     
-    } catch (e) {
-      // Handle errors
-      if (kDebugMode) {
-        print("Error during mobile login: $e");
-      }
-      return null;
-    }
+  void setOtpSuccess(bool value) {
+    otpSuccess = value;
+    notifyListeners();
   }
 
-  Future<bool> verifyPhoneOtp(
+  // Future<bool?> mobileLogin({required String phone}) async {
+  //   try {
+  //     final result = await authRepository.phoneLogin(phone: phone);
+  //     print(result);
+  //     // Handle success
+  //     if (result == "Otp send successfully") {
+  //       otpSuccess = true;
+  //       notifyListeners();
+  //       return true;
+  //     } else {
+  //       return false;
+  //     }
+  //   } catch (e) {
+  //     // Handle errors
+  //     if (kDebugMode) {
+  //       print("Error during mobile login: $e");
+  //     }
+  //     return null;
+  //   }
+  // }
+
+  Future<String?> verifyPhoneOtp(
       {required String phone, required String otp}) async {
     try {
       isLoading = true;
@@ -43,18 +47,89 @@ class LoginProvider extends ChangeNotifier {
       if (result == "success") {
         isLoading = false;
         notifyListeners();
-        return true;
+        return "success";
       } else {
         error = result.toString();
         isLoading = false;
-        return false;
+        return result.toString();
       }
     } catch (e) {
       // Handle errors
       if (kDebugMode) {
         print("Error during mobile login: $e");
       }
-      return false;
+      return null;
+    }
+  }
+
+  // change pw
+  Future<String?> editUser({required String password}) async {
+    isLoading = true;
+    notifyListeners();
+    try {
+      final result = await AuthRepository().editUser(password: password);
+      print(result);
+
+      if (result == "success") {
+        isLoading = false;
+        notifyListeners();
+        return "success";
+      } else {
+        isLoading = false;
+        notifyListeners();
+        return result;
+      }
+    } catch (e) {
+      print(e);
+      isLoading = false;
+      notifyListeners();
+      return e.toString();
+    }
+  }
+
+  Future<String?> forgotPasswordGetOtp({required String phn}) async {
+    try {
+      final result = await AuthRepository().forgotPw(phone: phn);
+      if (result == "success") {
+        otpSuccess = true;
+        notifyListeners();
+        return "success";
+      } else {
+        return result.toString();
+      }
+    } catch (e) {
+      print(e);
+      return e.toString();
+    }
+  }
+
+  Future<String?> changePassword(
+      {required String phone,
+      required String otp,
+      required String password}) async {
+    try {
+      final result = await AuthRepository()
+          .changePassword(password: password, phone: phone, otp: otp);
+      print(result);
+
+      return result.toString();
+    } catch (e) {
+      return e.toString();
+    }
+  }
+
+  Future<bool?> checkSubscriptions() async {
+    try {
+      final result = await AuthRepository().checkSubscriptions();
+      if (result != null && result == true) {
+        return true;
+      } else if (result != null && result == false) {
+        return false;
+      } else {
+        return null;
+      }
+    } catch (e) {
+      return null;
     }
   }
 }

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:recruiter_app/core/constants.dart';
-import 'package:recruiter_app/core/theme.dart';
+import 'package:recruiter_app/features/home/model/banner_model.dart';
 
 class BannerWidget extends StatelessWidget {
-  const BannerWidget({Key? key}) : super(key: key);
+  final BannerModel banner;
+  const BannerWidget({Key? key, required this.banner}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -19,48 +19,52 @@ class BannerWidget extends StatelessWidget {
           color: Colors.transparent,
           borderRadius: BorderRadius.circular(borderRadius),
           image: DecorationImage(
-              image: AssetImage("assets/images/banner_image.png"),
+              image: banner.image != null
+                  ? NetworkImage(banner.image)
+                  : AssetImage("assets/images/banner_image.png"),
               fit: BoxFit.cover)),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Get 1k+ featured Jobs",
-                  style:
-                      theme.textTheme.bodySmall!.copyWith(color: Colors.white),
-                ),
-                Container(
-                  height: screenHeight * 0.025,
-                  width: screenWidth * 0.2,
-                  decoration: BoxDecoration(
-                      color: buttonColor,
-                      borderRadius: BorderRadius.circular(20.r)),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          "Upgrade now",
-                          textAlign: TextAlign.center,
-                          overflow: TextOverflow.ellipsis,
-                          style: theme.textTheme.bodySmall!
-                              .copyWith(color: Colors.white, fontSize: 8.sp),
-                        ),
-                      )
-                    ],
-                  ),
-                )
-              ],
-            )
-          ],
-        ),
-      ),
+      // child: Padding(
+      //   padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+      //   child: Column(
+      //     mainAxisAlignment: MainAxisAlignment.end,
+      //     children: [
+      //       Row(
+      //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      //         children: [
+      //           Text(
+      //             "Get 1k+ featured Jobs",
+      //             style:
+      //                 theme.textTheme.bodySmall!.copyWith(color: Colors.white),
+      //           ),
+      //           Container(
+      //             height: screenHeight * 0.025,
+      //             width: screenWidth * 0.2,
+      //             decoration: BoxDecoration(
+      //                 color: buttonColor,
+      //                 borderRadius: BorderRadius.circular(20.r)),
+      //             child: Row(
+      //               mainAxisAlignment: MainAxisAlignment.center,
+      //               crossAxisAlignment: CrossAxisAlignment.center,
+      //               children: [
+      //                 Expanded(
+      //                   child: Text(
+      //                     "Upgrade now",
+      //                     textAlign: TextAlign.center,
+      //                     overflow: TextOverflow.ellipsis,
+      //                     style: theme.textTheme.bodySmall!
+      //                         .copyWith(color: Colors.white, fontSize: 8.sp),
+      //                   ),
+      //                 )
+      //               ],
+      //             ),
+      //           )
+      //         ],
+      //       )
+          
+          
+      //     ],
+      //   ),
+      // ),
     );
   }
 }
