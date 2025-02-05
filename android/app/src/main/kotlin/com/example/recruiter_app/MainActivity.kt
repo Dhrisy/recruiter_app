@@ -1,4 +1,4 @@
-package com.example.recruiter_app
+package com.emergio.recruiter_app
 
 import io.flutter.embedding.android.FlutterActivity
 

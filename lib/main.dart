@@ -89,7 +89,7 @@ int maxRetries = 3;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  // await Firebase.initializeApp();
 
   // Load theme preference before running the app
   final SharedPreferences prefs = await SharedPreferences.getInstance();

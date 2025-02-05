@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,10 +14,8 @@ import 'package:recruiter_app/features/auth/bloc/auth_event.dart';
 import 'package:recruiter_app/features/auth/bloc/auth_state.dart';
 import 'package:recruiter_app/features/auth/provider/login_provider.dart';
 import 'package:recruiter_app/features/auth/view/otp_screen.dart';
-import 'package:recruiter_app/features/auth/view/phone_signin.dart';
 import 'package:recruiter_app/features/auth/view/register.dart';
 import 'package:recruiter_app/features/auth/view/welcome_screen.dart';
-import 'package:recruiter_app/features/navbar/view/navbar.dart';
 import 'package:recruiter_app/widgets/common_snackbar.dart';
 import 'package:recruiter_app/widgets/reusable_button.dart';
 import 'package:recruiter_app/widgets/reusable_textfield.dart';
