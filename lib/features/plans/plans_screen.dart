@@ -2,15 +2,18 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/core/theme.dart';
 import 'package:recruiter_app/core/utils/app_theme_data.dart';
+import 'package:recruiter_app/features/plans/model/plan_model.dart';
+import 'package:recruiter_app/features/plans/viewmodel/plans_provider.dart';
 import 'package:recruiter_app/features/plans/widgets/plan_card_widget.dart';
 import 'package:recruiter_app/widgets/common_appbar_widget.dart';
 
 class PlansScreen extends StatefulWidget {
   final bool? fromSettings;
-  const PlansScreen({Key? key, this.fromSettings}) : super(key: key);
+  const PlansScreen({super.key, this.fromSettings});
 
   @override
   _PlansScreenState createState() => _PlansScreenState();
@@ -20,70 +23,11 @@ class _PlansScreenState extends State<PlansScreen> {
   int _currentIndex = 0;
   late AppThemeDataBloc _themeBloc;
 
-  final Map<String, List<bool>> _planFeatures = {
-    "Standard": [true, true, true, true, true, false, false, false],
-    "Classic": [true, true, true, true, true, true, false, false],
-    "Premium": [true, true, true, true, true, true, true, true],
-  };
-
-  final Map<String, List<bool>> _resdexFeatures = {
-    "Resdex Lite": [true, true, true, true, true, false, false, false],
-    "Resdex Premium": [true, true, true, true, true, true, true, true],
-  };
-
-  final Map<String, String> _prices = {
-    "Standard": "400",
-    "Classic": "800",
-    "Premium": "1650",
-    "Resdex Lite": "4000",
-    "Resdex Premium": "10500",
-  };
-
-  List<Map<String, dynamic>> _generatePlan(String name, List<String> features, Map<String, List<bool>> featureMap) {
-    return List.generate(features.length, (i) => {
-      "title": features[i],
-      "is_applicable": featureMap[name]![i],
-      "plan_name": name,
-      "rupees": _prices[name]!
-    });
-  }
-
-  late List<List<Map<String, dynamic>>> jobPostingPlans;
-  late List<List<Map<String, dynamic>>> resdexPlans;
-
   @override
   void initState() {
     super.initState();
     _themeBloc = AppThemeDataBloc();
-
-    List<String> jobPostingFeatures = [
-      "Upto 250 character job description",
-      "1 job location",
-      "200 applies",
-      "Applies expiry 30 days",
-      "1 job location",
-      "Jobseeker contact details are visible",
-      "Boost on Job Search Page",
-      "Job Branding"
-    ];
-
-    List<String> resdexFeatures = [
-      "100 CV views per requirement",
-      "Up to 500 search results",
-      "Candidates active in last 6 months",
-      "10+ advanced filters",
-      "Single user access",
-      "Download CVs in bulk",
-      "Keyword search",
-      "Create an email template to invite a candidate"
-    ];
-
-    jobPostingPlans = ["Standard", "Classic", "Premium"]
-        .map((name) => _generatePlan(name, jobPostingFeatures, _planFeatures))
-        .toList();
-    resdexPlans = ["Resdex Lite", "Resdex Premium"]
-        .map((name) => _generatePlan(name, resdexFeatures, _resdexFeatures))
-        .toList();
+    Provider.of<PlanProvider>(context, listen: false).fetchPlans();
   }
 
   @override
@@ -125,8 +69,8 @@ class _PlansScreenState extends State<PlansScreen> {
                 Expanded(
                   child: TabBarView(
                     children: [
-                      _buildPlanView(jobPostingPlans),
-                      _buildPlanView(resdexPlans)
+                      _buildPlanView(false), // Job Posting plans
+                      _buildPlanView(true), // Resdex plans
                     ],
                   ),
                 ),
@@ -138,34 +82,86 @@ class _PlansScreenState extends State<PlansScreen> {
     );
   }
 
-  Widget _buildPlanView(List<List<Map<String, dynamic>>> plans) {
-    return Center(
-      child: CarouselSlider(
-        items: plans.map((plan) => _buildPlanCard(plan, plans)).toList(),
-        options: CarouselOptions(
-          aspectRatio: 2 / 3,
-          enlargeCenterPage: true,
-          autoPlay: false,
-          onPageChanged: (index, reason) {
-            setState(() => _currentIndex = index);
-          },
-        ),
-      ),
+  Widget _buildPlanView(bool isResdex) {
+    return Consumer<PlanProvider>(
+      builder: (context, planProvider, child) {
+        if (planProvider.isLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (planProvider.error != null) {
+          return Center(child: Text('Error: ${planProvider.error}'));
+        }
+
+        final plans = planProvider.getPlansByType(isResdex);
+
+        List<String> features = isResdex
+            ? [
+                "100 CV views per requirement",
+                "Up to 500 search results",
+                "Candidates active in last 6 months",
+                "10+ advanced filters",
+                "Single user access",
+                "Download CVs in bulk",
+                "Keyword search",
+                "Create an email template to invite a candidate"
+              ]
+            : [
+                "Upto 250 character job description",
+                "1 job location",
+                "200 applies",
+                "Applies expiry 30 days",
+                "1 job location",
+                "Jobseeker contact details are visible",
+                "Boost on Job Search Page",
+                "Job Branding"
+              ];
+
+        return Center(
+          child: CarouselSlider.builder(
+            itemCount: plans.length,
+            itemBuilder: (context, index, realIndex) {
+              List<Map<String, dynamic>> planFeatures = List.generate(
+                  features.length,
+                  (i) => {
+                        "title": features[i],
+                        "is_applicable": true,
+                        "plan_name": plans[index].title,
+                        "rupees": plans[index].rate.toString()
+                      });
+
+              return _buildPlanCard(planFeatures, plans[index], index);
+            },
+            options: CarouselOptions(
+              aspectRatio: 2 / 3,
+              enlargeCenterPage: true,
+              autoPlay: false,
+              onPageChanged: (index, reason) {
+                // Move the setState to a post-frame callback
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  setState(() => _currentIndex = index);
+                });
+              },
+            ),
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildPlanCard(List<Map<String, dynamic>> plan,
-      List<List<Map<String, dynamic>>> planList) {
+  Widget _buildPlanCard(
+      List<Map<String, dynamic>> features, PlanModel plan, int index) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       width: double.infinity,
       decoration: BoxDecoration(
-        color: _currentIndex == planList.indexOf(plan)
-            ? secondaryColor
-            : buttonColor,
+        color: _currentIndex == index ? secondaryColor : buttonColor,
         borderRadius: BorderRadius.circular(20.r),
       ),
-      child: PlanCardWidget(lists: plan),
+      child: PlanCardWidget(
+        plan: plan,
+        lists: features,
+      ),
     );
   }
 }

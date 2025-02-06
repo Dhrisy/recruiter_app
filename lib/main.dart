@@ -19,6 +19,7 @@ import 'package:recruiter_app/features/job_post/viewmodel.dart/jobpost_provider.
 import 'package:recruiter_app/features/job_post/viewmodel.dart/search_job_provider.dart';
 import 'package:recruiter_app/features/navbar/view/animated_navbar.dart';
 import 'package:recruiter_app/features/navbar/view_model/navbar_viewmodel.dart';
+import 'package:recruiter_app/features/plans/viewmodel/plans_provider.dart';
 import 'package:recruiter_app/features/questionaires/bloc/questionaire_bloc.dart';
 import 'package:recruiter_app/features/questionaires/data/questionaire_repository.dart';
 import 'package:recruiter_app/features/resdex/provider/email_template_provider.dart';
@@ -85,7 +86,6 @@ int maxRetries = 3;
 //   runApp(MyApp(initialThemeMode: isDarkMode));
 // }
 
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -98,13 +98,8 @@ Future<void> main() async {
   OneSignal.Debug.setLogLevel(OSLogLevel.verbose); // Enable debug logs
   OneSignal.initialize("f57460e6-1f9e-418a-ab47-c499dce28870");
 
-  
-
-  
-
   runApp(MyApp(initialThemeMode: isDarkMode));
 }
-
 
 class MyApp extends StatefulWidget {
   final bool initialThemeMode;
@@ -160,7 +155,8 @@ class _MyAppState extends State<MyApp> {
           ChangeNotifierProvider(create: (context) => JobDetailsProvider()),
           ChangeNotifierProvider(create: (context) => JobPostingProvider()),
           ChangeNotifierProvider(create: (context) => HomeProvider()),
-           ChangeNotifierProvider(create: (context) => SettingsProvider()),
+          ChangeNotifierProvider(create: (context) => SettingsProvider()),
+          ChangeNotifierProvider(create: (context) => PlanProvider()),
         ],
         child: MultiBlocProvider(
           providers: [

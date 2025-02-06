@@ -5,6 +5,7 @@ class PlanModel {
     int posts;
     String duration;
     String audience;
+    bool resdex;
     int rate;
     bool feature;
     DateTime createdOn;
@@ -16,22 +17,28 @@ class PlanModel {
         required this.posts,
         required this.duration,
         required this.audience,
+        required this.resdex,
         required this.rate,
         required this.feature,
         required this.createdOn,
     });
 
-    factory PlanModel.fromJson(Map<String, dynamic> json) => PlanModel(
-        id: json["id"],
-        title: json["title"],
-        description: Description.fromJson(json["description"]),
-        posts: json["posts"],
-        duration: json["duration"],
-        audience: json["audience"],
-        rate: json["rate"],
-        feature: json["feature"],
-        createdOn: DateTime.parse(json["created_on"]),
-    );
+factory PlanModel.fromJson(Map<String, dynamic> json) => PlanModel(
+    id: json["id"] ?? 0,
+    title: json["title"] ?? "",
+    description: json["description"] != null 
+        ? Description.fromJson(json["description"])
+        : Description(),
+    posts: json["posts"] ?? 0,
+    duration: json["duration"] ?? "",
+    audience: json["audience"] ?? "",
+    resdex: json["resdex"] ?? false,
+    rate: json["rate"] ?? 0,
+    feature: json["feature"] ?? false,
+    createdOn: json["created_on"] != null 
+        ? DateTime.parse(json["created_on"])
+        : DateTime.now(),
+);
 
     Map<String, dynamic> toJson() => {
         "id": id,
@@ -40,6 +47,7 @@ class PlanModel {
         "posts": posts,
         "duration": duration,
         "audience": audience,
+        "resdex": resdex,
         "rate": rate,
         "feature": feature,
         "created_on": createdOn.toIso8601String(),
@@ -57,11 +65,19 @@ class Description {
         this.descTwo,
     });
 
-    factory Description.fromJson(Map<String, dynamic> json) => Description(
-        ss: json["ss"],
-        descOne: json["descOne"],
-        descTwo: json["descTwo"],
-    );
+    factory Description.fromJson(dynamic json) {
+      if (json is String) {
+        return Description(ss: json);
+      }
+      if (json is Map<String, dynamic>) {
+        return Description(
+          ss: json["ss"],
+          descOne: json["descOne"],
+          descTwo: json["descTwo"],
+        );
+      }
+      return Description();
+    }
 
     Map<String, dynamic> toJson() => {
         "ss": ss,
