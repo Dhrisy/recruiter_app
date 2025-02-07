@@ -13,6 +13,7 @@ import 'package:recruiter_app/services/auth_services/forgot_pw_service.dart';
 import 'package:recruiter_app/services/auth_services/login_service.dart';
 import 'package:recruiter_app/services/auth_services/otp_service.dart';
 import 'package:recruiter_app/services/auth_services/register_service.dart';
+import 'package:recruiter_app/services/plans/plans_service.dart';
 import 'package:recruiter_app/services/subscriptions/subscribe_service.dart';
 
 class AuthRepository {
@@ -284,6 +285,17 @@ class AuthRepository {
       }
     } catch (e) {
       return null;
+    }
+  }
+
+
+  Future<Map<String, dynamic>?>  fetchAllRecruiterPlans() async{
+    try {
+      final response = await PlansService.fetchPlans();
+      print("response of fetch all recruiter plans ${response.statusCode},  ${response.body}");
+
+    } catch (e) {
+      
     }
   }
 }

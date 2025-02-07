@@ -11,6 +11,7 @@ class QuestionaireModel {
   final String designation;
   final String? landlineNumber;
   final String contactPersonName;
+  final String? logo;
 
 
   QuestionaireModel({
@@ -25,7 +26,8 @@ class QuestionaireModel {
     required this.mobileNumber,
     required this.designation,
     required this.website,
-    required this.contactPersonName
+    required this.contactPersonName,
+    this.logo,
 
   });
 

@@ -188,6 +188,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/core/theme.dart';
 import 'package:recruiter_app/core/utils/navigation_animation.dart';
+import 'package:recruiter_app/features/auth/view/login_screen.dart';
 import 'package:recruiter_app/features/onboarding/onboarding2.dart';
 import 'package:recruiter_app/features/onboarding/onboarding3.dart';
 import 'package:recruiter_app/features/onboarding/widgets/circles.dart';
@@ -205,9 +206,16 @@ class Onboarding1 extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: Stack(
         children: [
+          SizedBox(
+            width: double.infinity,
+            height: screenHeight * 0.5,
+            child: SvgPicture.asset(
+              "assets/svgs/onboard_1.svg",
+              fit: BoxFit.cover,
+            ),
+          ),
           SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -223,18 +231,10 @@ class Onboarding1 extends StatelessWidget {
                         height: screenHeight * 0.45,
                         child: Stack(
                           children: [
-                            SizedBox(
-                              width: double.infinity,
-                              height: screenHeight * 0.45,
-                              child: SvgPicture.asset(
-                                "assets/svgs/onboard_1.svg",
-                                fit: BoxFit.cover,
-                              ),
-                            ),
                             SafeArea(
                               child: Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 15),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 15),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
@@ -243,8 +243,10 @@ class Onboarding1 extends StatelessWidget {
                                         Navigator.pushAndRemoveUntil(
                                             context,
                                             AnimatedNavigation()
-                                                .fadeAnimation(PlansScreen()),
-                                            (Route<dynamic> route) => false);
+                                                .fadeAnimation(
+                                                    LoginScreen()),
+                                            (Route<dynamic> route) =>
+                                                false);
                                       },
                                       child: Padding(
                                         padding: const EdgeInsets.only(
@@ -278,7 +280,7 @@ class Onboarding1 extends StatelessWidget {
                   ),
                 ),
                 // Additional content can be added here
-
+          
                 // Example of responsive text
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -302,29 +304,32 @@ class Onboarding1 extends StatelessWidget {
               ],
             ),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom: 30, ),
-                child: ReusableButton(
-                  action: () {
-                    Navigator.push(context,
-                        AnimatedNavigation().fadeAnimation(Onboarding2()));
-                  },
-                  text: "Next",
-                  width: 100.h,
-                  height: 35.h,
-                  radius: 30.r,
-                  textColor: buttonTextColor,
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(
+                    bottom: 30,
+                  ),
+                  child: ReusableButton(
+                    action: () {
+                      Navigator.push(context,
+                          AnimatedNavigation().fadeAnimation(Onboarding2()));
+                    },
+                    text: "Next",
+                    width: 100.h,
+                    height: 35.h,
+                    radius: 30.r,
+                    textColor: buttonTextColor,
+                  ),
                 ),
-              ),
-            ],
-          )
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
-
-  
 }

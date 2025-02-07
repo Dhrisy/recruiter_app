@@ -19,7 +19,7 @@ class CompanyServices {
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
-          "logo": "string",
+          // "logo": questionaire.,
           "about": questionaire.about.toString(),
           "website": questionaire.website.toString(),
           "functional_area": questionaire.functionalArea.toString(),

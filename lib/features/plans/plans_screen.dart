@@ -2,15 +2,21 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/core/theme.dart';
 import 'package:recruiter_app/core/utils/app_theme_data.dart';
+import 'package:recruiter_app/features/plans/viewmodel/plan_provider.dart';
 import 'package:recruiter_app/features/plans/widgets/plan_card_widget.dart';
 import 'package:recruiter_app/widgets/common_appbar_widget.dart';
 
 class PlansScreen extends StatefulWidget {
   final bool? fromSettings;
-  const PlansScreen({Key? key, this.fromSettings}) : super(key: key);
+  final bool? isRegister;
+  const PlansScreen({Key? key, 
+  this.fromSettings,
+  this.isRegister
+  }) : super(key: key);
 
   @override
   _PlansScreenState createState() => _PlansScreenState();
@@ -290,11 +296,15 @@ class _PlansScreenState extends State<PlansScreen> {
       resdexPlans.add(_resdexPremiumLists);
     });
 
-    print(jobPostingPlans.length);
+    WidgetsBinding.instance.addPostFrameCallback((_){
+Provider.of<PlanProvider>(context, listen: false).fetchAllRecruiterPlans();
+    });
+
   }
 
   @override
   Widget build(BuildContext context) {
+    print("pppppppp");
     final theme = Theme.of(context);
     final _themeBloc = context.read<AppThemeDataBloc>();
     return Material(
