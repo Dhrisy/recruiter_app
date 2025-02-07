@@ -43,11 +43,14 @@ class JobPostRepository {
       // Attempt to fetch posted jobs
       var response = await JobsService.fetchPostedJobs();
 
+    
+
       // Handle the success response
       if (response.statusCode == 200) {
         List<dynamic> responseData = jsonDecode(response.body);
         List<JobPostModel> jobsList =
             responseData.map((job) => JobPostModel.fromJson(job)).toList();
+            
         return jobsList;
       }
 

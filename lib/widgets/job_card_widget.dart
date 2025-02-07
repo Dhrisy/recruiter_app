@@ -155,48 +155,86 @@ class _JobCardWidgetState extends State<JobCardWidget> {
                 ),
                 Align(
                     alignment: Alignment.topRight,
-                    child: InkWell(
-                        onTap: () {
-                          FocusScope.of(context).unfocus();
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return CommonAlertDialog(
-                                  title: "Delete?",
-                                  message:
-                                      "Dou you want to delete this job ${widget.job.title}",
-                                  onConfirm: () async {
-                                    if (widget.job.id != null) {
-                                      final result =
-                                          await Provider.of<JobPostingProvider>(
-                                                  context,
-                                                  listen: false)
-                                              .deleteJobPost(
-                                                  jobId: widget.job.id!);
-
-                                      if (result == "success") {
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                    widget.job.status == true
+                    ? Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10.r),
+                        border: Border.all(
+                          color: Colors.green
+                        )
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: Text("Active",
+                        style: theme.textTheme.bodyMedium!.copyWith(
+                          color: Colors.green,
+                        
+                        ),
+                        ),
+                      ),
+                    ) :   Container(
+                       decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10.r),
+                        border: Border.all(
+                          color: greyTextColor
+                        )
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: Text("Expired",
+                         style: theme.textTheme.bodyMedium!.copyWith(
+                          color: greyTextColor,
+                        
+                        ),),
+                      ),
+                    ),
+                        InkWell(
+                            onTap: () {
+                              FocusScope.of(context).unfocus();
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return CommonAlertDialog(
+                                      title: "Delete?",
+                                      message:
+                                          "Dou you want to delete this job ${widget.job.title}",
+                                      onConfirm: () async {
+                                        if (widget.job.id != null) {
+                                          final result =
+                                              await Provider.of<JobPostingProvider>(
+                                                      context,
+                                                      listen: false)
+                                                  .deleteJobPost(
+                                                      jobId: widget.job.id!);
+                        
+                                          if (result == "success") {
+                                            Navigator.pop(context);
+                                            CommonSnackbar.show(context,
+                                                message:
+                                                    "${widget.job.title} deleted successfully");
+                                          } else {
+                                            Navigator.pop(context);
+                                            CommonSnackbar.show(context,
+                                                message: "$result");
+                                          }
+                                        }
+                                      },
+                                      onCancel: () {
                                         Navigator.pop(context);
-                                        CommonSnackbar.show(context,
-                                            message:
-                                                "${widget.job.title} deleted successfully");
-                                      } else {
-                                        Navigator.pop(context);
-                                        CommonSnackbar.show(context,
-                                            message: "$result");
-                                      }
-                                    }
-                                  },
-                                  onCancel: () {
-                                    Navigator.pop(context);
-                                  },
-                                  height: 100);
+                                      },
+                                      height: 100);
+                                },
+                              );
                             },
-                          );
-                        },
-                        child: const Icon(
-                          Icons.delete,
-                          color: secondaryColor,
-                        ))),
+                            child: const Icon(
+                              Icons.delete,
+                              color: secondaryColor,
+                            )),
+                      ],
+                    )),
               ],
             ),
           ),

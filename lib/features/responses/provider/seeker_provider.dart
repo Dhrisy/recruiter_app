@@ -1,66 +1,9 @@
-// import 'package:flutter/material.dart';
-// import 'package:recruiter_app/features/resdex/data/seeker_repository.dart';
-// import 'package:recruiter_app/features/resdex/model/job_response_model.dart';
-// import 'package:recruiter_app/features/resdex/model/seeker_model.dart';
-
-// class SeekerProvider extends ChangeNotifier{
-//   bool isLoading = false;
-//   Future<List<JobResponseModel>?>? seekerLists;
-//   String message = '';
-
-
-
-// void setLoading(bool val){
-//   isLoading = val;
-//   notifyListeners();
-// }
-
-
-//   Future<void>  fetchAllAppliedSeekers({int? jobId}) async{
-//      isLoading = true;
-//      notifyListeners();
-//     try {
-     
-//       final result =  SeekerRepository().fetchAllAppliedSeekers(jobId: jobId);
-      
-//       seekerLists = result;
-//       isLoading = false;
-//       notifyListeners();
-//     } catch (e) {
-//       isLoading = false;
-//       notifyListeners();
-//       throw Exception(e);
-//     }
-//   }
-
-//   // Future<void>  fetchAllAppliedSeekers({int? jobId}) async{
-//   //    isLoading = true;
-//   //    notifyListeners();
-//   //   try {
-     
-//   //     final result =  SeekerRepository().fetchAllAppliedSeekers(jobId: jobId);
-      
-//   //     seekerLists = result;
-//   //     isLoading = false;
-//   //     notifyListeners();
-//   //   } catch (e) {
-//   //     isLoading = false;
-//   //     notifyListeners();
-//   //     throw Exception(e);
-//   //   }
-//   // }
-
-
-
-  
-// }
-
-
-
 import 'package:flutter/material.dart';
 import 'package:recruiter_app/features/resdex/data/seeker_repository.dart';
 import 'package:recruiter_app/features/resdex/model/job_response_model.dart';
 import 'package:recruiter_app/features/resdex/model/seeker_model.dart';
+import 'package:recruiter_app/features/responses/data/response_repository.dart';
+import 'package:recruiter_app/features/responses/view/response.dart';
 
 class SeekerProvider extends ChangeNotifier {
   bool isLoading = false;
@@ -90,14 +33,16 @@ class SeekerProvider extends ChangeNotifier {
     } else {
       _filteredSeekers = allSeekers.where((seeker) {
         final name = seeker.seeker.personalData?.user.name?.toLowerCase() ?? '';
-        final email = seeker.seeker.personalData?.user.email?.toLowerCase() ?? '';
-        final phone = seeker.seeker.personalData?.user.phoneNumber?.toLowerCase() ?? '';
+        final email =
+            seeker.seeker.personalData?.user.email?.toLowerCase() ?? '';
+        final phone =
+            seeker.seeker.personalData?.user.phoneNumber?.toLowerCase() ?? '';
         final job = seeker.job.title?.toLowerCase() ?? '';
         final query = _searchQuery.toLowerCase();
 
         return name.contains(query) ||
             email.contains(query) ||
-            phone.contains(query)||
+            phone.contains(query) ||
             job.contains(query);
       }).toList();
     }
@@ -111,7 +56,7 @@ class SeekerProvider extends ChangeNotifier {
       final result = await SeekerRepository().fetchAllAppliedSeekers();
       if (result != null) {
         allSeekers = result;
-        _filterSeekers(); 
+        _filterSeekers();
         notifyListeners();
       }
       seekerLists = Future.value(result);
@@ -128,5 +73,19 @@ class SeekerProvider extends ChangeNotifier {
     _searchQuery = '';
     _filterSeekers();
     notifyListeners();
+  }
+
+  Future<bool?> editResponse({required int jobId}) async {
+    try {
+      final result = await ResponseRepository().editResponse(jobId: jobId);
+      print(result);
+      if (result == "success") {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      print(e);
+    }
   }
 }

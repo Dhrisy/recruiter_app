@@ -842,9 +842,7 @@ class _Questionaire1State extends State<Questionaire1> {
                       action: () async {
                         if (widget.isEdit == true &&
                             widget.accountData != null) {
-                          print(_selectedImage != null
-                              ? _selectedImage!.path.toString()
-                              : "kkkkk");
+                          
                           String fullPath =
                               _selectedImage !=null ? _selectedImage!.path.toString() : "";
                           String fileName = path.basename(fullPath);

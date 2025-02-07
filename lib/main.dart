@@ -19,6 +19,7 @@ import 'package:recruiter_app/features/job_post/viewmodel.dart/jobpost_provider.
 import 'package:recruiter_app/features/job_post/viewmodel.dart/search_job_provider.dart';
 import 'package:recruiter_app/features/navbar/view/animated_navbar.dart';
 import 'package:recruiter_app/features/navbar/view_model/navbar_viewmodel.dart';
+import 'package:recruiter_app/features/notifications/notification_provider.dart';
 import 'package:recruiter_app/features/plans/viewmodel/plans_provider.dart';
 import 'package:recruiter_app/features/questionaires/bloc/questionaire_bloc.dart';
 import 'package:recruiter_app/features/questionaires/data/questionaire_repository.dart';
@@ -88,7 +89,7 @@ int maxRetries = 3;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  // await Firebase.initializeApp();
 
   // Load theme preference before running the app
   final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -157,6 +158,7 @@ class _MyAppState extends State<MyApp> {
           ChangeNotifierProvider(create: (context) => HomeProvider()),
           ChangeNotifierProvider(create: (context) => SettingsProvider()),
           ChangeNotifierProvider(create: (context) => PlanProvider()),
+          ChangeNotifierProvider(create: (context) => NotificationProvider()),
         ],
         child: MultiBlocProvider(
           providers: [

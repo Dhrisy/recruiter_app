@@ -73,7 +73,7 @@ class JobPostModel {
       vaccancy: json["vacancy"],
       benefits: json["benefits"],
       skills: json["skills"],
-      customQuestions: json["custon_qns"],
+      customQuestions: json["custom_qns"],
       currency: json["currency"],
       id: json["id"],
       createdOn: json["created_on"],

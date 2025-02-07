@@ -1,12 +1,19 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:intl/intl.dart';
 import 'package:recruiter_app/core/utils/custom_functions.dart';
+import 'package:recruiter_app/features/responses/view/response.dart';
+import 'package:recruiter_app/features/settings/data/settings_repository.dart';
+import 'package:recruiter_app/features/settings/model/subscription_model.dart';
+import 'package:recruiter_app/services/auth_services/change_pw_service.dart';
 import 'package:recruiter_app/services/auth_services/forgot_pw_service.dart';
 import 'package:recruiter_app/services/auth_services/login_service.dart';
 import 'package:recruiter_app/services/auth_services/otp_service.dart';
 import 'package:recruiter_app/services/auth_services/register_service.dart';
+import 'package:recruiter_app/services/subscriptions/subscribe_service.dart';
 
 class AuthRepository {
   final _secureStorage = const FlutterSecureStorage();
@@ -151,7 +158,7 @@ class AuthRepository {
       Map<String, dynamic> responseData = jsonDecode(response.body);
       // Handle the success response
       if (response.statusCode == 200) {
-        return responseData["message"];
+        return "success";
       } else {
         return responseData["message"];
       }
@@ -203,5 +210,80 @@ class AuthRepository {
     }
   }
 
+// change pw
+  Future<String?> editUser(
+      {required String password,
+      int? retryCount = 0,
+      int? maxRetries = 3}) async {
+    try {
+      final response = await ChangePwService.editUser(password: password);
 
+      print("REsponse of change pw  ${response.statusCode},  ${response.body}");
+      if (response.statusCode == 200) {
+        return "success";
+      } else if (response.statusCode == 401) {
+        return editUser(
+            password: password,
+            retryCount: retryCount! + 1,
+            maxRetries: maxRetries);
+      } else {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+
+        return responseData["message"];
+      }
+    } catch (e) {
+      return null;
+    }
+  }
+
+// chnage pw by forgot passwrd
+  Future<String?> changePassword(
+      {required String password,
+      required String phone,
+      required String otp}) async {
+    try {
+      final response = await ChangePwService.changePwByForgotPw(
+          password: password, phone: phone, otp: otp);
+      print("${response.statusCode},   ${response.body}");
+      if (response.statusCode == 200) {
+        return "success";
+      } else {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+
+        return responseData["message"];
+      }
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<bool?> checkSubscriptions() async {
+    try {
+      final subscriptions = await SettingsRepository().fetchSubscriptions();
+      if (subscriptions != null) {
+        SubscriptionModel subscribe = subscriptions["subscription"];
+        final regExp = RegExp(r'P(\d+)D');
+        final match = regExp.firstMatch(subscribe.plan.duration);
+        int days = match != null ? int.parse(match.group(1)!) : 0;
+
+        // Adding duration to get end date
+        // Get the current date and add duration
+        DateTime durationDate = DateTime.now().add(Duration(days: days));
+
+        // Get today's date without time
+        DateTime today = DateTime.now();
+        String formattedEndDate = DateFormat('yyyy-MM-dd').format(durationDate);
+
+        print("Subscription Ends On: $formattedEndDate");
+        // If the subscription is expired, show an alert dialog
+        if (today.isAfter(durationDate)) {
+          return false;
+        } else {
+          return true;
+        }
+      }
+    } catch (e) {
+      return null;
+    }
+  }
 }

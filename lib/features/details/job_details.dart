@@ -12,6 +12,7 @@ import 'package:recruiter_app/core/utils/navigation_animation.dart';
 import 'package:recruiter_app/features/details/widgets/additional_details_widget.dart';
 import 'package:recruiter_app/features/details/widgets/job_details_widget.dart';
 import 'package:recruiter_app/features/job_post/model/job_post_model.dart';
+import 'package:recruiter_app/features/job_post/view/all_jobs.dart';
 import 'package:recruiter_app/features/job_post/view/job_form.dart';
 import 'package:recruiter_app/features/job_post/viewmodel.dart/job_posting_provider.dart';
 import 'package:recruiter_app/viewmodels/job_viewmodel.dart';
@@ -147,10 +148,14 @@ class _JobDetailsState extends State<JobDetails> with TickerProviderStateMixin {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Expanded(
-                              child: CommonAppbarWidget(
-                                // fromJobDetails: true,
-                                isBackArrow: true,
-                                title: CustomFunctions.toSentenceCase(widget.jobData.title.toString())
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 15),
+                                child: CommonAppbarWidget(
+                                    // fromJobDetails: true,
+                                    isBackArrow: true,
+                                    title: CustomFunctions.toSentenceCase(
+                                        widget.jobData.title.toString())),
                               ),
                             ),
                             PopupMenuButton<String>(
@@ -160,7 +165,7 @@ class _JobDetailsState extends State<JobDetails> with TickerProviderStateMixin {
                                 ),
                                 position: PopupMenuPosition.under,
                                 color: secondaryColor,
-                                onSelected: (value) {
+                                onSelected: (value) async {
                                   switch (value) {
                                     case "edit":
                                       Navigator.push(
@@ -189,7 +194,15 @@ class _JobDetailsState extends State<JobDetails> with TickerProviderStateMixin {
                                                               .jobData.id!);
 
                                                   if (result == "success") {
-                                                    Navigator.pop(context);
+                                                    Navigator
+                                                        .pushAndRemoveUntil(
+                                                            context,
+                                                            AnimatedNavigation()
+                                                                .fadeAnimation(
+                                                                    AllJobs()),
+                                                            (Route<dynamic>
+                                                                    route) =>
+                                                                false);
                                                     CommonSnackbar.show(context,
                                                         message:
                                                             "${widget.jobData.title} deleted successfully");
@@ -208,8 +221,67 @@ class _JobDetailsState extends State<JobDetails> with TickerProviderStateMixin {
                                       );
 
                                       print("delete");
-                                    case "share":
-                                      print("share");
+                                    case "close":
+                                      bool status = false;
+
+                                      if (widget.jobData.status == true) {
+                                        status = false;
+                                      }else{
+                                        status = true;
+                                      }
+                                      final result = await Provider.of<JobPostingProvider>(context, listen: false).editJobPost(
+                                          job: JobPostModel(
+                                              benefits: widget.jobData.benefits,
+                                              candidateLocation: widget
+                                                  .jobData.candidateLocation,
+                                              city: widget.jobData.city,
+                                              country: widget.jobData.country,
+                                              createdOn:
+                                                  widget.jobData.createdOn,
+                                              currency: widget.jobData.currency,
+                                              customQuestions: widget
+                                                  .jobData.customQuestions,
+                                              description:
+                                                  widget.jobData.description,
+                                              education:
+                                                  widget.jobData.education,
+                                              functionalArea:
+                                                  widget.jobData.functionalArea,
+                                              gender: widget.jobData.gender,
+                                              id: widget.jobData.id,
+                                              industry: widget.jobData.industry,
+                                              jobType: widget.jobData.jobType,
+                                              maximumExperience: widget
+                                                  .jobData.maximumExperience,
+                                              maximumSalary:
+                                                  widget.jobData.maximumSalary,
+                                              minimumExperience: widget
+                                                  .jobData.minimumExperience,
+                                              minimumSalary:
+                                                  widget.jobData.minimumSalary,
+                                              nationality:
+                                                  widget.jobData.nationality,
+                                              requirements:
+                                                  widget.jobData.requirements,
+                                              skills: widget.jobData.skills,
+                                              status: status,
+                                              title: widget.jobData.title,
+                                              vaccancy:
+                                                  widget.jobData.vaccancy));
+
+                                      if (result == "success") {
+                                        Navigator.pushAndRemoveUntil(
+                                            context,
+                                            AnimatedNavigation()
+                                                .fadeAnimation(AllJobs()),
+                                            (Route<dynamic> route) => false);
+                                        CommonSnackbar.show(context,
+                                            message:
+                                                "Closed the ob successfully");
+                                        Provider.of<JobPostingProvider>(context,
+                                                listen: false)
+                                            .fetchJobLists();
+                                      }
                                   }
                                 },
                                 itemBuilder: (BuildContext context) =>
@@ -252,8 +324,10 @@ class _JobDetailsState extends State<JobDetails> with TickerProviderStateMixin {
                                           ],
                                         ),
                                       ),
-                                       PopupMenuItem<String>(
-                                        value: 'close',
+                                      PopupMenuItem<String>(
+                                        value: widget.jobData.status == true
+                                            ? 'close'
+                                            : "open",
                                         child: Row(
                                           children: [
                                             Icon(
@@ -263,7 +337,9 @@ class _JobDetailsState extends State<JobDetails> with TickerProviderStateMixin {
                                             ),
                                             SizedBox(width: 8),
                                             Text(
-                                              'Close Job',
+                                              widget.jobData.status == true
+                                                  ? 'Close Job'
+                                                  : "Open",
                                               style: theme.textTheme.bodyMedium!
                                                   .copyWith(
                                                       color: Colors.white),

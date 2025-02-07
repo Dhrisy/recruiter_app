@@ -318,7 +318,7 @@ class _AccountState extends State<Account> with SingleTickerProviderStateMixin {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildTitleWidget(theme: theme, text: "Location Details", isEdit: true),
+            _buildTitleWidget(theme: theme, text: "Location Details", isEdit: true, index: 1),
             const SizedBox(
               height: 10,
             ),
@@ -408,7 +408,7 @@ class _AccountState extends State<Account> with SingleTickerProviderStateMixin {
           // spacing: 15,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildTitleWidget(theme: theme, text: "Additional Information"),
+            _buildTitleWidget(theme: theme, text: "Additional Information", index: 2, isEdit: true),
             _buildItemWidget(
                 theme: theme,
                 title: "Contact Person",
@@ -461,6 +461,7 @@ class _AccountState extends State<Account> with SingleTickerProviderStateMixin {
   Widget _buildTitleWidget({
     required ThemeData theme,
     required String text,
+    int? index,
     bool? isEdit,
   }) {
     return Consumer<AccountProvider>(builder: (context, provider, child) {
@@ -481,7 +482,7 @@ class _AccountState extends State<Account> with SingleTickerProviderStateMixin {
                           AnimatedNavigation().fadeAnimation(Questionaire1(
                             accountData: provider.accountData,
                             isEdit: true,
-                            index: 1,
+                            index: index ?? 0,
                           )));
                     }
                   },

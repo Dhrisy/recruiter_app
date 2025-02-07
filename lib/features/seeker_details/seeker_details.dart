@@ -80,6 +80,7 @@ class _SeekerDetailsState extends State<SeekerDetails>
 
   @override
   Widget build(BuildContext context) {
+
     final screenHeight = MediaQuery.of(context).size.height.h;
     final screenWidth = MediaQuery.of(context).size.width.w;
     final theme = Theme.of(context);

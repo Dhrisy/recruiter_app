@@ -37,13 +37,22 @@ class ApiLists {
   static String scheduleInterviewEndpoint =
       "$baseUrl/recruiter_actions/schedule_interview";
 
-
-       static String updateJobPostEndPoint = "$baseUrl/jobs/edit";
-       static String fetchScheduleInterviewEndpoint =
+  static String updateJobPostEndPoint = "$baseUrl/jobs/edit";
+  static String fetchScheduleInterviewEndpoint =
       "$baseUrl/recruiter_actions/interviews_scheduled";
 
-      static String oneSignalEndPoint = "$baseUrl/user/onesignal";
-       static String recruiterCountsEndPoint = "$baseUrl/recruiter_actions/recruiter_counts";
-       static String editComapany = "$baseUrl/company/edit";
-       static String suggestionEndPoint = "$baseUrl/common/suggestion";
+  static String oneSignalEndPoint = "$baseUrl/user/onesignal";
+  static String recruiterCountsEndPoint =
+      "$baseUrl/recruiter_actions/recruiter_counts";
+  static String editComapany = "$baseUrl/company/edit";
+  static String suggestionEndPoint = "$baseUrl/common/suggestion";
+  static String notification = "$baseUrl/common/notification";
+  static String deleteNotification = "$baseUrl/common/delete_notification";
+  static String updateJobApplications =
+      "$baseUrl/job-actions/update_job_applications";
+  static String fetchSubscriptions = "$baseUrl/common/subscriptions";
+  static String editUser = "$baseUrl/user/";
+    static String changePassword = "$baseUrl/user/change_password";
+
+    static String banners = "$baseUrl/common/banners";
 }

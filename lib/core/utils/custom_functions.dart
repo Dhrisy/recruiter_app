@@ -27,7 +27,7 @@ class CustomFunctions {
     return input[0].toUpperCase() + input.substring(1).toLowerCase();
   }
 
-  static String? validateUrl(String? url) {
+   String? validateUrl(String? url) {
     const String baseUrl = ApiLists.imageBaseUrl;
 
     if (url == null || url.isEmpty) {

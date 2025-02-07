@@ -14,7 +14,8 @@ class JobDetailsWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return _buildJobDetailsTab(context: context, theme: theme, jobdata: jobData);
+    return _buildJobDetailsTab(
+        context: context, theme: theme, jobdata: jobData);
   }
 
   Widget _buildJobDetailsTab(
@@ -34,21 +35,23 @@ class JobDetailsWidget extends StatelessWidget {
                   .textTheme
                   .titleMedium!
                   .copyWith(fontWeight: FontWeight.bold),
-            ).animate()
-                  .fadeIn(duration: 400.ms)
-                  .slideY(begin: 0.2, end: 0),
-            _basicDetails(theme: theme, context: context).animate()
-                  .fadeIn(duration: 400.ms)
-                  .slideY(begin: 0.2, end: 0),
-            _proffesionalDetails(context: context).animate()
-                  .fadeIn(duration: 400.ms)
-                  .slideY(begin: 0.2, end: 0),
-            _buildAdditionalInfo(context: context).animate()
-                  .fadeIn(duration: 400.ms)
-                  .slideY(begin: 0.2, end: 0),
-            _buildCustomQuestions(context: context).animate()
-                  .fadeIn(duration: 400.ms)
-                  .slideY(begin: 0.2, end: 0)
+            ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.2, end: 0),
+            _basicDetails(theme: theme, context: context)
+                .animate()
+                .fadeIn(duration: 400.ms)
+                .slideY(begin: 0.2, end: 0),
+            _proffesionalDetails(context: context)
+                .animate()
+                .fadeIn(duration: 400.ms)
+                .slideY(begin: 0.2, end: 0),
+            _buildAdditionalInfo(context: context)
+                .animate()
+                .fadeIn(duration: 400.ms)
+                .slideY(begin: 0.2, end: 0),
+            _buildCustomQuestions(context: context)
+                .animate()
+                .fadeIn(duration: 400.ms)
+                .slideY(begin: 0.2, end: 0)
           ],
         ),
       ),
@@ -121,7 +124,6 @@ class JobDetailsWidget extends StatelessWidget {
                 ? _buildSkillWidget(
                     theme: theme, skills: jobData.skills!, context: context)
                 : const SizedBox.shrink(),
-                
           ],
         ),
       ),
@@ -254,7 +256,9 @@ class JobDetailsWidget extends StatelessWidget {
                 Text(jobData.description.toString(),
                     style: AppTheme.mediumTitleText(
                       lightTextColor,
-                    ).copyWith()),
+                    ).copyWith(
+                      fontSize: 12.sp,
+                    )),
                 SizedBox(
                   height: 5.h,
                 ),
@@ -387,13 +391,13 @@ class JobDetailsWidget extends StatelessWidget {
         // spacing: 10,
         children: [
           Text(
-            "Custom Questions",
+            "Questions",
             style: Theme.of(context)
                 .textTheme
                 .titleMedium!
                 .copyWith(fontWeight: FontWeight.bold),
           ),
-          Text("Empty"),
+          Text("No questions to this job"),
         ],
       );
     }
@@ -402,6 +406,9 @@ class JobDetailsWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       // spacing: 10,
       children: [
+        const SizedBox(
+          height: 10,
+        ),
         Text(
           "Custom Questions",
           style: Theme.of(context)
@@ -426,52 +433,13 @@ class JobDetailsWidget extends StatelessWidget {
                   child: Text(
                     CustomFunctions.toSentenceCase(question),
                     style: theme.textTheme.bodyMedium!.copyWith(
-                        fontWeight: FontWeight.normal, fontSize: 14.sp),
+                        fontWeight: FontWeight.normal, fontSize: 12.sp),
                   ),
                 )
               ],
             );
           }),
         ),
-        Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(15.r),
-            ),
-            child: jobData.customQuestions != null
-                ? Column(
-                    children:
-                        List.generate(jobData.customQuestions!.length, (index) {
-                      return Row(
-                        children: [
-                          Text("${index + 1} "),
-                          Text("${jobData.customQuestions![index]}")
-                        ],
-                      );
-                    }),
-                  )
-                : Container(
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(color: borderColor),
-                        borderRadius: BorderRadius.circular(15.r)),
-                    child: Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "No questions to this job",
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium!
-                                .copyWith(color: greyTextColor),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ))
       ],
     );
   }

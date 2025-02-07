@@ -56,7 +56,8 @@ class _RecentlyAddedJobsListsState extends State<RecentlyAddedJobsLists> {
           children: [
             InkWell(
                 onTap: () {
-                  Navigator.push(context, AnimatedNavigation().fadeAnimation(AllJobs()));
+                  Navigator.push(
+                      context, AnimatedNavigation().fadeAnimation(AllJobs()));
                   // final state = context.read<JobBloc>().state;
                   // print("Attempting to navigate... Current state: $state");
 
@@ -80,29 +81,27 @@ class _RecentlyAddedJobsListsState extends State<RecentlyAddedJobsLists> {
           ],
         ),
 
+        const SizedBox(
+          height: 20,
+        ),
+
         Consumer<JobPostingProvider>(builder: (context, provider, child) {
           if (provider.jobLists != null) {
-            return SizedBox(
-              height: 290.h,
-              child: ListView.separated(
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemBuilder: (context, index) {
-                    final job = provider.jobLists![index];
-                    final borderColor =
-                        index.isEven ? buttonColor : secondaryColor;
-                    return JobCardWidget(
-                      job: job,
-                      borderColor: borderColor,
-                    );
-                  },
-                  separatorBuilder: (context, index) {
-                    return const SizedBox(
-                      height: 10,
-                    );
-                  },
-                  itemCount: provider.jobLists!.length
-                  // state.jobs.length >= 3 ? 3 : state.jobs.length
+            return Column(
+              children: List.generate(
+                  provider.jobLists!.length >= 3
+                      ? 3
+                      : provider.jobLists!.length, (index) {
+                final job = provider.jobLists![index];
+                final borderColor = index.isEven ? buttonColor : secondaryColor;
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 15),
+                  child: JobCardWidget(
+                    job: job,
+                    borderColor: borderColor,
                   ),
+                );
+              }),
             );
           } else {
             return CommonErrorWidget();
