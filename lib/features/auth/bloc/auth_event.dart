@@ -10,6 +10,8 @@ class RegisterEvent extends AuthEvent {
   final String password;
   final String role;
   final bool whatsappUpdations;
+  final int planId;
+  final String transactionId;
 
   RegisterEvent(
       {required this.companyName,
@@ -17,7 +19,9 @@ class RegisterEvent extends AuthEvent {
       required this.email,
       required this.password,
       required this.role,
-      required this.whatsappUpdations});
+      required this.whatsappUpdations,
+      required this.planId,
+      required this.transactionId});
   @override
   List<Object?> get props =>
       [companyName, email, contactNumber, password, role, whatsappUpdations];

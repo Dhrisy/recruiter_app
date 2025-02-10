@@ -1,7 +1,5 @@
 
 
-import 'package:recruiter_app/core/utils/custom_functions.dart';
-
 class AccountData {
   final int ? id;
   final String ? name;
@@ -62,8 +60,4 @@ class AccountData {
 
     );
   }
-
-
- 
-
 }

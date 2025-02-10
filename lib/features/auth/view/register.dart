@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -17,7 +17,8 @@ import 'package:recruiter_app/widgets/reusable_button.dart';
 import 'package:recruiter_app/widgets/reusable_textfield.dart';
 
 class Register extends StatefulWidget {
-  const Register({Key? key}) : super(key: key);
+  final int? planId;
+  const Register({Key? key, this.planId}) : super(key: key);
 
   @override
   _RegisterState createState() => _RegisterState();
@@ -79,6 +80,7 @@ class _RegisterState extends State<Register> {
                     children: [
                       _buildRegisterModule(context, theme),
                       OtpScreen(
+                        planId: widget.planId,
                         isRegistering: true,
                         phone: _phnCont.text,
                         controller: _pageController,
@@ -302,13 +304,17 @@ class _RegisterState extends State<Register> {
 
                           if (_registerFormKey.currentState!.validate() &&
                               isEqual == true) {
-                            context.read<AuthBloc>().add(RegisterEvent(
+                           if(widget.planId != null){
+                             context.read<AuthBloc>().add(RegisterEvent(
+                              planId: widget.planId!,
+                              transactionId: "demo",
                                 companyName: _nameCont.text,
                                 contactNumber: _phnCont.text,
                                 email: _emailCont.text,
                                 password: _pwCont.text,
                                 role: "recruiter",
                                 whatsappUpdations: _whatsapp_updations));
+                           }
 
                           }
 

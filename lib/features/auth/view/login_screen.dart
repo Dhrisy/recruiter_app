@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,6 +15,8 @@ import 'package:recruiter_app/features/auth/provider/login_provider.dart';
 import 'package:recruiter_app/features/auth/view/otp_screen.dart';
 import 'package:recruiter_app/features/auth/view/register.dart';
 import 'package:recruiter_app/features/auth/view/welcome_screen.dart';
+import 'package:recruiter_app/features/home/viewmodel/home_provider.dart';
+import 'package:recruiter_app/features/plans/plans_screen.dart';
 import 'package:recruiter_app/widgets/common_snackbar.dart';
 import 'package:recruiter_app/widgets/reusable_button.dart';
 import 'package:recruiter_app/widgets/reusable_textfield.dart';
@@ -303,19 +304,27 @@ class _LoginScreenState extends State<LoginScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text("Don't you have an account? "),
-                          InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    AnimatedNavigation()
-                                        .slideAnimation(Register()));
-                              },
-                              child: Text(
-                                "Sign up",
-                                style: theme.textTheme.bodyMedium!.copyWith(
-                                    color: buttonColor,
-                                    fontWeight: FontWeight.w600),
-                              ))
+                          Consumer<LoginProvider>(
+                              builder: (context, provider, child) {
+                            return InkWell(
+                                onTap: () async {
+                                  Navigator.push(
+                                      context,
+                                      AnimatedNavigation()
+                                          .fadeAnimation(PlansScreen()));
+
+                                  // Navigator.push(
+                                  //     context,
+                                  //     AnimatedNavigation()
+                                  //         .slideAnimation(Register()));
+                                },
+                                child: Text(
+                                  "Sign up",
+                                  style: theme.textTheme.bodyMedium!.copyWith(
+                                      color: buttonColor,
+                                      fontWeight: FontWeight.w600),
+                                ));
+                          })
                         ],
                       )
                     ],
@@ -424,7 +433,8 @@ class _ForgotPassWordState extends State<ForgotPassWord> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               SizedBox(
-                                height: MediaQuery.of(context).size.height * 0.1,
+                                height:
+                                    MediaQuery.of(context).size.height * 0.1,
                               ),
                               Row(
                                 children: [
@@ -441,7 +451,8 @@ class _ForgotPassWordState extends State<ForgotPassWord> {
                                   Text(
                                     "Forgot password",
                                     style: GoogleFonts.beVietnamPro(
-                                        fontSize: 23.sp, fontWeight: FontWeight.bold),
+                                        fontSize: 23.sp,
+                                        fontWeight: FontWeight.bold),
                                   ),
                                 ],
                               ),
@@ -456,16 +467,20 @@ class _ForgotPassWordState extends State<ForgotPassWord> {
                                           labelText: "Phone number",
                                           hintText: "Enter your phone",
                                           validation: (_) {
-                                            if (_phnController.text.trim().isEmpty) {
+                                            if (_phnController.text
+                                                .trim()
+                                                .isEmpty) {
                                               return "This field is required";
                                             }
                                             return null;
                                           },
                                         ),
                                         const Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
                                           children: [
-                                            Text("An OTP will be sent to your phone"),
+                                            Text(
+                                                "An OTP will be sent to your phone"),
                                           ],
                                         ),
                                         const SizedBox(
@@ -487,8 +502,9 @@ class _ForgotPassWordState extends State<ForgotPassWord> {
                                         ),
                                         InkWell(
                                             onTap: () async {
-                                              await provider.forgotPasswordGetOtp(
-                                                  phn: _phnController.text);
+                                              await provider
+                                                  .forgotPasswordGetOtp(
+                                                      phn: _phnController.text);
                                             },
                                             child: const Text("Resend")),
                                         _buildCreateNewPassword(
@@ -515,41 +531,40 @@ class _ForgotPassWordState extends State<ForgotPassWord> {
                                     password: _passwordCont.text,
                                     phone: _phnController.text,
                                     otp: _otpController.text);
-                        
+
                                 if (result == "success") {
                                   print("success");
                                   Navigator.pop(context);
-                                  CommonSnackbar.show(
-                                    context,
-                                        message: "Password changed successfully!"
-                                  );
+                                  CommonSnackbar.show(context,
+                                      message:
+                                          "Password changed successfully!");
                                 } else {
-                                  CommonSnackbar.show(
-                                    context,
-                                        message: "Something went wrong"
-                                  );
+                                  CommonSnackbar.show(context,
+                                      message: "Something went wrong");
                                 }
                               } else {
                                 if (_forgotPwFormKey.currentState!.validate()) {
-                                  final result = await provider.forgotPasswordGetOtp(
-                                      phn: _phnController.text);
-                        
+                                  final result =
+                                      await provider.forgotPasswordGetOtp(
+                                          phn: _phnController.text);
+
                                   if (result == "success") {
                                     CommonSnackbar.show(context,
-                                        message: "OTP sent to your mobile number");
+                                        message:
+                                            "OTP sent to your mobile number");
                                   } else {
                                     CommonSnackbar.show(context,
                                         message: result.toString());
                                   }
                                 }
                               }
-                        
+
                               //   if (_forgotPwFormKey.currentState!.validate()) {
                               //     context.read<AuthBloc>().add(
                               //         ForgotPasswordEvent(
                               //             phone: _phnController.text.trim()));
                               //   }
-                        
+
                               //   setState(() {
                               //     _isOtp = false;
                               //   });
@@ -572,7 +587,7 @@ class _ForgotPassWordState extends State<ForgotPassWord> {
         }),
       ),
     );
-    }
+  }
 
   Widget _buildCreateNewPassword(
       {required BuildContext context, required ThemeData theme}) {
