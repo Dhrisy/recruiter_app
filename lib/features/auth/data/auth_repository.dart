@@ -291,11 +291,29 @@ class AuthRepository {
 
   Future<Map<String, dynamic>?>  fetchAllRecruiterPlans() async{
     try {
-      final response = await PlansService.fetchPlans();
+      final response = await PlanService().fetchRecruiterPlans();
       print("response of fetch all recruiter plans ${response.statusCode},  ${response.body}");
+      if(response.statusCode == 200){
+        final List<dynamic> responseData = jsonDecode(response.body);
+
+        List<PlanModel> planLists = responseData.map((item)
+        => PlanModel.fromJson(item)).toList();
+
+        return {
+          "plans": planLists,
+          "message": "success"
+        };
+      }else{
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        return {
+          "plans": null,
+          "message": responseData["message"]
+        };
+      }
+     
 
     } catch (e) {
-      
+      return null;
     }
   }
 }

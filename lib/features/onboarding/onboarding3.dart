@@ -24,7 +24,7 @@ class Onboarding3 extends StatelessWidget {
         children: [
           SizedBox(
                               width: double.infinity,
-                              height: screenHeight * 0.5,
+                              height: screenHeight * 0.45,
                               child: SvgPicture.asset(
                                 "assets/svgs/onboard_3.svg",
                                 fit: BoxFit.cover,

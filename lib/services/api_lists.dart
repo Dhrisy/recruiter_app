@@ -56,6 +56,7 @@ class ApiLists {
 
     static String banners = "$baseUrl/common/banners";
      static String allPlansEndPoint = "$baseUrl/common/all_plans";
+     static String subscribeEndPoint = "$baseUrl/common/subscribe";
 
     static String allRecruiterPlansEndPoint = "$baseUrl/common/recruiter_plans";
 }

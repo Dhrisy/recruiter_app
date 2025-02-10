@@ -26,6 +26,7 @@ import 'package:recruiter_app/services/one_signal_service.dart';
 import 'package:recruiter_app/viewmodels/job_viewmodel.dart';
 import 'package:recruiter_app/widgets/common_alertdialogue.dart';
 import 'package:recruiter_app/widgets/profile_completion_card.dart';
+import 'package:recruiter_app/widgets/shimmer_widget.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -42,6 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int activeIndex = 0;
   String _name = 'Name';
   bool isHomeLoading = true;
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -69,7 +71,13 @@ class _HomeScreenState extends State<HomeScreen> {
         Provider.of<HomeProvider>(context, listen: false)
             .fetchRecruiterCounts();
         OneSignalService().oneSIgnalIdSetToApi();
-        Provider.of<HomeProvider>(context, listen: false).fetchBanners();
+        Provider.of<HomeProvider>(context, listen: false).fetchBanners().then((_){
+          if(mounted){
+            setState(() {
+              isLoading = false;
+            });
+          }
+        });
         Provider.of<AccountProvider>(context, listen: false).fetchAccountData();
       } else {
         print("errrrrrrrrrrrrrrrrrrrrrrrrrrrrrorrrrrrrrrrrrr");
@@ -391,6 +399,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
       return Column(
         children: [
+          isLoading == true
+          ? _buildBannerLoading() :
           CarouselSlider(
             carouselController: _carouselController,
             items: List.generate(provider.bannersLists!.length, (index) {
@@ -432,5 +442,39 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ).animate().fadeIn(duration: 500.ms).slideX(begin: -0.5, end: 0);
     });
+  }
+
+
+  Widget _buildBannerLoading() {
+
+     return  CarouselSlider(
+            carouselController: _carouselController,
+            items: List.generate(2, (index) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: ShimmerWidget(height: double.infinity, width: double.infinity,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.r)
+                ),),
+              );
+            }),
+            options: CarouselOptions(
+              onPageChanged: (index, reason) {
+                setState(() {
+                  activeIndex = index;
+                });
+              },
+              scrollDirection: Axis.horizontal,
+              height: 130.h,
+              viewportFraction: 1,
+              aspectRatio: 10 / 9,
+              autoPlay: true,
+              autoPlayCurve: Curves.linearToEaseOut,
+              animateToClosest: true,
+              autoPlayAnimationDuration: const Duration(milliseconds: 200),
+            ),
+          );
+         
+
   }
 }

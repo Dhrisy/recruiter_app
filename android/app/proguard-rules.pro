@@ -1,0 +1,2 @@
+-keep class * { fontFamily: *; }
+-keep class androidx.compose.ui.text.** { *; }

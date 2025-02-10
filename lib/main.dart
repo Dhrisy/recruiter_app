@@ -178,6 +178,7 @@ class _MyAppState extends State<MyApp> {
             builder: (context, state) {
               return MaterialApp(
                 title: 'Recruiter',
+                
                 debugShowCheckedModeBanner: false,
                 theme: state.isDarkMode
                     ? RecruiterAppTheme.darkTheme

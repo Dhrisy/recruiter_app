@@ -8,15 +8,15 @@ import 'package:recruiter_app/core/theme.dart';
 import 'package:recruiter_app/core/utils/app_theme_data.dart';
 import 'package:recruiter_app/features/plans/viewmodel/plan_provider.dart';
 import 'package:recruiter_app/features/plans/widgets/plan_card_widget.dart';
+import 'package:recruiter_app/features/settings/model/subscription_model.dart';
 import 'package:recruiter_app/widgets/common_appbar_widget.dart';
+import 'package:recruiter_app/widgets/shimmer_widget.dart';
 
 class PlansScreen extends StatefulWidget {
   final bool? fromSettings;
   final bool? isRegister;
-  const PlansScreen({Key? key, 
-  this.fromSettings,
-  this.isRegister
-  }) : super(key: key);
+  const PlansScreen({Key? key, this.fromSettings, this.isRegister})
+      : super(key: key);
 
   @override
   _PlansScreenState createState() => _PlansScreenState();
@@ -24,6 +24,7 @@ class PlansScreen extends StatefulWidget {
 
 class _PlansScreenState extends State<PlansScreen> {
   int _currentIndex = 0;
+  bool isLoading = true;
 
   final List<Map<String, dynamic>> _stdLists = [
     {
@@ -296,61 +297,48 @@ class _PlansScreenState extends State<PlansScreen> {
       resdexPlans.add(_resdexPremiumLists);
     });
 
-    WidgetsBinding.instance.addPostFrameCallback((_){
-Provider.of<PlanProvider>(context, listen: false).fetchAllRecruiterPlans();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final result = await Provider.of<PlanProvider>(context, listen: false)
+          .fetchPlans()
+          .then((_) {
+        if (mounted) {
+          setState(() {
+            isLoading = false;
+          });
+        }
+      });
     });
-
   }
 
   @override
   Widget build(BuildContext context) {
-    print("pppppppp");
     final theme = Theme.of(context);
-    final _themeBloc = context.read<AppThemeDataBloc>();
     return Material(
       child: SafeArea(
         child: Scaffold(
           body: DefaultTabController(
-            length: 2, // Number of tabs
+            length: 2,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const SizedBox(
-                  height: 10,
-                ),
+                const SizedBox(height: 10),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 15),
                   child: widget.fromSettings == true
-                      ? Expanded(
+                      ? const Expanded(
                           child: CommonAppbarWidget(
                               isBackArrow: true, title: "Plans Screen"))
-                      : Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              "Planning prices",
-                              style: theme.textTheme.headlineMedium,
-                            ),
-                          ],
-                        ),
+                      : Text("Planning prices",
+                          style: theme.textTheme.headlineMedium),
                 ),
-                Text(
-                  "Hire skilled candidates for your business",
-                  style: theme.textTheme.bodyMedium!
-                      .copyWith(color: greyTextColor),
-                ),
+                Text("Hire skilled candidates for your business",
+                    style: theme.textTheme.bodyMedium!
+                        .copyWith(color: greyTextColor)),
                 const SizedBox(height: 20),
                 TabBar(
                   dividerColor: Colors.transparent,
                   indicatorSize: TabBarIndicatorSize.tab,
-                  tabs: const [
-                    Tab(
-                      text: "Job Posting",
-                    ),
-                    Tab(
-                      text: "Resdex",
-                    ),
-                  ],
+                  tabs: const [Tab(text: "Job Posting"), Tab(text: "Resdex")],
                   labelColor: _themeBloc.state.isDarkMode
                       ? darkTextColor
                       : lightTextColor,
@@ -360,7 +348,15 @@ Provider.of<PlanProvider>(context, listen: false).fetchAllRecruiterPlans();
                 ),
                 Expanded(
                   child: TabBarView(
-                    children: [_buildJobPostingPlan(), _buildResdexPlan()],
+                    children: [
+                      isLoading == true
+                          ? _buildLodingShimmer()
+                          : _buildPlanView(false),
+                      // _buildPlanView(false), // Job Posting plans
+                      isLoading == true
+                          ? _buildLodingShimmer()
+                          : _buildPlanView(true), // Resdex plans
+                    ],
                   ),
                 ),
               ],
@@ -371,69 +367,106 @@ Provider.of<PlanProvider>(context, listen: false).fetchAllRecruiterPlans();
     );
   }
 
-  Widget _buildJobPostingPlan() {
-    return Center(
-      child: CarouselSlider(
-        items: List.generate(
-          jobPostingPlans.length,
-          (index) => AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: _currentIndex == index ? secondaryColor : buttonColor,
-              borderRadius: BorderRadius.circular(20.r),
-            ),
-            child: PlanCardWidget(
-              lists: jobPostingPlans[index],
+  Widget _buildPlanView(bool isResdex) {
+    return Consumer<PlanProvider>(
+      builder: (context, planProvider, child) {
+        if (planProvider.isLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (planProvider.error != null) {
+          return Center(child: Text('Error: ${planProvider.error}'));
+        }
+
+        final plans = planProvider.getPlansByType(isResdex);
+
+        List<String> features = isResdex
+            ? [
+                "100 CV views per requirement",
+                "Up to 500 search results",
+                "Candidates active in last 6 months",
+                "10+ advanced filters",
+                "Single user access",
+                "Download CVs in bulk",
+                "Keyword search",
+                "Create an email template to invite a candidate"
+              ]
+            : [
+                "Upto 250 character job description",
+                "1 job location",
+                "200 applies",
+                "Applies expiry 30 days",
+                "1 job location",
+                "Jobseeker contact details are visible",
+                "Boost on Job Search Page",
+                "Job Branding"
+              ];
+
+        return Center(
+          child: CarouselSlider.builder(
+            itemCount: plans.length,
+            itemBuilder: (context, index, realIndex) {
+              List<Map<String, dynamic>> planFeatures = List.generate(
+                  features.length,
+                  (i) => {
+                        "title": features[i],
+                        "is_applicable": true,
+                        "plan_name": plans[index].title,
+                        "rupees": plans[index].rate.toString()
+                      });
+
+              return _buildPlanCard(planFeatures, plans[index], index);
+            },
+            options: CarouselOptions(
+              aspectRatio: 2 / 3,
+              enlargeCenterPage: true,
+              autoPlay: false,
+              onPageChanged: (index, reason) {
+                // Move the setState to a post-frame callback
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  setState(() => _currentIndex = index);
+                });
+              },
             ),
           ),
-        ),
-        options: CarouselOptions(
-          aspectRatio: 2 / 3,
-          enlargeCenterPage: true,
-          autoPlay: false,
-          autoPlayInterval: const Duration(seconds: 3),
-          autoPlayAnimationDuration: const Duration(milliseconds: 800),
-          autoPlayCurve: Curves.fastOutSlowIn,
-          onPageChanged: (index, reason) {
-            setState(() {
-              _currentIndex = index;
-            });
-          },
-        ),
+        );
+      },
+    );
+  }
+
+  Widget _buildPlanCard(
+      List<Map<String, dynamic>> features, PlanModel plan, int index) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: _currentIndex == index ? secondaryColor : buttonColor,
+        borderRadius: BorderRadius.circular(20.r),
+      ),
+      child: PlanCardWidget(
+        plan: plan,
+        lists: features,
+        fromSettings: widget.fromSettings,
       ),
     );
   }
 
-  Widget _buildResdexPlan() {
+  Widget _buildLodingShimmer() {
     return Center(
-      child: CarouselSlider(
-        items: List.generate(
-          resdexPlans.length,
-          (index) => AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
+      child: CarouselSlider.builder(
+        itemCount: 3,
+        itemBuilder: (context, index, realIndex) {
+          return ShimmerWidget(
             width: double.infinity,
-            decoration: BoxDecoration(
-              color: _currentIndex == index ? secondaryColor : buttonColor,
-              borderRadius: BorderRadius.circular(20.r),
-            ),
-            child: PlanCardWidget(
-              lists: resdexPlans[index],
-            ),
-          ),
-        ),
+            height: double.infinity,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.r)),
+          );
+        },
         options: CarouselOptions(
           aspectRatio: 2 / 3,
           enlargeCenterPage: true,
           autoPlay: false,
-          autoPlayInterval: const Duration(seconds: 3),
-          autoPlayAnimationDuration: const Duration(milliseconds: 800),
-          autoPlayCurve: Curves.fastOutSlowIn,
-          onPageChanged: (index, reason) {
-            setState(() {
-              _currentIndex = index;
-            });
-          },
         ),
       ),
     );

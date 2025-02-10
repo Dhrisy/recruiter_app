@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:provider/provider.dart';
 import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/core/utils/navigation_animation.dart';
 import 'package:recruiter_app/features/auth/bloc/auth_bloc.dart';
@@ -14,6 +15,7 @@ import 'package:recruiter_app/features/auth/bloc/auth_event.dart';
 import 'package:recruiter_app/features/auth/bloc/auth_state.dart';
 import 'package:recruiter_app/features/auth/view/welcome_screen.dart';
 import 'package:recruiter_app/features/navbar/view/navbar.dart';
+import 'package:recruiter_app/features/plans/viewmodel/plan_provider.dart';
 import 'package:recruiter_app/features/questionaires/view/questionaire1.dart';
 import 'package:recruiter_app/widgets/common_snackbar.dart';
 import 'package:recruiter_app/widgets/reusable_button.dart';
@@ -23,8 +25,14 @@ class OtpScreen extends StatefulWidget {
   final String? phone;
   final String? email;
   final bool isRegistering;
-  const OtpScreen({Key? key, this.controller, this.phone, this.email,
-  required this.isRegistering})
+  final int? planId;
+  const OtpScreen(
+      {Key? key,
+      this.controller,
+      this.phone,
+      this.email,
+      this.planId,
+      required this.isRegistering})
       : super(key: key);
 
   @override
@@ -191,11 +199,12 @@ class _OtpScreenState extends State<OtpScreen> {
                       Navigator.push(context,
                           AnimatedNavigation().fadeAnimation(Questionaire1()));
                     });
-                  }else if(state is OtpVerified && widget.isRegistering == false){
-                     Navigator.push(context,
-                          AnimatedNavigation().fadeAnimation(WelcomeScreen()));
+                  } else if (state is OtpVerified &&
+                      widget.isRegistering == false) {
+                    Navigator.push(context,
+                        AnimatedNavigation().fadeAnimation(WelcomeScreen()));
                   }
-      
+
                   if (state is OtpVerifiedFailed) {
                     CommonSnackbar.show(context, message: state.error);
                   }
@@ -207,16 +216,28 @@ class _OtpScreenState extends State<OtpScreen> {
                       child: ReusableButton(
                         action: () async {
                           if (_otpFormKey.currentState!.validate()) {
-                            if (widget.phone != null) {
-                              context.read<AuthBloc>().add(MobileOtpVerifyEvent(
-                                  phone: widget.phone!, otp: _otpCont.text));
+                            if (widget.phone != null && widget.planId != null) {
+                              final result = await Provider.of<PlanProvider>(
+                                      context,
+                                      listen: false)
+                                  .subscribePlan(
+                                      planId: widget.planId!,
+                                      phone: widget.phone!,
+                                      transactionId: "transactionId");
+
+                              if (result == "success") {
+                                context.read<AuthBloc>().add(
+                                    MobileOtpVerifyEvent(
+                                        phone: widget.phone!,
+                                        otp: _otpCont.text));
+                              }
                             } else if (widget.email != null) {
-                              context
-                                  .read<AuthBloc>()
-                                  .add(EmailOtpVerifyEVent(otp: _otpCont.text, email: widget.email.toString()));
+                              context.read<AuthBloc>().add(EmailOtpVerifyEVent(
+                                  otp: _otpCont.text,
+                                  email: widget.email.toString()));
                             }
                           }
-      
+
                           // _showAlertDialogue(context);
                           // Future.delayed(Duration(seconds: 1), (){
                           //   Navigator.push(context, AnimatedNavigation().fadeAnimation(Questionaire1()));
