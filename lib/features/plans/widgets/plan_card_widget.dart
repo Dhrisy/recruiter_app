@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:recruiter_app/core/constants.dart';
+import 'package:recruiter_app/core/theme.dart';
 import 'package:recruiter_app/core/utils/navigation_animation.dart';
 import 'package:recruiter_app/features/auth/view/login_screen.dart';
 import 'package:recruiter_app/features/auth/view/register.dart';
@@ -37,13 +38,11 @@ class PlanCardWidget extends StatelessWidget {
                     children: [
                       Text(
                         plan.title,
-                        style: theme.textTheme.headlineMedium!
-                            .copyWith(color: Colors.white),
+                        style: AppTheme.headingLarge(Colors.white),
                       ),
                       Text(
                         '₹ ${plan.rate}',
-                        style: theme.textTheme.headlineMedium!
-                            .copyWith(color: Colors.white),
+                        style: AppTheme.headingLarge(Colors.white),
                       ),
                     ],
                   ),
@@ -52,8 +51,7 @@ class PlanCardWidget extends StatelessWidget {
                     children: [
                       Text(
                         "KEY FEATURES",
-                        style: theme.textTheme.titleLarge!
-                            .copyWith(fontSize: 15.sp, color: greyTextColor),
+                        style: AppTheme.mediumTitleText(Colors.white),
                       ),
                     ],
                   ),
@@ -109,8 +107,7 @@ class PlanCardWidget extends StatelessWidget {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(features[index]!,
-                    style: theme.textTheme.bodyMedium!
-                        .copyWith(fontSize: 13.sp, color: Colors.white)),
+                    style: AppTheme.bodyText(Colors.white)),
               )
             ],
           ),

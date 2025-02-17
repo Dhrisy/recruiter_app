@@ -253,7 +253,7 @@ class Onboarding1 extends StatelessWidget {
                                             right: 0, top: 0),
                                         child: Text(
                                           "Skip",
-                                          // style: theme.textTheme.bodyMedium,
+                                          style: AppTheme.bodyText(lightTextColor),
                                         ),
                                       ),
                                     )
@@ -289,13 +289,13 @@ class Onboarding1 extends StatelessWidget {
                     children: [
                       Text(
                         'Find the perfect candidates for your team effortlessly',
-                        style: theme.textTheme.headlineMedium,
+                        style: AppTheme.headingText(lightTextColor).copyWith(fontWeight: FontWeight.bold),
                         textAlign: TextAlign.center,
                       ),
                       SizedBox(height: 20.h),
                       Text(
                         'A one-stop platform for connecting with top talent, streamlining hiring processes, and building exceptional teams',
-                        style: theme.textTheme.bodyMedium,
+                        style: AppTheme.bodyText(lightTextColor),
                         textAlign: TextAlign.center,
                       ),
                     ],

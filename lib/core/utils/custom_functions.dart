@@ -1,5 +1,8 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:recruiter_app/services/api_lists.dart';
+import 'package:recruiter_app/widgets/common_snackbar.dart';
 import 'package:share_plus/share_plus.dart';
 
 class CustomFunctions {
@@ -78,6 +81,35 @@ class CustomFunctions {
     } catch (e) {
       return 'N/A';
     }
+  }
+
+/// Checks for internet connection before making API calls
+  static Future<bool> checkInternetConnection() async {
+    var connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult.contains(ConnectivityResult.none)) {
+      return false; // No internet
+    }
+    return true; // Internet available
+  }
+
+
+
+static void showNoInternetPopup(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("No Internet Connection"),
+          content: const Text("Please check your internet connection and try again."),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
   }
 
 }

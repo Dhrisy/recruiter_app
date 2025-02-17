@@ -1,3 +1,5 @@
+import 'dart:io';
+
 abstract class Questionaireevent {}
 
 @override
@@ -17,6 +19,7 @@ class QuestionaireSubmitEvent extends Questionaireevent{
   final String mobilePhn;
   final String? landline;
   final String designation;
+  final File? logo;
 
 
   QuestionaireSubmitEvent({
@@ -31,7 +34,8 @@ class QuestionaireSubmitEvent extends Questionaireevent{
     required this.industry,
     required this.mobilePhn,
     required this.postalCode,
-    required this.website
+    required this.website,
+   required  this.logo,
   });
 
   List<Object?> get props => [
@@ -45,6 +49,7 @@ class QuestionaireSubmitEvent extends Questionaireevent{
     industry,
     mobilePhn,
     postalCode,
-    website
+    website,
+    logo, landline
   ];
 }

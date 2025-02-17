@@ -62,7 +62,7 @@ class Onboarding3 extends StatelessWidget {
                                             const EdgeInsets.only(left: 8, top: 8),
                                         child: Text(
                                           "Back",
-                                          style: theme.textTheme.bodyMedium,
+                                          style:AppTheme.bodyText(lightTextColor)
                                         ),
                                       ),
                                     ),
@@ -77,7 +77,7 @@ class Onboarding3 extends StatelessWidget {
                                             const EdgeInsets.only(right: 0, top: 8),
                                         child: Text(
                                           "Skip",
-                                          style: theme.textTheme.bodyMedium,
+                                          style: AppTheme.bodyText(lightTextColor)
                                         ),
                                       ),
                                     )
@@ -112,13 +112,13 @@ class Onboarding3 extends StatelessWidget {
                           children: [
                             Text(
                               'Your hiring journey starts here',
-                              style:theme.textTheme.headlineMedium,
+                              style:AppTheme.headingText(lightTextColor),
                               textAlign: TextAlign.center,
                             ),
                             SizedBox(height: 20.h),
                             Text(
                               'Streamline your hiring process by connecting with qualified candidates and making better hiring decisions with ease',
-                              style: theme.textTheme.bodyMedium,
+                              style: AppTheme.bodyText(lightTextColor),
                               textAlign: TextAlign.center,
                             ),
                           ],

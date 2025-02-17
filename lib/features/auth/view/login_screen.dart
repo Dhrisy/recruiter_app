@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:provider/provider.dart';
 import 'package:recruiter_app/core/constants.dart';
+import 'package:recruiter_app/core/theme.dart';
 import 'package:recruiter_app/core/utils/navigation_animation.dart';
 import 'package:recruiter_app/features/auth/bloc/auth_bloc.dart';
 import 'package:recruiter_app/features/auth/bloc/auth_event.dart';
@@ -82,7 +83,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Material(
         child: Scaffold(
       body: Container(
@@ -109,7 +109,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: PageView(
                       controller: _pageController,
                       children: [
-                        _buildLogin(theme: theme),
+                        _buildLogin(),
                       ],
                     ),
                   ),
@@ -172,7 +172,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildLogin({required ThemeData theme}) {
+  Widget _buildLogin() {
     return SizedBox(
       // color: Colors.green,
       height: double.infinity,
@@ -203,6 +203,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           ReusableTextfield(
                             controller: _emailCont,
+                            keyBoardType: TextInputType.emailAddress,
                             labelText: "Email",
                             hintText: "Email",
                             validation: (_) {
@@ -245,8 +246,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   },
                                   child: Text(
                                     "Forgot password?",
-                                    style: theme.textTheme.bodyMedium!
-                                        .copyWith(color: buttonColor),
+                                    style: AppTheme.bodyText(buttonColor).copyWith(),
                                   )),
                             ],
                           ),
@@ -287,6 +287,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         action: () {
                           if (_loginFormKey.currentState!.validate()) {
                             context.read<AuthBloc>().add(EmailLoginEvent(
+                              context: context,
                                 email: _emailCont.text,
                                 password: _pwCont.text));
                           } else {
@@ -303,7 +304,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text("Don't you have an account? "),
+                          Text("Don't you have an account? ", 
+                          style:AppTheme.bodyText(lightTextColor).copyWith(
+                                      ),),
                           Consumer<LoginProvider>(
                               builder: (context, provider, child) {
                             return InkWell(
@@ -320,7 +323,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 },
                                 child: Text(
                                   "Sign up",
-                                  style: theme.textTheme.bodyMedium!.copyWith(
+                                  style:AppTheme.bodyText(buttonColor).copyWith(
                                       color: buttonColor,
                                       fontWeight: FontWeight.w600),
                                 ));
@@ -350,8 +353,12 @@ class _LoginScreenState extends State<LoginScreen> {
       keyboardType: keyboardType,
       maxLines: 1,
       obscureText: !isVisisble,
+      style: AppTheme.bodyText(lightTextColor),
       decoration: InputDecoration(
         hintText: "",
+        labelStyle: AppTheme.bodyText(greyTextColor),
+        hintStyle: AppTheme.bodyText(greyTextColor),
+        errorStyle: AppTheme.bodyText(Colors.red),
         labelText: labelText,
         suffixIcon: InkWell(
             onTap: () {
@@ -414,7 +421,7 @@ class _ForgotPassWordState extends State<ForgotPassWord> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    // final theme = Theme.of(context);
     return Material(
       child: Scaffold(
         body: Consumer<LoginProvider>(builder: (context, provider, child) {
@@ -464,6 +471,7 @@ class _ForgotPassWordState extends State<ForgotPassWord> {
                                       children: [
                                         ReusableTextfield(
                                           controller: _phnController,
+                                          keyBoardType: TextInputType.phone,
                                           labelText: "Phone number",
                                           hintText: "Enter your phone",
                                           validation: (_) {
@@ -475,12 +483,13 @@ class _ForgotPassWordState extends State<ForgotPassWord> {
                                             return null;
                                           },
                                         ),
-                                        const Row(
+                                         Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.start,
                                           children: [
                                             Text(
-                                                "An OTP will be sent to your phone"),
+                                                "An OTP will be sent to your phone",
+                                                style: AppTheme.bodyText(greyTextColor),),
                                           ],
                                         ),
                                         const SizedBox(
@@ -497,18 +506,24 @@ class _ForgotPassWordState extends State<ForgotPassWord> {
                                         Text(
                                           "Enter the OTP which is sent to your phone number",
                                           textAlign: TextAlign.center,
-                                          style: theme.textTheme.bodySmall!
+                                          style: AppTheme.bodyText(greyTextColor)
                                               .copyWith(color: greyTextColor),
                                         ),
-                                        InkWell(
-                                            onTap: () async {
-                                              await provider
-                                                  .forgotPasswordGetOtp(
-                                                      phn: _phnController.text);
-                                            },
-                                            child: const Text("Resend")),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Text("Don't received yet? ", style: AppTheme.bodyText(greyTextColor),),
+                                            InkWell(
+                                                onTap: () async {
+                                                  await provider
+                                                      .forgotPasswordGetOtp(
+                                                          phn: _phnController.text);
+                                                },
+                                                child:  Text("Resend", style: AppTheme.bodyText(Colors.blue),)),
+                                          ],
+                                        ),
                                         _buildCreateNewPassword(
-                                            context: context, theme: theme),
+                                            context: context,),
                                         const SizedBox(
                                           height: 20,
                                         )
@@ -590,7 +605,7 @@ class _ForgotPassWordState extends State<ForgotPassWord> {
   }
 
   Widget _buildCreateNewPassword(
-      {required BuildContext context, required ThemeData theme}) {
+      {required BuildContext context}) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -629,7 +644,17 @@ class _ForgotPassWordState extends State<ForgotPassWord> {
                   }
                   return null;
                 },
+                onChanged: (value){
+                  if(_passwordCont.text != value){
+                    setState(() {
+                      isMatch =false;
+                    });
+                  }
+                },
               ),
+
+              isMatch == true? const SizedBox.shrink() : Text("Password doesn't match",
+              style: AppTheme.bodyText(Colors.red),),
               const SizedBox(
                 height: 15,
               ),
@@ -738,7 +763,7 @@ class ValidationCheckbox extends StatelessWidget {
             color: isValid ? Colors.green : Colors.grey,
           ),
           SizedBox(width: 8),
-          Text(title, style: Theme.of(context).textTheme.bodyMedium),
+          Text(title, style: AppTheme.bodyText(greyTextColor)),
         ],
       ),
     );

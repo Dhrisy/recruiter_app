@@ -9,10 +9,13 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:provider/provider.dart';
 import 'package:recruiter_app/core/constants.dart';
+import 'package:recruiter_app/core/theme.dart';
 import 'package:recruiter_app/core/utils/navigation_animation.dart';
 import 'package:recruiter_app/features/auth/bloc/auth_bloc.dart';
 import 'package:recruiter_app/features/auth/bloc/auth_event.dart';
 import 'package:recruiter_app/features/auth/bloc/auth_state.dart';
+import 'package:recruiter_app/features/auth/provider/login_provider.dart';
+import 'package:recruiter_app/features/auth/provider/register_provider.dart';
 import 'package:recruiter_app/features/auth/view/welcome_screen.dart';
 import 'package:recruiter_app/features/navbar/view/navbar.dart';
 import 'package:recruiter_app/features/plans/viewmodel/plan_provider.dart';
@@ -75,7 +78,6 @@ class _OtpScreenState extends State<OtpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Material(
       child: SafeArea(
         child: Container(
@@ -111,8 +113,7 @@ class _OtpScreenState extends State<OtpScreen> {
                             ),
                             Text(
                               "OTP Verification",
-                              style: theme.textTheme.headlineMedium!.copyWith(
-                                  fontWeight: FontWeight.bold, fontSize: 23.sp),
+                              style: AppTheme.headingText(lightTextColor),
                             ),
                           ],
                         ),
@@ -121,6 +122,8 @@ class _OtpScreenState extends State<OtpScreen> {
                         ),
                         Text(
                           "We have send a verification code to ${widget.phone != null ? "+91${widget.phone}" : widget.email != null ? "${widget.email}" : ""}",
+                          style: AppTheme.bodyText(lightTextColor).copyWith(fontSize: 12.sp
+                          ),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(
@@ -132,11 +135,11 @@ class _OtpScreenState extends State<OtpScreen> {
                             Text(
                               "Change ",
                               textAlign: TextAlign.center,
-                              style: theme.textTheme.bodyMedium!
-                                  .copyWith(color: buttonColor),
+                              style: AppTheme.bodyText(buttonColor)
                             ),
                             Text(
                               "number..?",
+                              style: AppTheme.bodyText(lightTextColor),
                               textAlign: TextAlign.center,
                             ),
                           ],
@@ -155,13 +158,12 @@ class _OtpScreenState extends State<OtpScreen> {
                               Text(
                                 "Resend OTP in ",
                                 textAlign: TextAlign.center,
-                                style: theme.textTheme.bodyMedium,
+                                style: AppTheme.bodyText(lightTextColor)
                               ),
                               Text(
                                 " 00:${_remainingTime.toString().padLeft(2, '0')}",
                                 textAlign: TextAlign.center,
-                                style: theme.textTheme.bodyMedium!
-                                    .copyWith(color: buttonColor),
+                                style: AppTheme.bodyText(buttonColor)
                               ),
                             ],
                           ),
@@ -172,15 +174,17 @@ class _OtpScreenState extends State<OtpScreen> {
                               Text(
                                 "Didn't receive code? Resend",
                                 textAlign: TextAlign.center,
-                                style: theme.textTheme.bodyMedium,
+                                style: AppTheme.bodyText(lightTextColor)
                               ),
                               InkWell(
-                                onTap: () {},
+                                onTap: () async{
+                                await  Provider.of<RegisterProvider>(context, listen: false).retryOTP(
+                                                          phn: widget.phone.toString());
+                                },
                                 child: Text(
                                   " OTP",
                                   textAlign: TextAlign.center,
-                                  style: theme.textTheme.bodyMedium!
-                                      .copyWith(color: buttonColor),
+                                  style: AppTheme.bodyText(buttonColor),
                                 ),
                               ),
                             ],
@@ -214,6 +218,7 @@ class _OtpScreenState extends State<OtpScreen> {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 20),
                       child: ReusableButton(
+                        isLoading: state is AuthLoading,
                         action: () async {
                           if (_otpFormKey.currentState!.validate()) {
                             if (widget.phone != null && widget.planId != null) {

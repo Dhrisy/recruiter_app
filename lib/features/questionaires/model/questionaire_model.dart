@@ -1,3 +1,5 @@
+import 'dart:io';
+
 class QuestionaireModel {
   final String website;
   final String about;
@@ -11,7 +13,7 @@ class QuestionaireModel {
   final String designation;
   final String? landlineNumber;
   final String contactPersonName;
-  final String? logo;
+  final File? logo;
 
 
   QuestionaireModel({

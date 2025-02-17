@@ -27,7 +27,7 @@ class AccountService {
         body: jsonEncode({
           "id": account.id,
           "name": account.name,
-          "logo":  account.logo,
+          // "logo":  account.logo,
           "about": account.about,
           "website": account.website,
           "functional_area": account.functionalArea,
@@ -52,6 +52,17 @@ class AccountService {
    static Future<http.Response> fetchRecruiterCounts() async {
     final token = await CustomFunctions().retrieveCredentials("access_token");
     final url = Uri.parse(ApiLists.recruiterCountsEndPoint);
+    final response = await http.get(url, headers: {
+      'Authorization': 'Bearer ${token.toString()}',
+    });
+
+    return response;
+  }
+
+
+  static Future<http.Response> fetchUserData() async {
+    final token = await CustomFunctions().retrieveCredentials("access_token");
+    final url = Uri.parse(ApiLists.editUser);
     final response = await http.get(url, headers: {
       'Authorization': 'Bearer ${token.toString()}',
     });

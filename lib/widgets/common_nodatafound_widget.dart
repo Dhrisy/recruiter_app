@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:recruiter_app/core/constants.dart';
+import 'package:recruiter_app/core/theme.dart';
 
 class CommonNodatafoundWidget extends StatelessWidget {
   const CommonNodatafoundWidget({Key? key}) : super(key: key);
@@ -20,10 +21,7 @@ class CommonNodatafoundWidget extends StatelessWidget {
           ),
           Text(
             "No results found",
-            style: Theme.of(context)
-                .textTheme
-                .titleLarge!
-                .copyWith(color: greyTextColor, fontSize: 14.sp),
+            style: AppTheme.bodyText(greyTextColor)
           )
         ],
       ),

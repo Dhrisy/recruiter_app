@@ -9,6 +9,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:recruiter_app/core/constants.dart';
+import 'package:recruiter_app/core/theme.dart';
 import 'package:recruiter_app/core/utils/app_theme_data.dart';
 import 'package:recruiter_app/core/utils/custom_functions.dart';
 import 'package:recruiter_app/core/utils/navigation_animation.dart';
@@ -71,8 +72,10 @@ class _HomeScreenState extends State<HomeScreen> {
         Provider.of<HomeProvider>(context, listen: false)
             .fetchRecruiterCounts();
         OneSignalService().oneSIgnalIdSetToApi();
-        Provider.of<HomeProvider>(context, listen: false).fetchBanners().then((_){
-          if(mounted){
+        Provider.of<HomeProvider>(context, listen: false)
+            .fetchBanners()
+            .then((_) {
+          if (mounted) {
             setState(() {
               isLoading = false;
             });
@@ -87,7 +90,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final _themeBloc = context.read<AppThemeDataBloc>();
     return Material(
       child: Scaffold(
@@ -115,7 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         fit: BoxFit.cover,
                       ),
                     ),
-                    _buildAppBarWidget(themeBloc: _themeBloc, theme: theme),
+                    _buildAppBarWidget(themeBloc: _themeBloc,),
                   ],
                 ),
               ),
@@ -139,8 +141,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         Text(
                           "Analytics",
-                          style: theme.textTheme.titleLarge!
-                              .copyWith(fontWeight: FontWeight.bold),
+                          style: AppTheme.titleText(lightTextColor).copyWith(
+                            fontWeight: FontWeight.bold
+                          ),
                         )
                       ],
                     ),
@@ -155,7 +158,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           spacing: 10,
                           children: [
                             _countContainer(
-                              theme: theme,
                               color: secondaryColor,
                               count: provider.countData != null
                                   ? provider.countData!.applicationCount
@@ -165,7 +167,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               subtitle: "Application",
                             ),
                             _countContainer(
-                              theme: theme,
+                              
                               color: buttonColor,
                               count: provider.countData != null
                                   ? provider.countData!.interviewScheduledCount
@@ -175,7 +177,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               subtitle: "Scheduled",
                             ),
                             _countContainer(
-                              theme: theme,
+                              
                               color: secondaryColor,
                               count: provider.countData != null
                                   ? provider.countData!.activeJobsCount
@@ -185,7 +187,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               subtitle: "Job Count",
                             ),
                             _countContainer(
-                              theme: theme,
+                             
                               color: buttonColor,
                               count: provider.countData != null
                                   ? provider.countData!.inactiveJobsCount
@@ -226,7 +228,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _countContainer({
-    required ThemeData theme,
+    
     required Color color,
     required String count,
     required String title,
@@ -238,7 +240,7 @@ class _HomeScreenState extends State<HomeScreen> {
       decoration: BoxDecoration(
           color: color, borderRadius: BorderRadius.circular(20.r)),
       child: _buildCountColumn(
-          count: count, title: title, subtitle: subtitle, theme: theme),
+          count: count, title: title, subtitle: subtitle,),
     ).animate().fadeIn(duration: 500.ms).scale();
   }
 
@@ -246,7 +248,7 @@ class _HomeScreenState extends State<HomeScreen> {
     required String count,
     required String title,
     required String subtitle,
-    required ThemeData theme,
+    
   }) {
     return Padding(
       padding: const EdgeInsets.all(10.0),
@@ -256,22 +258,24 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Text(
             count,
-            style: theme.textTheme.bodySmall!.copyWith(
+            style: AppTheme.mediumTitleText(Colors.white).copyWith(
                 fontSize: 15.sp,
                 fontWeight: FontWeight.bold,
                 color: Colors.white),
           ),
           Text(
             title,
-            style: theme.textTheme.bodySmall!
-                .copyWith(fontSize: 10.sp, color: Colors.white),
+            style: AppTheme.bodyText(Colors.white).copyWith(
+              fontSize: 11.sp
+            ),
           ),
           Expanded(
               child: Text(
             subtitle,
             overflow: TextOverflow.ellipsis,
-            style: theme.textTheme.bodySmall!
-                .copyWith(fontSize: 10.sp, color: Colors.white),
+            style: AppTheme.bodyText(Colors.white).copyWith(
+              fontSize: 10.sp
+            )
           ))
         ],
       ),
@@ -279,7 +283,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildAppBarWidget(
-      {required AppThemeDataBloc themeBloc, required ThemeData theme}) {
+      {required AppThemeDataBloc themeBloc}) {
     return Consumer<AccountProvider>(builder: (context, provider, child) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -310,13 +314,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         Text(
                           "Hello ${provider.accountData != null ? provider.accountData!.name : ""}",
-                          style: theme.textTheme.bodyLarge!.copyWith(
-                              color: Colors.white, fontWeight: FontWeight.bold),
+                          style: AppTheme.headingText(Colors.white)
+                              .copyWith(fontSize: 18.sp),
                         ).animate().fadeIn(duration: 500.ms).scale(),
                         Text(
                           "Begin your quest for discovery!",
-                          style: theme.textTheme.bodyMedium!
-                              .copyWith(color: Colors.white),
+                          style: AppTheme.bodyText(Colors.white)
+                              .copyWith(fontSize: 12.sp),
                         ).animate().fadeIn(duration: 600.ms).scale(),
                       ],
                     ),
@@ -400,31 +404,32 @@ class _HomeScreenState extends State<HomeScreen> {
       return Column(
         children: [
           isLoading == true
-          ? _buildBannerLoading() :
-          CarouselSlider(
-            carouselController: _carouselController,
-            items: List.generate(provider.bannersLists!.length, (index) {
-              final banner = provider.bannersLists![index];
-              return BannerWidget(
-                banner: banner,
-              );
-            }),
-            options: CarouselOptions(
-              onPageChanged: (index, reason) {
-                setState(() {
-                  activeIndex = index;
-                });
-              },
-              scrollDirection: Axis.horizontal,
-              height: 130.h,
-              viewportFraction: 1,
-              aspectRatio: 10 / 9,
-              autoPlay: true,
-              autoPlayCurve: Curves.linearToEaseOut,
-              animateToClosest: true,
-              autoPlayAnimationDuration: const Duration(milliseconds: 200),
-            ),
-          ),
+              ? _buildBannerLoading()
+              : CarouselSlider(
+                  carouselController: _carouselController,
+                  items: List.generate(provider.bannersLists!.length, (index) {
+                    final banner = provider.bannersLists![index];
+                    return BannerWidget(
+                      banner: banner,
+                    );
+                  }),
+                  options: CarouselOptions(
+                    onPageChanged: (index, reason) {
+                      setState(() {
+                        activeIndex = index;
+                      });
+                    },
+                    scrollDirection: Axis.horizontal,
+                    height: 130.h,
+                    viewportFraction: 1,
+                    aspectRatio: 10 / 9,
+                    autoPlay: true,
+                    autoPlayCurve: Curves.linearToEaseOut,
+                    animateToClosest: true,
+                    autoPlayAnimationDuration:
+                        const Duration(milliseconds: 200),
+                  ),
+                ),
           SizedBox(height: 10.h),
           AnimatedSmoothIndicator(
             activeIndex: activeIndex,
@@ -444,37 +449,35 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-
   Widget _buildBannerLoading() {
-
-     return  CarouselSlider(
-            carouselController: _carouselController,
-            items: List.generate(2, (index) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: ShimmerWidget(height: double.infinity, width: double.infinity,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15.r)
-                ),),
-              );
-            }),
-            options: CarouselOptions(
-              onPageChanged: (index, reason) {
-                setState(() {
-                  activeIndex = index;
-                });
-              },
-              scrollDirection: Axis.horizontal,
-              height: 130.h,
-              viewportFraction: 1,
-              aspectRatio: 10 / 9,
-              autoPlay: true,
-              autoPlayCurve: Curves.linearToEaseOut,
-              animateToClosest: true,
-              autoPlayAnimationDuration: const Duration(milliseconds: 200),
-            ),
-          );
-         
-
+    return CarouselSlider(
+      carouselController: _carouselController,
+      items: List.generate(2, (index) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: ShimmerWidget(
+            height: double.infinity,
+            width: double.infinity,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.r)),
+          ),
+        );
+      }),
+      options: CarouselOptions(
+        onPageChanged: (index, reason) {
+          setState(() {
+            activeIndex = index;
+          });
+        },
+        scrollDirection: Axis.horizontal,
+        height: 130.h,
+        viewportFraction: 1,
+        aspectRatio: 10 / 9,
+        autoPlay: true,
+        autoPlayCurve: Curves.linearToEaseOut,
+        animateToClosest: true,
+        autoPlayAnimationDuration: const Duration(milliseconds: 200),
+      ),
+    );
   }
 }

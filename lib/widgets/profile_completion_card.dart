@@ -34,6 +34,7 @@ class _ProfileCompletionCardState extends State<ProfileCompletionCard> {
         builder: (context, accountProvider, child) {
       return InkWell(
         onTap: () {
+          print(accountProvider.accountData);
           if (accountProvider.accountData != null) {
             Navigator.push(
                 context,
@@ -100,7 +101,7 @@ class _ProfileCompletionCardState extends State<ProfileCompletionCard> {
                     // restartAnimation: true,
                     center: Text(
                       provider.countData != null
-                          ? "${provider.countData!.profileCompletionPercentage}%"
+                          ? "${provider.countData!.profileCompletionPercentage.toStringAsFixed(2)}%"
                           : "0%",
                       style: theme.textTheme.bodyMedium!
                           .copyWith(color: Colors.white),

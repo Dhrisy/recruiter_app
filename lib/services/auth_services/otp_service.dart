@@ -31,5 +31,15 @@ class OtpService {
 
     return response;
   }
+ static Future<http.Response>  retryOtp({required String phone}) async{
+    final url = Uri.parse(ApiLists.mobileOtpRetryEndPoint);
+    final response = await http.post(url,
+    body: jsonEncode({
+      "phone": phone
+    }));
 
+    print("Response of retyr otp  ${response.statusCode},  ${response.body}");
+
+    return response;
+  }
 }

@@ -36,6 +36,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(AuthLoading());
       try {
         final success = await authRepository.emailLogin(
+          context: event.context,
             email: event.email, password: event.password);
 
         if (success == "success") {
@@ -60,7 +61,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(AuthLoading());
 
       try {
-        final response = await authRepository.getPhoneOtp(phone: event.phone);
+        final response = await authRepository.resendOTP(phone: event.phone);
 
         if (response != null && response == "success") {
           emit(GetOtpSuccess());

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:recruiter_app/core/constants.dart';
+import 'package:recruiter_app/core/theme.dart';
 
 class CommonAppbarWidget extends StatelessWidget {
   final String title;
@@ -50,7 +51,7 @@ class CommonAppbarWidget extends StatelessWidget {
                   child: Text(
                     title,
                     style:
-                        theme.textTheme.headlineMedium!.copyWith(fontSize: 20.sp),
+                        AppTheme.headingText(lightTextColor),
                   )
                       .animate()
                       .fadeIn(

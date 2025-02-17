@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:recruiter_app/core/constants.dart';
+import 'package:recruiter_app/core/theme.dart';
 import 'package:recruiter_app/features/home/viewmodel/home_provider.dart';
 
 class JobCreditMeter extends StatefulWidget {
@@ -30,8 +31,9 @@ class _JobCreditMeterState extends State<JobCreditMeter> {
         children: [
           Text(
             "Job posting credit meter",
-            style: theme.textTheme.titleLarge!
-                .copyWith(fontWeight: FontWeight.bold),
+            style: AppTheme.titleText(lightTextColor).copyWith(
+              fontWeight: FontWeight.bold
+            ),
           ),
           const SizedBox(
             height: 10,
@@ -80,7 +82,10 @@ class _JobCreditMeterState extends State<JobCreditMeter> {
                   const SizedBox(
                     height: 10,
                   ),
-                  Text("Here is a summary of your usage")
+                  Text("Here is a summary of your usage",
+                  style: AppTheme.bodyText(lightTextColor).copyWith(
+                    fontSize: 11.sp
+                  ),)
                 ],
               ),
             ),
@@ -104,7 +109,9 @@ class _JobCreditMeterState extends State<JobCreditMeter> {
         const SizedBox(
           width: 10,
         ),
-        Text("$title: $count")
+        Text("$title: $count", style: AppTheme.bodyText(lightTextColor).copyWith(
+          fontSize: 11.sp
+        ),)
       ],
     ).animate().fadeIn(duration: 500.ms).scale();
   }

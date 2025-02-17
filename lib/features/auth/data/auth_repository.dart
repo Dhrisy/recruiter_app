@@ -15,10 +15,9 @@ import 'package:recruiter_app/services/auth_services/otp_service.dart';
 import 'package:recruiter_app/services/auth_services/register_service.dart';
 import 'package:recruiter_app/services/plans/plans_service.dart';
 import 'package:recruiter_app/services/subscriptions/subscribe_service.dart';
+import 'package:recruiter_app/widgets/common_alertdialogue.dart';
 
 class AuthRepository {
-  final _secureStorage = const FlutterSecureStorage();
-
   Future<String?> register({
     required String companyName,
     required String email,
@@ -28,50 +27,62 @@ class AuthRepository {
     required bool whatsappUpdations,
   }) async {
     try {
+      bool hasInternet = await CustomFunctions.checkInternetConnection();
+      if (!hasInternet) {
+        return "Check your internet connection";
+      }
+
       final registerResponse = await RegisterService.register(
-          companyName: companyName,
-          email: email,
-          contactNumber: contactNumber,
-          password: password,
-          role: role,
-          whatsappUpdations: whatsappUpdations);
+        companyName: companyName,
+        email: email,
+        contactNumber: contactNumber,
+        password: password,
+        role: role,
+        whatsappUpdations: whatsappUpdations,
+      );
 
       print(
-          "Register response ${registerResponse.statusCode},  ${registerResponse.body}");
+          "Register response ${registerResponse.statusCode}, ${registerResponse.body}");
       final Map<String, dynamic> responseData =
           jsonDecode(registerResponse.body);
 
       if (registerResponse.statusCode == 201) {
         return "success";
-      } else if (responseData.containsKey("message") &&
-          responseData["message"] == "User already exists") {
+      } else if (responseData.containsKey("message")) {
         return responseData["message"];
+      } else {
+        return "An unexpected error occurred";
       }
-
-      // if (responseData.containsKey("message") &&
-      //     responseData["message"] == "User already exists") {
-      //   return responseData["message"];
-      // } else if (responseData.containsKey("access")) {
-      //   await _secureStorage.write(key: "access_token", value: responseData["access"]);
-      //   await _secureStorage.write(key: "refresh_token", value: responseData["refresh"]);
-
-      //   return "success";
-      // }
     } catch (e) {
-      log(e.toString());
-      return null;
+      print("Error during registration: $e");
+      return "An error occurred during registration";
     }
   }
 
-  Future<String?> emailLogin({
-    required String email,
-    required String password,
-  }) async {
+  Future<String?> emailLogin(
+      {required String email,
+      required String password,
+      required BuildContext context}) async {
     try {
+      bool hasInternet = await CustomFunctions.checkInternetConnection();
+      print(hasInternet);
+      if (!hasInternet) {
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return CommonAlertDialog(
+                  title: "Oops!",
+                  message: "Check your internet connection",
+                  onConfirm: () {},
+                  onlyConfirm: true,
+                  onCancel: () {},
+                  height: 200);
+            });
+      }
+
       final response = await LoginService.emailLoginService(
           email: email, password: password);
 
-      print("email login response  ${response.statusCode},   ${response.body}");
       final Map<String, dynamic> responseData = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
@@ -111,9 +122,9 @@ class AuthRepository {
     }
   }
 
-  Future<String?> getPhoneOtp({required String phone}) async {
+  Future<String?> resendOTP({required String phone}) async {
     try {
-      final response = await LoginService.retryOtp(phone: phone);
+      final response = await OtpService.retryOtp(phone: phone);
       print("Get otp auth ${response.statusCode}, ${response.body}");
       final Map<String, dynamic> responseData = jsonDecode(response.body);
 
@@ -130,6 +141,11 @@ class AuthRepository {
   Future<String?> mobileOtpVerify(
       {required String phone, required String otp}) async {
     try {
+      bool hasInternet = await CustomFunctions.checkInternetConnection();
+      if (!hasInternet) {
+        return "Check your internet connection";
+      }
+
       final response =
           await LoginService.mobileOtpVerify(phone: phone, otp: otp);
 
@@ -288,30 +304,22 @@ class AuthRepository {
     }
   }
 
-
-  Future<Map<String, dynamic>?>  fetchAllRecruiterPlans() async{
+  Future<Map<String, dynamic>?> fetchAllRecruiterPlans() async {
     try {
       final response = await PlanService().fetchRecruiterPlans();
-      print("response of fetch all recruiter plans ${response.statusCode},  ${response.body}");
-      if(response.statusCode == 200){
+      print(
+          "response of fetch all recruiter plans ${response.statusCode},  ${response.body}");
+      if (response.statusCode == 200) {
         final List<dynamic> responseData = jsonDecode(response.body);
 
-        List<PlanModel> planLists = responseData.map((item)
-        => PlanModel.fromJson(item)).toList();
+        List<PlanModel> planLists =
+            responseData.map((item) => PlanModel.fromJson(item)).toList();
 
-        return {
-          "plans": planLists,
-          "message": "success"
-        };
-      }else{
+        return {"plans": planLists, "message": "success"};
+      } else {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
-        return {
-          "plans": null,
-          "message": responseData["message"]
-        };
+        return {"plans": null, "message": responseData["message"]};
       }
-     
-
     } catch (e) {
       return null;
     }

@@ -15,20 +15,22 @@ class CommonAlertDialog extends StatelessWidget {
   final double? height;
   final bool isLoading;
   final String? subTitle;
+  final bool? onlyConfirm;
 
-  const CommonAlertDialog({
-    Key? key,
-   required this.title,
-   required this.message,
-    this.cancelButtonText = 'No',
-    this.confirmButtonText = 'Yes',
-    this.titleColor = Colors.red,
-    required this.onConfirm,
-    required this.onCancel,
-   required this.height,
-    this.isLoading = false,
-    this.subTitle
-  }) : super(key: key);
+  const CommonAlertDialog(
+      {Key? key,
+      required this.title,
+      required this.message,
+      this.cancelButtonText = 'No',
+      this.confirmButtonText = 'Yes',
+      this.titleColor = Colors.red,
+      required this.onConfirm,
+      required this.onCancel,
+      required this.height,
+      this.isLoading = false,
+      this.subTitle,
+      this.onlyConfirm})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -56,30 +58,36 @@ class CommonAlertDialog extends StatelessWidget {
             Column(
               spacing: 10,
               children: [
-
-            subTitle != null ?   Text(subTitle!,
-            textAlign: TextAlign.center,
-            
-            ) : const SizedBox.shrink(),
-                Text(message,
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                  color: greyTextColor
-                ),),
+                subTitle != null
+                    ? Text(
+                        subTitle!,
+                        textAlign: TextAlign.center,
+                      )
+                    : const SizedBox.shrink(),
+                Text(
+                  message,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium!
+                      .copyWith(color: greyTextColor),
+                ),
               ],
             ),
-            Row(
+           onlyConfirm == true
+                    ? const SizedBox.shrink()
+                    :   Row(
               spacing: 15,
               children: [
-                Expanded(
-                  child: ReusableButton(
-                    height: 40,
-                    textColor: Colors.white,
-                    action: onCancel,
-                    text: cancelButtonText,
-                    buttonColor: secondaryColor,
-                  ),
-                ),
+               Expanded(
+                        child: ReusableButton(
+                          height: 40,
+                          textColor: Colors.white,
+                          action: onCancel,
+                          text: cancelButtonText,
+                          buttonColor: secondaryColor,
+                        ),
+                      ),
                 Expanded(
                   child: ReusableButton(
                     height: 40,

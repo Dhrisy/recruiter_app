@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:recruiter_app/core/constants.dart';
+import 'package:recruiter_app/core/theme.dart';
 
 class CommonSearchWidget extends StatefulWidget {
   final void Function(String)? onChanged;
@@ -35,6 +36,7 @@ class _CommonSearchWidgetState extends State<CommonSearchWidget> {
         child: TextFormField(
           controller: widget.controller,
           onChanged: widget.onChanged,
+          style: AppTheme.bodyText(lightTextColor),
           decoration: InputDecoration(
             hintText: "Search",
             

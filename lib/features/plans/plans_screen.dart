@@ -10,6 +10,7 @@ import 'package:recruiter_app/features/plans/viewmodel/plan_provider.dart';
 import 'package:recruiter_app/features/plans/widgets/plan_card_widget.dart';
 import 'package:recruiter_app/features/settings/model/subscription_model.dart';
 import 'package:recruiter_app/widgets/common_appbar_widget.dart';
+import 'package:recruiter_app/widgets/common_error_widget.dart';
 import 'package:recruiter_app/widgets/shimmer_widget.dart';
 
 class PlansScreen extends StatefulWidget {
@@ -299,7 +300,7 @@ class _PlansScreenState extends State<PlansScreen> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final result = await Provider.of<PlanProvider>(context, listen: false)
-          .fetchPlans()
+          .fetchPlans(context)
           .then((_) {
         if (mounted) {
           setState(() {
@@ -329,11 +330,10 @@ class _PlansScreenState extends State<PlansScreen> {
                           child: CommonAppbarWidget(
                               isBackArrow: true, title: "Plans Screen"))
                       : Text("Planning prices",
-                          style: theme.textTheme.headlineMedium),
+                          style: AppTheme.headingText(lightTextColor)),
                 ),
                 Text("Hire skilled candidates for your business",
-                    style: theme.textTheme.bodyMedium!
-                        .copyWith(color: greyTextColor)),
+                    style: AppTheme.bodyText(greyTextColor).copyWith(fontSize: 12.sp)),
                 const SizedBox(height: 20),
                 TabBar(
                   dividerColor: Colors.transparent,
@@ -342,7 +342,7 @@ class _PlansScreenState extends State<PlansScreen> {
                   labelColor: _themeBloc.state.isDarkMode
                       ? darkTextColor
                       : lightTextColor,
-                  labelStyle: theme.textTheme.bodyLarge,
+                  labelStyle: AppTheme.mediumTitleText(lightTextColor),
                   unselectedLabelColor: Colors.grey,
                   indicatorColor: buttonColor,
                 ),
@@ -375,7 +375,14 @@ class _PlansScreenState extends State<PlansScreen> {
         }
 
         if (planProvider.error != null) {
-          return Center(child: Text('Error: ${planProvider.error}'));
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CommonErrorWidget(
+          
+          )
+            ],
+          );
         }
 
         final plans = planProvider.getPlansByType(isResdex);

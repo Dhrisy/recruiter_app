@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:recruiter_app/core/theme.dart';
 import 'package:recruiter_app/core/utils/navigation_animation.dart';
 import 'package:recruiter_app/features/onboarding/onboarding.dart';
 import 'package:recruiter_app/features/onboarding/onboarding1.dart';
@@ -66,12 +67,10 @@ class _LandingScreenState extends State<LandingScreen>
           const SizedBox(
             height: 15,
           ),
-          const Text(
+           Text(
             "A one-stop platform for buying and selling businesses,plots,and real estate properties, offering convenience",
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.white
-            ),
+            style: AppTheme.bodyText(Colors.white),
           ),
           const SizedBox(
             height: 25,

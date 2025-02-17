@@ -13,44 +13,11 @@ class AccountShimmerWidget extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              spacing: 15,
-              children: [
-                ShimmerWidget(
-                  width: 100.w,
-                  height: 100.h,
-                  isCircle: true,
-                ),
-                Column(
-                  spacing: 10,
-                  children: [
-                    ShimmerWidget(
-                      width: 150.w,
-                      height: 20.h,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15.r)),
-                    ),
-                    ShimmerWidget(
-                      width: 150.w,
-                      height: 20.h,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15.r)),
-                    ),
-                    ShimmerWidget(
-                      width: 150.w,
-                      height: 20.h,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15.r)),
-                    )
-                  ],
-                )
-              ],
-            ),
-            const SizedBox(
+           const SizedBox(
               height: 40,
             ),
             Column(
-              spacing: 15,
+             
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 ShimmerWidget(
@@ -59,20 +26,25 @@ class AccountShimmerWidget extends StatelessWidget {
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15.r)),
                 ),
+                const SizedBox(height: 15),
                 _biuldAboutWidget(),
+                const SizedBox(height: 15),
                 ShimmerWidget(
                   width: 200.w,
                   height: 20.h,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15.r)),
                 ),
+                const SizedBox(height: 15),
                 _biuldAboutWidget(),
+                const SizedBox(height: 15),
                 ShimmerWidget(
                   width: 200.w,
                   height: 20.h,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15.r)),
                 ),
+                const SizedBox(height: 15),
                 _biuldAboutWidget(),
               ],
             )

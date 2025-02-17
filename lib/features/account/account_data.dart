@@ -1,5 +1,7 @@
 
 
+import 'package:recruiter_app/core/utils/custom_functions.dart';
+
 class AccountData {
   final int ? id;
   final String ? name;
@@ -50,7 +52,7 @@ class AccountData {
       country: json["country"] ?? "n/a",
       designation: json["designation"] ?? "n/a",
       id: json["id"],
-      // logo: CustomFunctions().validateUrl(json["logo"].toString()),
+      logo: CustomFunctions().validateUrl(json["logo"].toString()),
       name: json["name"] ?? "n/a",
       postalCode: json["postal_code"] ?? "n/a",
       website: json["website"] ?? "n/a",
@@ -58,6 +60,32 @@ class AccountData {
       industry: json["industry"] ?? "n/a"
       
 
+    );
+  }
+}
+
+
+
+class UserModel{
+  final String email;
+  final String phone;
+  final int id;
+  final String name;
+
+  UserModel({
+    required this.email,
+    required this.phone,
+    required this.id,
+    required this.name
+  });
+
+
+  factory UserModel.fromJson(Map<String, dynamic> json){
+    return UserModel(
+      email: json["email"],
+      phone: json["username"],
+      id: json["id"],
+      name: json["name"]
     );
   }
 }

@@ -1,8 +1,9 @@
- import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:recruiter_app/core/constants.dart';
+import 'package:recruiter_app/core/theme.dart';
 import 'package:recruiter_app/core/utils/custom_functions.dart';
 import 'package:recruiter_app/core/utils/navigation_animation.dart';
 import 'package:recruiter_app/features/auth/bloc/auth_bloc.dart';
@@ -53,7 +54,6 @@ class _RegisterState extends State<Register> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Material(
         child: Scaffold(
       body: Container(
@@ -78,7 +78,7 @@ class _RegisterState extends State<Register> {
                     controller: _pageController,
                     physics: NeverScrollableScrollPhysics(),
                     children: [
-                      _buildRegisterModule(context, theme),
+                      _buildRegisterModule(context),
                       OtpScreen(
                         planId: widget.planId,
                         isRegistering: true,
@@ -109,7 +109,7 @@ class _RegisterState extends State<Register> {
     );
   }
 
-  Widget _buildRegisterModule(BuildContext context, ThemeData theme) {
+  Widget _buildRegisterModule(BuildContext context) {
     return SingleChildScrollView(
         child: BlocConsumer<AuthBloc, AuthState>(listener: (context, state) {
       if (state is RegisterAuthSuccess) {
@@ -144,8 +144,7 @@ class _RegisterState extends State<Register> {
                       ),
                       Text(
                         "Register your company",
-                        style: theme.textTheme.headlineMedium!.copyWith(
-                            fontWeight: FontWeight.bold, fontSize: 23.sp),
+                        style: AppTheme.headingText(lightTextColor),
                       ),
                       const SizedBox(
                         height: 30,
@@ -226,17 +225,17 @@ class _RegisterState extends State<Register> {
                         // isRequired: true,
                       ),
                       Text(
-                        "Password must contain alphabets, numerics, and special characters",
-                        style: theme.textTheme.bodySmall!.copyWith(
-                            color: pwError == true
-                                ? Colors.red.shade900
-                                : greyTextColor),
+                        "Password must contain alphabets, numerics, and special characters(@ \$ ! % * ? &)",
+                        style: AppTheme.bodyText(pwError == true
+                            ? Colors.red.shade900
+                            : greyTextColor),
                       ),
                       const SizedBox(
                         height: 20,
                       ),
                       ReusableTextfield(
                         controller: _confirmPwCont,
+                        
                         validation: (_) {
                           if (_confirmPwCont.text.trim().isEmpty) {
                             return "This field is required";
@@ -247,7 +246,9 @@ class _RegisterState extends State<Register> {
                         labelText: "Confirm password",
                         isRequired: true,
                         onChanged: (value) {
-                          if (_pwCont.text != _confirmPwCont.text) {
+                          print(value);
+                          print(_pwCont.text);
+                          if (_pwCont.text != value) {
                             setState(() {
                               isEqual = false;
                             });
@@ -266,8 +267,8 @@ class _RegisterState extends State<Register> {
                               children: [
                                 Text(
                                   "Password doesn't match",
-                                  style: theme.textTheme.bodySmall!
-                                      .copyWith(color: Colors.red.shade900),
+                                  // style: theme.textTheme.bodySmall!
+                                  //     .copyWith(color: Colors.red.shade900),
                                 ),
                               ],
                             )
@@ -289,7 +290,10 @@ class _RegisterState extends State<Register> {
                           ),
                           Expanded(
                               child: Text(
-                                  "Send me important updates & promotions via email, SMS and Whatsapp"))
+                            "Send me important updates & promotions via email, SMS and Whatsapp",
+                            style: AppTheme.bodyText(lightTextColor)
+                                .copyWith(fontSize: 12.sp),
+                          ))
                         ],
                       ),
                       const SizedBox(
@@ -298,24 +302,22 @@ class _RegisterState extends State<Register> {
                       ReusableButton(
                         isLoading: state is AuthLoading,
                         action: () {
-                          // _pageController.nextPage(
-                          //     duration: Duration(milliseconds: 550),
-                          //     curve: Curves.easeInOut);
+                          print(isEqual);
 
                           if (_registerFormKey.currentState!.validate() &&
                               isEqual == true) {
-                           if(widget.planId != null){
-                             context.read<AuthBloc>().add(RegisterEvent(
-                              planId: widget.planId!,
-                              transactionId: "demo",
-                                companyName: _nameCont.text,
-                                contactNumber: _phnCont.text,
-                                email: _emailCont.text,
-                                password: _pwCont.text,
-                                role: "recruiter",
-                                whatsappUpdations: _whatsapp_updations));
-                           }
-
+                                print(widget.planId);
+                            if (widget.planId != null) {
+                              context.read<AuthBloc>().add(RegisterEvent(
+                                  planId: widget.planId!,
+                                  transactionId: "demo",
+                                  companyName: _nameCont.text,
+                                  contactNumber: _phnCont.text,
+                                  email: _emailCont.text,
+                                  password: _pwCont.text,
+                                  role: "recruiter",
+                                  whatsappUpdations: _whatsapp_updations));
+                            }
                           }
 
                           FocusScope.of(context).unfocus();
@@ -327,18 +329,22 @@ class _RegisterState extends State<Register> {
                         textColor: Colors.white,
                         radius: 30.r,
                       ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      Text("or"),
-                      const SizedBox(
-                        height: 25,
-                      ),
-                      Text("Continue with"),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      _buildSocialLogin(context)
+                      // const SizedBox(
+                      //   height: 20,
+                      // ),
+                      // Text("or",
+                      // style: AppTheme.bodyText(lightTextColor).copyWith(
+                      //   fontSize: 12.sp
+                      // ),),
+                      // const SizedBox(
+                      //   height: 25,
+                      // ),
+                      // Text("Continue with",
+                      // style: AppTheme.bodyText(lightTextColor).copyWith(fontSize: 12.sp),),
+                      // const SizedBox(
+                      //   height: 20,
+                      // ),
+                      // _buildSocialLogin(context)
                     ],
                   ),
                 ),
@@ -348,7 +354,8 @@ class _RegisterState extends State<Register> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text("Already have an account? "),
+              Text("Already have an account? ",
+              style: AppTheme.bodyText(lightTextColor),),
               InkWell(
                   onTap: () {
                     Navigator.push(context,
@@ -356,8 +363,9 @@ class _RegisterState extends State<Register> {
                   },
                   child: Text(
                     "Login",
-                    style: theme.textTheme.bodyMedium!
-                        .copyWith(color: buttonColor),
+                    style: AppTheme.bodyText(buttonColor),
+                    // style: theme.textTheme.bodyMedium!
+                    //     .copyWith(color: buttonColor),
                   ))
             ],
           )
@@ -366,9 +374,5 @@ class _RegisterState extends State<Register> {
     }));
   }
 
-  Widget _buildOtpScreen({required String phn}) {
-    return Column(
-      children: [Text("aaaaaaaaaaa")],
-    );
-  }
+  
 }
