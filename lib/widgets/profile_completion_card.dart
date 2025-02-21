@@ -34,7 +34,6 @@ class _ProfileCompletionCardState extends State<ProfileCompletionCard> {
         builder: (context, accountProvider, child) {
       return InkWell(
         onTap: () {
-          print(accountProvider.accountData);
           if (accountProvider.accountData != null) {
             Navigator.push(
                 context,
@@ -43,6 +42,9 @@ class _ProfileCompletionCardState extends State<ProfileCompletionCard> {
                           isEdit: true,
                           accountData: accountProvider.accountData,
                         )));
+          } else {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => Questionaire1(isEdit: true,)));
           }
         },
         child: Consumer<HomeProvider>(builder: (context, provider, child) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:recruiter_app/core/constants.dart';
+import 'package:recruiter_app/core/theme.dart';
 import 'package:recruiter_app/features/resdex/model/seeker_model.dart';
 import 'package:recruiter_app/features/resdex/provider/search_seeker_provider.dart';
 import 'package:recruiter_app/widgets/common_empty_list.dart';
@@ -51,9 +52,7 @@ class _SearchCvFormWidgetState extends State<SearchCvFormWidget> {
           children: [
             Text(
               "Browse through the list of candidates and manage their details efficiently. Use filters to narrow down your search and find the right candidate quickly.",
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium!
+              style: AppTheme.bodyText(greyTextColor)
                   .copyWith(color: greyTextColor),
             ),
             // provider.searchResultEmpty == false

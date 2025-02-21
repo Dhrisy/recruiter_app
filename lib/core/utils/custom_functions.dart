@@ -1,6 +1,7 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:recruiter_app/features/auth/data/auth_repository.dart';
 import 'package:recruiter_app/services/api_lists.dart';
 import 'package:recruiter_app/widgets/common_snackbar.dart';
 import 'package:share_plus/share_plus.dart';
@@ -17,11 +18,13 @@ class CustomFunctions {
     return accessToken;
   }
 
-  bool isValidEmail(String email) {
-    final emailRegex =
-        RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
-    return emailRegex.hasMatch(email);
-  }
+ bool isValidEmail(String email) {
+  final emailRegex = RegExp(
+    r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+(?<!\.)\.[a-zA-Z]{2,}$'
+  );
+  return emailRegex.hasMatch(email);
+}
+
 
   static String toSentenceCase(String input) {
     if (input.isEmpty) return input;
@@ -30,7 +33,7 @@ class CustomFunctions {
     return input[0].toUpperCase() + input.substring(1).toLowerCase();
   }
 
-   String? validateUrl(String? url) {
+  String? validateUrl(String? url) {
     const String baseUrl = ApiLists.imageBaseUrl;
 
     if (url == null || url.isEmpty) {
@@ -54,10 +57,8 @@ class CustomFunctions {
     return null;
   }
 
-  Future<void> shareContent({
-    required String content, 
-    required String subject
-    }) async {
+  Future<void> shareContent(
+      {required String content, required String subject}) async {
     try {
       await Share.share(content, subject: subject);
     } catch (e) {
@@ -65,7 +66,7 @@ class CustomFunctions {
     }
   }
 
-    String formatCTC(dynamic ctc) {
+  String formatCTC(dynamic ctc) {
     if (ctc == null) return 'N/A';
 
     try {
@@ -83,24 +84,32 @@ class CustomFunctions {
     }
   }
 
-/// Checks for internet connection before making API calls
+  /// Checks for internet connection before making API calls
   static Future<bool> checkInternetConnection() async {
     var connectivityResult = await Connectivity().checkConnectivity();
+    print(connectivityResult);
     if (connectivityResult.contains(ConnectivityResult.none)) {
       return false; // No internet
     }
     return true; // Internet available
   }
 
+  static Future<String?> checkNetworkConnection() async {
+    // Check network connection
+    var connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult.contains(ConnectivityResult.none)) {
+      return "No internet connection. Please check your network.";
+    }
+  }
 
-
-static void showNoInternetPopup(BuildContext context) {
+  static void showNoInternetPopup(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text("No Internet Connection"),
-          content: const Text("Please check your internet connection and try again."),
+          content: const Text(
+              "Please check your internet connection and try again."),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
@@ -112,4 +121,19 @@ static void showNoInternetPopup(BuildContext context) {
     );
   }
 
+
+  Future<bool?> checkSubscription() async{
+     try {
+      final result = await AuthRepository().checkSubscriptions();
+      if (result != null && result == true) {
+        return true;
+      } else if (result != null && result == false) {
+        return false;
+      } else {
+        return null;
+      }
+    } catch (e) {
+      return null;
+    }
+  }
 }

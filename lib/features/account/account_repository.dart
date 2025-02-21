@@ -17,6 +17,7 @@ class AccountRepository {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
 
         AccountData accountData = AccountData.fromJson(responseData);
+        
 
         return {"account": accountData, "message": ""};
       } else if (response.statusCode == 401) {

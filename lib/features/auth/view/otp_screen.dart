@@ -22,6 +22,7 @@ import 'package:recruiter_app/features/plans/viewmodel/plan_provider.dart';
 import 'package:recruiter_app/features/questionaires/view/questionaire1.dart';
 import 'package:recruiter_app/widgets/common_snackbar.dart';
 import 'package:recruiter_app/widgets/reusable_button.dart';
+import 'package:recruiter_app/widgets/reusable_textfield.dart';
 
 class OtpScreen extends StatefulWidget {
   final PageController? controller;
@@ -46,6 +47,7 @@ class _OtpScreenState extends State<OtpScreen> {
   late Timer _timer;
   int _remainingTime = 30;
   final TextEditingController _otpCont = TextEditingController();
+  final TextEditingController _changePhnCont = TextEditingController();
   final _otpFormKey = GlobalKey<FormState>();
 
   @override
@@ -75,6 +77,8 @@ class _OtpScreenState extends State<OtpScreen> {
     _timer.cancel();
     super.dispose();
   }
+
+  bool _changeNumber = false;
 
   @override
   Widget build(BuildContext context) {
@@ -122,28 +126,54 @@ class _OtpScreenState extends State<OtpScreen> {
                         ),
                         Text(
                           "We have send a verification code to ${widget.phone != null ? "+91${widget.phone}" : widget.email != null ? "${widget.email}" : ""}",
-                          style: AppTheme.bodyText(lightTextColor).copyWith(fontSize: 12.sp
-                          ),
+                          style: AppTheme.bodyText(lightTextColor)
+                              .copyWith(fontSize: 12.sp),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(
                           height: 20,
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Text(
-                              "Change ",
-                              textAlign: TextAlign.center,
-                              style: AppTheme.bodyText(buttonColor)
-                            ),
-                            Text(
-                              "number..?",
-                              style: AppTheme.bodyText(lightTextColor),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
+
+                        _changeNumber == true
+                            ? ReusableTextfield(
+                                controller: _changePhnCont,
+                                hintText: "Enter the phone number",
+                                labelText: "Phone number",
+                                keyBoardType: TextInputType.number,
+                                lengthLimit: 10,
+                                validation: (_) {
+                                  if (_changePhnCont.text.trim().isEmpty) {
+                                    return "Enter phone number";
+                                  } else if (_changePhnCont.text.length < 10) {
+                                    return "Phone number must contain 10 character";
+                                  }
+                                },
+                              )
+                            : InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    _changeNumber = true;
+                                  });
+                                },
+                                child: Text("Change number..?",
+                                    textAlign: TextAlign.center,
+                                    style: AppTheme.bodyText(buttonColor)),
+                              ),
+                        // Row(
+                        //   mainAxisAlignment: MainAxisAlignment.end,
+                        //   children: [
+                        //     Text(
+                        //       "Change number..?",
+                        //       textAlign: TextAlign.center,
+                        //       style: AppTheme.bodyText(buttonColor)
+                        //     ),
+                        //     Text(
+                        //       "number..?",
+                        //       style: AppTheme.bodyText(lightTextColor),
+                        //       textAlign: TextAlign.center,
+                        //     ),
+                        //   ],
+                        // ),
                         const SizedBox(
                           height: 20,
                         ),
@@ -155,31 +185,27 @@ class _OtpScreenState extends State<OtpScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
+                              Text("Resend OTP in ",
+                                  textAlign: TextAlign.center,
+                                  style: AppTheme.bodyText(lightTextColor)),
                               Text(
-                                "Resend OTP in ",
-                                textAlign: TextAlign.center,
-                                style: AppTheme.bodyText(lightTextColor)
-                              ),
-                              Text(
-                                " 00:${_remainingTime.toString().padLeft(2, '0')}",
-                                textAlign: TextAlign.center,
-                                style: AppTheme.bodyText(buttonColor)
-                              ),
+                                  " 00:${_remainingTime.toString().padLeft(2, '0')}",
+                                  textAlign: TextAlign.center,
+                                  style: AppTheme.bodyText(buttonColor)),
                             ],
                           ),
                         if (_remainingTime == 0)
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text(
-                                "Didn't receive code? Resend",
-                                textAlign: TextAlign.center,
-                                style: AppTheme.bodyText(lightTextColor)
-                              ),
+                              Text("Didn't receive code? Resend",
+                                  textAlign: TextAlign.center,
+                                  style: AppTheme.bodyText(lightTextColor)),
                               InkWell(
-                                onTap: () async{
-                                await  Provider.of<RegisterProvider>(context, listen: false).retryOTP(
-                                                          phn: widget.phone.toString());
+                                onTap: () async {
+                                  await Provider.of<RegisterProvider>(context,
+                                          listen: false)
+                                      .retryOTP(phn: widget.phone.toString());
                                 },
                                 child: Text(
                                   " OTP",
@@ -200,8 +226,11 @@ class _OtpScreenState extends State<OtpScreen> {
                   if (state is OtpVerified && widget.isRegistering == true) {
                     _showAlertDialogue(context);
                     Future.delayed(Duration(seconds: 1), () {
-                      Navigator.push(context,
-                          AnimatedNavigation().fadeAnimation(Questionaire1()));
+                      Navigator.push(
+                          context,
+                          AnimatedNavigation().fadeAnimation(Questionaire1(
+                            isRegistering: true,
+                          )));
                     });
                   } else if (state is OtpVerified &&
                       widget.isRegistering == false) {
@@ -227,7 +256,7 @@ class _OtpScreenState extends State<OtpScreen> {
                                       listen: false)
                                   .subscribePlan(
                                       planId: widget.planId!,
-                                      phone: widget.phone!,
+                                      phone: _changePhnCont.text.trim().isNotEmpty ? _changePhnCont.text : widget.phone!,
                                       transactionId: "transactionId");
 
                               if (result == "success") {
@@ -236,7 +265,7 @@ class _OtpScreenState extends State<OtpScreen> {
                                         phone: widget.phone!,
                                         otp: _otpCont.text));
                               }
-                            } else if (widget.email != null) {
+                            } else if (widget.isRegistering == false) {
                               context.read<AuthBloc>().add(EmailOtpVerifyEVent(
                                   otp: _otpCont.text,
                                   email: widget.email.toString()));

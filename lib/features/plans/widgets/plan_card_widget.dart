@@ -12,11 +12,13 @@ class PlanCardWidget extends StatelessWidget {
   final List<Map<String, dynamic>> lists;
   final bool? fromSettings;
   final PlanModel plan;
+  final VoidCallback action;
   const PlanCardWidget({
     Key? key,
     required this.plan,
     required this.lists,
     this.fromSettings,
+    required this.action
   }) : super(key: key);
 
   @override
@@ -64,13 +66,7 @@ class PlanCardWidget extends StatelessWidget {
           Align(
             alignment: Alignment.bottomCenter,
             child: ReusableButton(
-              action: () async {
-                if (fromSettings == true) {
-                } else {
-                  Navigator.push(
-                      context, AnimatedNavigation().slideAnimation(Register(planId: plan.id,)));
-                }
-              },
+              action: action,
               text: "Buy now",
               textColor: Colors.white,
               textSize: 20.sp,

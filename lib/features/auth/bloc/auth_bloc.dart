@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:recruiter_app/core/utils/custom_functions.dart';
 import 'package:recruiter_app/features/auth/bloc/auth_event.dart';
 import 'package:recruiter_app/features/auth/bloc/auth_state.dart';
 import 'package:recruiter_app/features/auth/data/auth_repository.dart';
@@ -11,6 +12,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthBloc(this.authRepository) : super(AuthInitial()) {
     on<RegisterEvent>((event, emit) async {
       emit(AuthLoading());
+
+         final connectivityResult = await CustomFunctions.checkNetworkConnection();
+    if(connectivityResult != null){
+     emit(AuthFailure(connectivityResult.toString()));
+    }
+
+
       try {
         final success = await authRepository.register(
             companyName: event.companyName,
@@ -25,7 +33,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         } else if (success == "User already exists") {
           emit(AuthExists());
         } else {
-          emit(AuthFailure("Something went wrong. Regiseration failed"));
+          emit(AuthFailure(success.toString()));
         }
       } catch (e) {
         emit(AuthFailure(e.toString()));
@@ -34,6 +42,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     on<EmailLoginEvent>((event, emit) async {
       emit(AuthLoading());
+
+       final connectivityResult = await CustomFunctions.checkNetworkConnection();
+    if(connectivityResult != null){
+     emit(AuthFailure(connectivityResult.toString()));
+    }else{
+
       try {
         final success = await authRepository.emailLogin(
           context: event.context,
@@ -54,6 +68,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         print("Auth repository error  $e");
         emit(AuthFailure(e.toString()));
       }
+    }
+
+
     });
 
     on<GetOtpEVent>((event, emit) async {

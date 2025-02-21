@@ -73,7 +73,9 @@ class _ReusableTextfieldState extends State<ReusableTextfield> {
             borderSide: BorderSide(color: Colors.red.shade900)),
       ),
       inputFormatters: [
-        LengthLimitingTextInputFormatter(widget.lengthLimit != null ? 10 : 500)
+        LengthLimitingTextInputFormatter(widget.lengthLimit != null ? 10 : 500),
+        FilteringTextInputFormatter.allow(
+                RegExp(r'^[a-zA-Z0-9@._-]+$')),
       ],
     );
   }

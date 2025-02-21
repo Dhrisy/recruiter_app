@@ -1,11 +1,14 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:linear_progress_bar/linear_progress_bar.dart';
 import 'package:provider/provider.dart';
@@ -40,9 +43,16 @@ class Questionaire1 extends StatefulWidget {
   final bool? isEdit;
   final AccountData? accountData;
   final int? index;
-
+  final bool? isback;
+  final bool? isRegistering;
   const Questionaire1(
-      {super.key, this.isFromHome, this.isEdit, this.accountData, this.index});
+      {super.key,
+      this.isFromHome,
+      this.isEdit,
+      this.accountData,
+      this.index,
+      this.isback,
+      this.isRegistering});
 
   @override
   State<Questionaire1> createState() => _Questionaire1State();
@@ -95,13 +105,84 @@ class _Questionaire1State extends State<Questionaire1> {
   // }
 
   // Function to pick image
-  Future<void> _pickImage() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.camera);
+  void _pickImageBottomSheet() async {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext context) {
+          return Container(
+            width: double.infinity,
+            height: 150.h,
+            child: Padding(
+              padding: const EdgeInsets.all(15),
+              child: Column(
+                children: [
+                 
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Choose logo",
+                        style: AppTheme.mediumTitleText(secondaryColor),
+                      ),
+                    ],
+                  ),
+                   const SizedBox(
+                    height: 25,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          _pickImage(ImageSource.camera);
+                        },
+                        child: SizedBox(
+                          child: Column(
+                            children: [
+                              const Icon(
+                                Icons.camera_alt,
+                                color: buttonColor,
+                              ),
+                              Text(
+                                "Camera",
+                                style: AppTheme.bodyText(lightTextColor),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () {
+                          _pickImage(ImageSource.gallery);
+                        },
+                        child: SizedBox(
+                          child: Column(
+                            children: [
+                              const Icon(Icons.photo, color: buttonColor),
+                              Text("Gallery",
+                                  style: AppTheme.bodyText(lightTextColor))
+                            ],
+                          ),
+                        ),
+                      )
+                    ],
+                  )
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    final pickedFile = await _picker.pickImage(source: source);
     if (pickedFile != null) {
       setState(() {
         _image = File(pickedFile.path);
       });
     }
+
+    Navigator.pop(context);
   }
 
   // Function to upload the image
@@ -146,66 +227,18 @@ class _Questionaire1State extends State<Questionaire1> {
       print("Status Code: ${response.statusCode}");
       print("Response Body: $responseBody");
       if (response.statusCode == 200) {
-       return true;
-      } else if(response.statusCode
-       == 401){
+        return true;
+      } else if (response.statusCode == 401) {
         await RefreshTokenService.refreshToken();
 
-      return _uploadImage();
+        return _uploadImage();
       }
     } catch (e) {
-     return false;
+      return false;
     }
   }
 
-  // Function to upload image
-//   Future<void> _uploadImage() async {
-//     if (_image == null) {
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         SnackBar(content: Text("Please select an image")),
-//       );
-//       return;
-//     }
-
-//     String url = "${ApiLists.baseUrl}/company/company/logo"; // Replace with actual API
-
-//     FormData formData = FormData.fromMap({
-//       "logo": await MultipartFile.fromFile(_image!.path, filename: "company_logo.jpg"),
-//     });
-
-// final token = await CustomFunctions().retrieveCredentials("access_token");
-//     try {
-//       final response = await http.post(
-//         url,
-//         data: formData,
-//         options: Options(
-//           headers: {
-//             "Authorization": token.toString(), // Replace with actual token if required
-//             "Content-Type": "multipart/form-data",
-//           },
-//         ),
-//       );
-
-//       print(response.statusCode);
-//       // print()
-
-//       if (response.statusCode == 200) {
-//         ScaffoldMessenger.of(context).showSnackBar(
-//           SnackBar(content: Text("Logo uploaded successfully!")),
-//         );
-//       } else {
-//         ScaffoldMessenger.of(context).showSnackBar(
-//           SnackBar(content: Text("Failed to upload logo")),
-//         );
-//       }
-//     } catch (e) {
-//       print("Upload Error: $e");
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         SnackBar(content: Text("Error uploading logo")),
-//       );
-//     }
-//   }
-
+ 
   // Navigate to a specific index
   void _navigateToPage(int index) {
     _pageController.animateToPage(
@@ -251,92 +284,109 @@ class _Questionaire1State extends State<Questionaire1> {
 
   @override
   Widget build(BuildContext context) {
-    // final theme = Theme.of(context);
+    final screenHeight = MediaQuery.of(context).size.height.h;
     return PopScope(
-      canPop: false, // Prevents accidental exits
+      canPop: false,
       onPopInvoked: (didPop) async {
-        if (didPop) return;
-        Navigator.of(context).pop();
+        if (didPop || !mounted) return;
+
+        if (widget.isRegistering == true) {
+          SystemNavigator.pop(); // Exit the app
+        } else if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop(); // Navigate back
+        }
       },
       child: Material(
-        child: SafeArea(
-            child: Scaffold(
-          appBar: AppBar(
-            automaticallyImplyLeading: widget.isEdit == true ? true : false,
-          ),
+        child: Scaffold(
           body: Stack(
             children: [
-              Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
+              SizedBox(
+                width: double.infinity,
+                height: screenHeight * 0.45,
                 child: SvgPicture.asset(
-                  "assets/svgs/group_circle.svg",
-                  fit: BoxFit.fill,
+                  "assets/svgs/onboard_1.svg",
+                  fit: BoxFit.cover,
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                child: Column(
-                  children: [
-                    const SizedBox(
-                      height: 15,
-                    ),
-                    LinearProgressBar(
-                      maxSteps: 3,
-                      progressType: LinearProgressBar.progressTypeLinear,
-                      currentStep: _currentIndex + 1,
-                      progressColor: buttonColor,
-                      backgroundColor: borderColor,
-                      valueColor: AlwaysStoppedAnimation<Color>(buttonColor),
-                      semanticsLabel: "Label",
-                      semanticsValue: "Value",
-                      minHeight: 11,
-                      borderRadius: BorderRadius.circular(25.r),
-                    ),
-                    const SizedBox(
-                      height: 15,
-                    ),
-                    Expanded(
-                        child:
-                            BlocConsumer<QuestionaireBloc, QuestionaireState>(
-                                listener: (context, state) {
-                      if (state is QuestionaireFailure) {
-                        return CommonSnackbar.show(context,
-                            message: state.error);
-                      }
+              SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: Column(
+                    children: [
+                      widget.isRegistering != true
+                          ? Row(
+                              children: [
+                                InkWell(
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: SizedBox(
+                                        child: Text(
+                                      "Back",
+                                      style: AppTheme.bodyText(lightTextColor),
+                                    ))),
+                              ],
+                            )
+                          : const SizedBox.shrink(),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      LinearProgressBar(
+                        maxSteps: 3,
+                        progressType: LinearProgressBar.progressTypeLinear,
+                        currentStep: _currentIndex + 1,
+                        progressColor: secondaryColor,
+                        backgroundColor: borderColor,
+                        valueColor: AlwaysStoppedAnimation<Color>(secondaryColor),
+                        semanticsLabel: "Label",
+                        semanticsValue: "Value",
+                        minHeight: 11,
+                        borderRadius: BorderRadius.circular(25.r),
+                      ),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      Expanded(
+                          child:
+                              BlocConsumer<QuestionaireBloc, QuestionaireState>(
+                                  listener: (context, state) {
+                        if (state is QuestionaireFailure) {
+                          return CommonSnackbar.show(context,
+                              message: state.error);
+                        }
 
-                      if (state is QuestionaireSuccess) {
-                        Navigator.pushAndRemoveUntil(
-                            context,
-                            AnimatedNavigation()
-                                .scaleAnimation(SuccessfullyRegisteredScreen()),
-                            (Route<dynamic> route) => false);
-                      }
-                    }, builder: (context, state) {
-                      return PageView(
-                        controller: _pageController,
-                        onPageChanged: (value) {
-                          setState(() {
-                            _currentIndex = value;
-                          });
-                        },
-                        scrollDirection: Axis.vertical,
-                        physics: NeverScrollableScrollPhysics(),
-                        children: [
-                          _buildCompanyDetailWidget(),
-                          _buildLocationDetailsWidget(),
-                          _buildContactDetails(),
-                          // _buildSuccessfullWidget(theme: theme)
-                        ],
-                      );
-                    }))
-                  ],
+                        if (state is QuestionaireSuccess) {
+                          Navigator.pushAndRemoveUntil(
+                              context,
+                              AnimatedNavigation().scaleAnimation(
+                                  SuccessfullyRegisteredScreen()),
+                              (Route<dynamic> route) => false);
+                        }
+                      }, builder: (context, state) {
+                        return PageView(
+                          controller: _pageController,
+                          onPageChanged: (value) {
+                            setState(() {
+                              _currentIndex = value;
+                            });
+                          },
+                          scrollDirection: Axis.vertical,
+                          physics: NeverScrollableScrollPhysics(),
+                          children: [
+                            _buildCompanyDetailWidget(),
+                            _buildLocationDetailsWidget(),
+                            _buildContactDetails(),
+                            // _buildSuccessfullWidget(theme: theme)
+                          ],
+                        );
+                      }))
+                    ],
+                  ),
                 ),
               ),
             ],
           ),
-        )),
+        ),
       ),
     );
   }
@@ -372,27 +422,49 @@ class _Questionaire1State extends State<Questionaire1> {
               height: 140.h,
               child: Column(
                 children: [
-                  widget.isEdit == true && widget.accountData != null && _image == null
+                  widget.isEdit == true &&
+                          widget.accountData != null &&
+                          _image == null
                       ? InkWell(
                           onTap: () {
-                            _pickImage();
+                            _pickImageBottomSheet();
                           },
-                          child: CircleAvatar(
-                              radius: 60.r,
-                              backgroundColor: Colors.transparent,
-                              backgroundImage: widget.accountData!.logo != null
-                                  ? NetworkImage(
-                                      widget.accountData!.logo.toString(),
-                                      )
-                                  : const AssetImage(
-                                      "assets/images/default_logo.webp")),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(50),
+                            child: CachedNetworkImage(
+                              imageUrl: widget.accountData!.logo.toString(),
+                              placeholder: (context, url) => const Center(
+                                child: CircularProgressIndicator(
+                                  backgroundColor: greyTextColor,
+                                  color: secondaryColor,
+                                ), // Loading indicator
+                              ),
+                              errorWidget: (context, url, error) => Image.asset(
+                                "assets/images/default_logo.webp",
+                                fit: BoxFit.cover,
+                              ),
+                              fit: BoxFit.cover,
+                              width: 90,
+                              height: 90,
+                            ),
+                          ),
+
+                          //  CircleAvatar(
+                          //     radius: 60.r,
+                          //     backgroundColor: Colors.transparent,
+                          //     backgroundImage: widget.accountData!.logo != null
+                          //         ? NetworkImage(
+                          //             widget.accountData!.logo.toString(),
+                          //           )
+                          //         : const AssetImage(
+                          //             "assets/images/default_logo.webp")),
                         )
                       : InkWell(
                           onTap: () {
-                            _pickImage();
+                            _pickImageBottomSheet();
                           },
                           child: CircleAvatar(
-                            radius: 60.r,
+                            radius: 90.r,
                             backgroundColor: Colors.transparent,
                             backgroundImage: _image != null
                                 ? FileImage(_image!)
@@ -406,14 +478,27 @@ class _Questionaire1State extends State<Questionaire1> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      InkWell(
-                          onTap: () {
-                            // _uploadImage();
-                            setState(() {
-                              _image = null;
-                            });
-                          },
-                          child: Icon(Icons.delete))
+                      _image == null && widget.accountData?.logo != null
+                          ? InkWell(
+                              onTap: () {
+                                _pickImageBottomSheet();
+                              },
+                              child: SizedBox(
+                                  child: Text(
+                                "Edit picture",
+                                style: AppTheme.bodyText(Colors.blue),
+                              )),
+                            )
+                          : InkWell(
+                              onTap: () {
+                                // _uploadImage();
+                                setState(() {
+                                  _image = null;
+                                });
+
+                                
+                              },
+                              child: Icon(Icons.delete))
                       // Text("Edit"), const SizedBox(
                       //   width: 10,
                       // ),
@@ -968,9 +1053,11 @@ class _Questionaire1State extends State<Questionaire1> {
                   height: 55,
                 ),
                 BlocConsumer<QuestionaireBloc, QuestionaireState>(
-                    listener: (context, state) async{
+                    listener: (context, state) async {
                   if (widget.isFromHome == true) {
                     if (state is QuestionaireSuccess) {
+                      Provider.of<AccountProvider>(context, listen: false)
+                          .setEditLoading(true);
                       Navigator.pushAndRemoveUntil(
                           context,
                           AnimatedNavigation()
@@ -980,31 +1067,100 @@ class _Questionaire1State extends State<Questionaire1> {
                       CommonSnackbar.show(context, message: "");
                     }
                     if (state is QuestionaireFailure) {
+                      Provider.of<AccountProvider>(context, listen: false)
+                          .setEditLoading(true);
                       CommonSnackbar.show(context,
                           message: "Failed to post job");
                     }
-                  }else{
-                  if(state is QuestionaireSuccess){
-
-                    Navigator.pushAndRemoveUntil(
+                  } else {
+                    if (state is QuestionaireSuccess &&
+                        widget.isRegistering != null &&
+                        widget.isRegistering == true) {
+                      Provider.of<AccountProvider>(context, listen: false)
+                          .setEditLoading(true);
+                      Navigator.pushAndRemoveUntil(
                           context,
                           AnimatedNavigation()
                               .scaleAnimation(SuccessfullyRegisteredScreen()),
                           (Route<dynamic> route) => false);
-                      CommonSnackbar.show(context, message: "Successfully added company details");
-                    
-                  }else{
-                    CommonSnackbar.show(context, message: "Failed to upload logo");
-                  }
+                      CommonSnackbar.show(context,
+                          message: "Successfully added company details");
+                    } else if (widget.isEdit == true &&
+                        state is QuestionaireSuccess) {
+                      Provider.of<AccountProvider>(context, listen: false)
+                          .setEditLoading(true);
+                      Navigator.pushAndRemoveUntil(
+                          context,
+                          AnimatedNavigation()
+                              .scaleAnimation(CustomBottomNavBar(
+                            index: 3,
+                          )),
+                          (Route<dynamic> route) => false);
 
-
+                      // CommonSnackbar.show(context,
+                      //     message: "Failed to upload logo");
+                    }
+                    Provider.of<AccountProvider>(context, listen: false)
+                        .setEditLoading(true);
                   }
                 }, builder: (context, state) {
                   return Consumer<AccountProvider>(
                       builder: (context, provider, child) {
                     return ReusableButton(
-                      isLoading: provider.isLoading,
+                      isLoading: provider.isLoading || provider.editLoading,
                       action: () async {
+                        if (widget.isEdit == true &&
+                            widget.isRegistering != null &&
+                            widget.isRegistering != true) {
+                          final account = AccountData(
+                              id: widget.accountData!.id,
+                              contactLandNumber: _landlineNumberCont.text,
+                              about: _aboutCont.text,
+                              address: [_addressCont.text],
+                              city: _selectedCity,
+                              contactMobileNumber: _mobileNumberCont.text,
+                              contactName: _personNameCont.text,
+                              country: _selectedCountry,
+                              designation: _designationCont.text,
+                              functionalArea: _selectedFunctionalArea,
+                              industry: _selectedIndustry,
+                              name: _companyNameCont.text,
+                              website: _companyWesiteCont.text,
+                              postalCode: _postalCodeCont.text);
+
+                          if (_image != null) {
+                            final result = await _uploadImage();
+                            if (result == false) {
+                              CommonSnackbar.show(context,
+                                  message: "Failed to upload logo");
+                              return;
+                            }
+                          }
+
+                          final result = await Provider.of<AccountProvider>(
+                                  context,
+                                  listen: false)
+                              .editCompanyDetails(account: account);
+
+                          if (result == "success") {
+                            Navigator.pushAndRemoveUntil(
+                                context,
+                                AnimatedNavigation()
+                                    .fadeAnimation(CustomBottomNavBar(
+                                  index: 3,
+                                )),
+                                (Route<dynamic> route) => false);
+
+                            Provider.of<AccountProvider>(context, listen: false)
+                                .fetchAccountData();
+                            CommonSnackbar.show(context,
+                                message: "Chnage saved successfully");
+                          } else {
+                            CommonSnackbar.show(context,
+                                message: result.toString());
+                          }
+                        }
+
                         if (widget.isEdit == true &&
                             widget.accountData != null) {
                           final account = AccountData(
@@ -1019,17 +1175,18 @@ class _Questionaire1State extends State<Questionaire1> {
                               designation: _designationCont.text,
                               functionalArea: _selectedFunctionalArea,
                               industry: _selectedIndustry,
-                              name: "Emergio games",
+                              name: _companyNameCont.text,
                               website: _companyWesiteCont.text,
                               postalCode: _postalCodeCont.text);
 
-                              if(_image != null){
-                                final result = await _uploadImage();
-                                if(result == false){
-                                  CommonSnackbar.show(context, message: "Failed to upload logo");
-                                  return;
-                                }
-                              }
+                          if (_image != null) {
+                            final result = await _uploadImage();
+                            if (result == false) {
+                              CommonSnackbar.show(context,
+                                  message: "Failed to upload logo");
+                              return;
+                            }
+                          }
 
                           final result = await Provider.of<AccountProvider>(
                                   context,
@@ -1055,9 +1212,10 @@ class _Questionaire1State extends State<Questionaire1> {
                           }
                         } else {
                           if (_contactFormKey.currentState!.validate()) {
+                            provider.setEditLoading(true);
                             context.read<QuestionaireBloc>().add(
                                 QuestionaireSubmitEvent(
-                                    logo: _image,
+                                    logo: _image != null ? _image : null,
                                     aboutCompany: _aboutCont.text,
                                     address: _addressCont.text,
                                     city: _selectedCity,
@@ -1070,7 +1228,6 @@ class _Questionaire1State extends State<Questionaire1> {
                                     postalCode: _postalCodeCont.text,
                                     website: _companyWesiteCont.text,
                                     landline: _landlineNumberCont.text));
-
 
                             // Navigator.pushAndRemoveUntil(
                             //     context,

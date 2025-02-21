@@ -14,7 +14,6 @@ class HomeRepository {
       print("count response ${response.body}");
 
       print(response.statusCode);
-      print(response.body);
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
@@ -22,13 +21,14 @@ class HomeRepository {
         CountModel countData = CountModel.fromJson(responseData);
         return countData;
       } else if (response.statusCode == 401) {
+       
         await RefreshTokenService.refreshToken();
         return fetchRecruiterCounts(maxRetries: 3, retryCount: retryCount! + 1);
       } else {
         return null;
       }
     } catch (e) {
-      print("Unexpected error $e");
+      print("Unexpected errorrrrrrrrrrrrrr $e");
       return null;
     }
   }

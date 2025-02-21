@@ -81,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
             });
           }
         });
-        Provider.of<AccountProvider>(context, listen: false).fetchAccountData();
+        Provider.of<AccountProvider>(context, listen: false).fetchAndCombineUserData();
       } else {
         print("errrrrrrrrrrrrrrrrrrrrrrrrrrrrrorrrrrrrrrrrrr");
       }
@@ -328,6 +328,30 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 Row(
                   children: [
+                    InkWell(
+                      onTap: () async{
+                        Future.delayed(const Duration(seconds: 2),
+                                () async {
+                              final storage =
+                                  FlutterSecureStorage();
+                              await storage.deleteAll();
+                              await storage.write(
+                                  key: "user", value: "installed");
+
+                              setState(() {
+                                isLoading = false;
+                              });
+                              Navigator.pushAndRemoveUntil(
+                                context,
+                                AnimatedNavigation()
+                                    .slideAnimation(SplashScreen()),
+                                (Route<dynamic> route) => false,
+                              );
+                            });
+                      },
+                      child: SizedBox(
+                          child: Icon(Icons.logout)).animate().fadeIn(duration: 500.ms).scale(),
+                    ),
                     InkWell(
                       onTap: () {
                         Navigator.push(

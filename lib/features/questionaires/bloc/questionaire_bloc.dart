@@ -7,13 +7,10 @@ import 'package:recruiter_app/features/questionaires/model/questionaire_model.da
 class QuestionaireBloc extends Bloc<Questionaireevent, QuestionaireState> {
   final QuestionaireRepository questionaireRepository;
   QuestionaireBloc(this.questionaireRepository) : super(QuestionaireLoading()) {
-    print("eeeeeeeeeeeeeeeeeeeeeeeeeee");
     on<QuestionaireSubmitEvent>((event, emit) async {
       emit(QuestionaireLoading());
-      print("wwwwwwwwwwwwwwwwwwww");
       try {
-        print("dddddddddddddd");
-        print("ooooooooooooo ${event.logo}");
+      
         final result = await questionaireRepository.questionaireSubmission(
             questionaire: QuestionaireModel(
                 logo: event.logo,
@@ -37,7 +34,6 @@ class QuestionaireBloc extends Bloc<Questionaireevent, QuestionaireState> {
               error: "Something went wrong. Couldn't submit the details"));
         }
       } catch (e) {
-        print("hhhhh     $e");
         emit(QuestionaireFailure(error: e.toString()));
       }
     });

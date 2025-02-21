@@ -6,8 +6,13 @@ import 'package:provider/provider.dart';
 import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/core/theme.dart';
 import 'package:recruiter_app/core/utils/app_theme_data.dart';
+import 'package:recruiter_app/core/utils/navigation_animation.dart';
+import 'package:recruiter_app/features/auth/view/register.dart';
+import 'package:recruiter_app/features/auth/view/welcome_screen.dart';
+import 'package:recruiter_app/features/plans/data/plan_repository.dart';
 import 'package:recruiter_app/features/plans/viewmodel/plan_provider.dart';
 import 'package:recruiter_app/features/plans/widgets/plan_card_widget.dart';
+import 'package:recruiter_app/features/plans/widgets/subscribe_plan.dart';
 import 'package:recruiter_app/features/settings/model/subscription_model.dart';
 import 'package:recruiter_app/widgets/common_appbar_widget.dart';
 import 'package:recruiter_app/widgets/common_error_widget.dart';
@@ -16,7 +21,10 @@ import 'package:recruiter_app/widgets/shimmer_widget.dart';
 class PlansScreen extends StatefulWidget {
   final bool? fromSettings;
   final bool? isRegister;
-  const PlansScreen({Key? key, this.fromSettings, this.isRegister})
+
+  final bool? forSubscription;
+  const PlansScreen(
+      {Key? key, this.fromSettings, this.isRegister, this.forSubscription})
       : super(key: key);
 
   @override
@@ -333,7 +341,8 @@ class _PlansScreenState extends State<PlansScreen> {
                           style: AppTheme.headingText(lightTextColor)),
                 ),
                 Text("Hire skilled candidates for your business",
-                    style: AppTheme.bodyText(greyTextColor).copyWith(fontSize: 12.sp)),
+                    style: AppTheme.bodyText(greyTextColor)
+                        .copyWith(fontSize: 12.sp)),
                 const SizedBox(height: 20),
                 TabBar(
                   dividerColor: Colors.transparent,
@@ -377,11 +386,7 @@ class _PlansScreenState extends State<PlansScreen> {
         if (planProvider.error != null) {
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CommonErrorWidget(
-          
-          )
-            ],
+            children: [CommonErrorWidget()],
           );
         }
 
@@ -454,6 +459,21 @@ class _PlansScreenState extends State<PlansScreen> {
         plan: plan,
         lists: features,
         fromSettings: widget.fromSettings,
+        action: () async{
+          if (widget.fromSettings == true) {
+          } else if (widget.forSubscription == true) {
+            Navigator.push(
+                context, AnimatedNavigation().fadeAnimation(SubscribePlan(
+                  planId: plan.id,
+                )));
+          } else {
+            Navigator.push(
+                context,
+                AnimatedNavigation().slideAnimation(Register(
+                  planId: plan.id,
+                )));
+          }
+        },
       ),
     );
   }

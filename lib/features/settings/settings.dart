@@ -3,9 +3,12 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/core/utils/navigation_animation.dart';
 import 'package:recruiter_app/features/account/account_data.dart';
+import 'package:recruiter_app/features/account/account_provider.dart';
 import 'package:recruiter_app/features/auth/view/change_pw.dart';
 import 'package:recruiter_app/features/faqs/faq.dart';
 import 'package:recruiter_app/features/plans/plans_screen.dart';
@@ -17,8 +20,9 @@ import 'package:recruiter_app/widgets/common_appbar_widget.dart';
 import 'package:recruiter_app/widgets/reusable_button.dart';
 
 class SettingsScreen extends StatefulWidget {
-  final AccountData accountData;
-  SettingsScreen({super.key, required this.accountData});
+  SettingsScreen({
+    super.key,
+  });
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -62,47 +66,56 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           .copyWith(color: greyTextColor),
                     ),
                   ),
-                  _buildSettingsItem(
-                      context,
-                      'Edit Account',
-                      () => Navigator.push(
-                          context,
-                          AnimatedNavigation().slideAnimation(Questionaire1(
-                            isEdit: true,
-                            accountData: widget.accountData,
-                          )))),
+                  Consumer<AccountProvider>(
+                      builder: (context, provider, child) {
+                    return _buildSettingsItem(context, 'Edit Account', () {
+                      if (provider.accountData != null) {
+                        
+                        Navigator.push(
+                            context,
+                            AnimatedNavigation().slideAnimation(Questionaire1(
+                              isEdit: true,
+                              accountData: provider.accountData,
+                            )));
+                      } else {
+                       
+                        Navigator.push(
+                            context,
+                            AnimatedNavigation().slideAnimation(Questionaire1(
+                              isEdit: true,
+                            )));
+                      }
+                    });
+                  }),
                   _buildSettingsItem(
                     context,
                     'See Plans',
-                    () => Navigator.push(context,
-                        AnimatedNavigation().slideAnimation(PlansScreen(fromSettings: true,))),
+                    () => Navigator.push(
+                        context,
+                        AnimatedNavigation().slideAnimation(PlansScreen(
+                          fromSettings: true,
+                        ))),
                   ),
                   _buildSettingsItem(
                     context,
                     'Change Password',
-                    () => Navigator.push(
-                      context,
-                     AnimatedNavigation().slideAnimation(ChangePw())
-                    ),
+                    () => Navigator.push(context,
+                        AnimatedNavigation().slideAnimation(ChangePw())),
                   ),
-                 
                   _buildSettingsItem(
                     context,
                     'Closed Jobs',
-                    () => Navigator.push(
-                      context,
-                     AnimatedNavigation().slideAnimation(ClosedJobs())
-                    ),
+                    () => Navigator.push(context,
+                        AnimatedNavigation().slideAnimation(ClosedJobs())),
                   ),
                   _buildSettingsItem(
                     context,
                     'Suggestions',
                     () => Navigator.push(
-                      context,
-                      AnimatedNavigation().slideAnimation(SuggestionScreen())
-                    ),
+                        context,
+                        AnimatedNavigation()
+                            .slideAnimation(SuggestionScreen())),
                   ),
-                 
                   _buildSettingsItem(
                     context,
                     'FAQ',
@@ -144,8 +157,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             });
                             Future.delayed(const Duration(seconds: 2),
                                 () async {
-                              final _storage =
-                                  FlutterSecureStorage(); // Remove 'await' from the constructor
+                              final _storage = FlutterSecureStorage();
                               await _storage.deleteAll();
                               await _storage.write(
                                   key: "user", value: "installed");

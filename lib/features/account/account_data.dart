@@ -21,6 +21,7 @@ class AccountData {
 
 
 
+
   AccountData({
     this.about,
     this.address,
@@ -86,6 +87,29 @@ class UserModel{
       phone: json["username"],
       id: json["id"],
       name: json["name"]
+    );
+  }
+}
+
+
+
+class UserData {
+  final AccountData? accountModel;
+  final UserModel userModel;
+
+  UserData({
+    this.accountModel,
+    required this.userModel,
+  });
+
+  // Factory constructor to create UserData from UserModel and AccountData
+  factory UserData.fromModels({
+    required UserModel userModel,
+    AccountData? accountModel,
+  }) {
+    return UserData(
+      userModel: userModel,
+      accountModel: accountModel,
     );
   }
 }

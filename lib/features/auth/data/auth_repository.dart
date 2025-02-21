@@ -1,11 +1,8 @@
 import 'dart:convert';
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:recruiter_app/core/utils/custom_functions.dart';
-import 'package:recruiter_app/features/responses/view/response.dart';
 import 'package:recruiter_app/features/settings/data/settings_repository.dart';
 import 'package:recruiter_app/features/settings/model/subscription_model.dart';
 import 'package:recruiter_app/services/auth_services/change_pw_service.dart';
@@ -14,8 +11,6 @@ import 'package:recruiter_app/services/auth_services/login_service.dart';
 import 'package:recruiter_app/services/auth_services/otp_service.dart';
 import 'package:recruiter_app/services/auth_services/register_service.dart';
 import 'package:recruiter_app/services/plans/plans_service.dart';
-import 'package:recruiter_app/services/subscriptions/subscribe_service.dart';
-import 'package:recruiter_app/widgets/common_alertdialogue.dart';
 
 class AuthRepository {
   Future<String?> register({
@@ -41,8 +36,7 @@ class AuthRepository {
         whatsappUpdations: whatsappUpdations,
       );
 
-      print(
-          "Register response ${registerResponse.statusCode}, ${registerResponse.body}");
+      
       final Map<String, dynamic> responseData =
           jsonDecode(registerResponse.body);
 
@@ -54,7 +48,7 @@ class AuthRepository {
         return "An unexpected error occurred";
       }
     } catch (e) {
-      print("Error during registration: $e");
+      
       return "An error occurred during registration";
     }
   }
@@ -64,22 +58,6 @@ class AuthRepository {
       required String password,
       required BuildContext context}) async {
     try {
-      bool hasInternet = await CustomFunctions.checkInternetConnection();
-      print(hasInternet);
-      if (!hasInternet) {
-        showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return CommonAlertDialog(
-                  title: "Oops!",
-                  message: "Check your internet connection",
-                  onConfirm: () {},
-                  onlyConfirm: true,
-                  onCancel: () {},
-                  height: 200);
-            });
-      }
-
       final response = await LoginService.emailLoginService(
           email: email, password: password);
 
@@ -169,6 +147,11 @@ class AuthRepository {
 
   Future<String?> forgotPw({required String phone}) async {
     try {
+       bool hasInternet = await CustomFunctions.checkInternetConnection();
+       print("cccccccccc  $hasInternet");
+      if (!hasInternet) {
+        return "Check your internet connection";
+      }
       final response = await ForgotPwService().forgotPw(phone: phone);
 
       print("Response of forgot pw ${response.statusCode}, ${response.body}");
@@ -192,11 +175,21 @@ class AuthRepository {
       print(
           "Response of email erify ${response.statusCode},  ${response.body}");
       final Map<String, dynamic> responseData = jsonDecode(response.body);
+      
+      Fluttertoast.showToast(
+        msg: responseData["message"],
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0
+    );
       if (response.statusCode == 200) {
-        await CustomFunctions()
-            .storeCredentials("access_token", responseData["access"]);
-        await CustomFunctions()
-            .storeCredentials("refresh_token", responseData["refresh"]);
+        // await CustomFunctions()
+        //     .storeCredentials("access_token", responseData["access"]);
+        // await CustomFunctions()
+        //     .storeCredentials("refresh_token", responseData["refresh"]);
         return "success";
       } else {
         return responseData["message"];
@@ -217,6 +210,10 @@ class AuthRepository {
           "Response of email erify ${response.statusCode},  ${response.body}");
       final Map<String, dynamic> responseData = jsonDecode(response.body);
       if (response.statusCode == 200) {
+         await CustomFunctions()
+            .storeCredentials("access_token", responseData["access"]);
+        await CustomFunctions()
+            .storeCredentials("refresh_token", responseData["refresh"]);
         return "success";
       } else {
         return responseData["message"];
@@ -259,6 +256,7 @@ class AuthRepository {
       required String phone,
       required String otp}) async {
     try {
+      
       final response = await ChangePwService.changePwByForgotPw(
           password: password, phone: phone, otp: otp);
       print("${response.statusCode},   ${response.body}");

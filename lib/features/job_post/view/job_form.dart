@@ -1025,9 +1025,8 @@ class _JobFormState extends State<JobForm> {
                     height: 15,
                   ),
                   addQuestion == true
-                      ? Form(
-                          key: _questionsForm,
-                          child: ReusableTextfield(
+                      ? 
+                          ReusableTextfield(
                             controller: _questionCont,
                             validation: (_) {
                               if (_questionCont.text.trim().isEmpty) {
@@ -1039,8 +1038,7 @@ class _JobFormState extends State<JobForm> {
                             hintText: "Enter your question here...",
                             labelText: "Question",
                             float: FloatingLabelBehavior.never,
-                          ),
-                        )
+                          )
                       : const SizedBox.shrink(),
                   const SizedBox(
                     height: 10,
