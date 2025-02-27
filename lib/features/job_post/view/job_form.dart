@@ -116,7 +116,8 @@ class _JobFormState extends State<JobForm> {
         _selectedEducation = widget.jobData!.education ?? '';
         _selectedCurrency = widget.jobData!.currency ?? 'INR';
         if (widget.jobData!.skills != null) {
-          selectedSkills = List<String>.from(widget.jobData!.skills!);
+          // selectedSkills = widget.jobData!.skills as List<String>;
+          selectedSkills = widget.jobData!.skills != null ? List<String>.from(widget.jobData!.skills!): [];
         }
         if (widget.jobData!.customQuestions != null) {
           customQuestionSLists =
@@ -163,7 +164,6 @@ class _JobFormState extends State<JobForm> {
       });
     }
 
-    print(validateCurrentStep());
   }
 
   void submitForm() async {
@@ -198,7 +198,7 @@ class _JobFormState extends State<JobForm> {
       if (result == "success") {
         Navigator.pushReplacement(
             context, AnimatedNavigation().fadeAnimation(AllJobs()));
-        CommonSnackbar.show(context, message: "Chnages saved successfully!");
+        CommonSnackbar.show(context, message: "Changes saved successfully!");
         Provider.of<JobPostingProvider>(context, listen: false).fetchJobLists();
       } else {
         CommonSnackbar.show(context, message: result.toString());
@@ -379,7 +379,6 @@ class _JobFormState extends State<JobForm> {
                                 child: ReusableButton(
                                   // isLoading: ,
                                   action: () async {
-                                    print("pppppppppppppppp");
                                     handleNext(theme);
                                   },
                                   text:
@@ -406,7 +405,6 @@ class _JobFormState extends State<JobForm> {
   }
 
   Widget _buildJobDetailsForm({required ThemeData theme}) {
-    print(selectedSkills.length);
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -656,12 +654,12 @@ class _JobFormState extends State<JobForm> {
               spacing: 10,
               children: [
                 Text("Roles and Responsibilities",
-                    style: theme.textTheme.titleLarge!
+                    style:  AppTheme.mediumTitleText(lightTextColor)
                         .copyWith(fontWeight: FontWeight.bold)),
                 Text(
                   "Outline the key activities and responsibilities that define the role and showcase its impact!",
                   style:
-                      theme.textTheme.bodySmall!.copyWith(color: greyTextColor),
+                       AppTheme.bodyText(greyTextColor).copyWith(fontSize: 12),
                 ),
                 ReusableTextfield(
                   controller: _roleDescriptionCont,
@@ -675,12 +673,12 @@ class _JobFormState extends State<JobForm> {
                   borderColor: Colors.transparent,
                 ),
                 Text("Desired Candidate Profile",
-                    style: theme.textTheme.titleLarge!
+                    style:  AppTheme.mediumTitleText(lightTextColor)
                         .copyWith(fontWeight: FontWeight.bold)),
                 Text(
                   "Highlight the ideal candidate's skills, relevant experience, certifications, and qualifications to excel in the role!",
                   style:
-                      theme.textTheme.bodySmall!.copyWith(color: greyTextColor),
+                       AppTheme.bodyText(greyTextColor).copyWith(fontSize: 12),
                 ),
                 ReusableTextfield(
                   controller: _descriptionCont,
@@ -1086,46 +1084,6 @@ class _JobFormState extends State<JobForm> {
     );
   }
 
-  Widget _buildQuestionsWidget({required ThemeData theme}) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-          color: Colors.white, borderRadius: BorderRadius.circular(15.r)),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 15,
-          children: [
-            _buildTitleWidget(
-                theme: theme,
-                title: "Custom questions for candidate",
-                isSubtitle: true,
-                subTitle:
-                    "You can add questions that candidates can answer while applying for this job."),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                InkWell(
-                    onTap: () {},
-                    child: Text(
-                      "+ Add question",
-                      style: theme.textTheme.bodyMedium!.copyWith(
-                          color: secondaryColor, fontWeight: FontWeight.bold),
-                    )),
-                Text(
-                  "You can add upto 5 questions",
-                  style: theme.textTheme.bodySmall!.copyWith(
-                    color: greyTextColor,
-                  ),
-                )
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   Widget _buildTitleWidget(
       {required ThemeData theme,
@@ -1139,10 +1097,10 @@ class _JobFormState extends State<JobForm> {
           spacing: 3,
           children: [
             Text(title,
-                style: theme.textTheme.titleLarge!
+                style: AppTheme.mediumTitleText(lightTextColor)
                     .copyWith(fontWeight: FontWeight.bold)),
             Text("*",
-                style: theme.textTheme.titleLarge!
+                style:AppTheme.mediumTitleText(lightTextColor)
                     .copyWith(fontWeight: FontWeight.bold, color: Colors.red))
           ],
         ),
@@ -1150,7 +1108,7 @@ class _JobFormState extends State<JobForm> {
             ? Text(
                 subTitle ?? "",
                 style:
-                    theme.textTheme.bodyMedium!.copyWith(color: greyTextColor),
+                    AppTheme.bodyText(greyTextColor).copyWith(fontSize: 12),
               )
             : const SizedBox.shrink(),
       ],
@@ -1166,11 +1124,11 @@ class _JobFormState extends State<JobForm> {
       children: [
         Text(
           heading,
-          style: theme.textTheme.headlineMedium,
+          style: AppTheme.mediumTitleText(lightTextColor).copyWith(),
         ),
         Text(
           subHeading,
-          style: theme.textTheme.bodyMedium!.copyWith(color: greyTextColor),
+          style:AppTheme.bodyText(greyTextColor).copyWith(fontSize: 12),
         ),
       ],
     );
@@ -1202,6 +1160,7 @@ class _JobFormState extends State<JobForm> {
         },
         decoratorProps: DropDownDecoratorProps(
           expands: false,
+          baseStyle:  AppTheme.bodyText(lightTextColor),
           decoration: InputDecoration(
             labelText: labelText,
             border: OutlineInputBorder(
@@ -1223,9 +1182,13 @@ class _JobFormState extends State<JobForm> {
         onChanged: onChanged,
         popupProps: PopupProps.menu(
           showSearchBox: true,
+          
           searchFieldProps: TextFieldProps(
+            style: AppTheme.bodyText(lightTextColor),
             decoration: InputDecoration(
               hintText: hintText,
+              labelStyle: AppTheme.bodyText(greyTextColor),
+              hintStyle:  AppTheme.bodyText(greyTextColor),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
                 borderSide: const BorderSide(color: borderColor),

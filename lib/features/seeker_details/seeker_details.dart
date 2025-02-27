@@ -1,31 +1,30 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:recruiter_app/core/constants.dart';
+import 'package:recruiter_app/core/theme.dart';
 import 'package:recruiter_app/core/utils/custom_functions.dart';
 import 'package:recruiter_app/core/utils/navigation_animation.dart';
-import 'package:recruiter_app/features/details/job_details.dart';
 import 'package:recruiter_app/features/details/job_details_provider.dart';
 import 'package:recruiter_app/features/details/widgets/send_email_widget.dart';
 import 'package:recruiter_app/features/job_post/model/job_post_model.dart';
-import 'package:recruiter_app/features/job_post/view/job_form.dart';
 import 'package:recruiter_app/features/job_post/viewmodel.dart/job_posting_provider.dart';
 import 'package:recruiter_app/features/resdex/model/interview_model.dart';
-import 'package:recruiter_app/features/resdex/model/invite_seeker_model.dart';
 import 'package:recruiter_app/features/resdex/model/job_response_model.dart';
 import 'package:recruiter_app/features/resdex/model/seeker_model.dart';
 import 'package:recruiter_app/features/resdex/provider/interview_provider.dart';
+import 'package:recruiter_app/features/resdex/provider/resume_provider.dart';
 import 'package:recruiter_app/features/resdex/provider/search_seeker_provider.dart';
 import 'package:recruiter_app/features/resdex/widgets/common_dropdown_widget.dart';
+import 'package:recruiter_app/features/resdex/widgets/pdf_view_screen.dart';
 import 'package:recruiter_app/features/seeker_details/invite_seeker_provider.dart';
 import 'package:recruiter_app/features/seeker_details/widgets/details_tab_widget.dart';
-import 'package:recruiter_app/features/seeker_details/widgets/job_activity_tab.dart';
-import 'package:recruiter_app/viewmodels/job_viewmodel.dart';
 import 'package:recruiter_app/widgets/chip_container_widget.dart';
 import 'package:recruiter_app/widgets/common_appbar_widget.dart';
 import 'package:recruiter_app/widgets/common_error_widget.dart';
@@ -80,10 +79,8 @@ class _SeekerDetailsState extends State<SeekerDetails>
 
   @override
   Widget build(BuildContext context) {
-
     final screenHeight = MediaQuery.of(context).size.height.h;
     final screenWidth = MediaQuery.of(context).size.width.w;
-    final theme = Theme.of(context);
     final seekerName = widget.seekerData.personalData?.user.name ?? "Unknown";
     final id = widget.seekerData.personalData?.personal.id;
     bool bookMarked = Provider.of<SearchSeekerProvider>(context, listen: false)
@@ -103,7 +100,7 @@ class _SeekerDetailsState extends State<SeekerDetails>
 
           final _provider =
               Provider.of<JobDetailsProvider>(context, listen: false);
-              final inviteProvider =
+          final inviteProvider =
               Provider.of<SearchSeekerProvider>(context, listen: false);
 
           InterviewModel? model = (_provider.interviewedSeekerLists != null &&
@@ -118,20 +115,7 @@ class _SeekerDetailsState extends State<SeekerDetails>
                 )
               : null;
 
-  // InvitedSeekerWithJob? invitedModel = (inviteProvider.invitedCandidateLists != null &&
-  //                 inviteProvider.invitedCandidateLists!.isNotEmpty)
-  //             ? inviteProvider.invitedCandidateLists!.firstWhere(
-  //                 (item) =>
-  //                     item.seeker.personalData?.personal.id ==
-  //                     widget.seekerData.personalData?.personal.id,
-  //                 orElse: () => InvitedSeekerWithJob(
-  //                   job: JobPostModel(),
-  //                   read: false,
-  //                     seeker: widget.seekerData), // ✅ Provide a default InterviewModel instance
-  //               )
-  //             : null;
-
-
+      
           return SpeedDial(
             activeBackgroundColor: secondaryColor,
             backgroundColor: secondaryColor,
@@ -149,7 +133,7 @@ class _SeekerDetailsState extends State<SeekerDetails>
                 backgroundColor: buttonColor,
                 label: "Invite $seekerName for job",
                 onTap: () {
-                  _showInviteSheet(theme: theme);
+                  _showInviteSheet();
                 },
               ),
               if (widget.fromResponse == true)
@@ -376,11 +360,12 @@ class _SeekerDetailsState extends State<SeekerDetails>
                   children: [
                     Consumer<SearchSeekerProvider>(
                         builder: (context, provider, child) {
+                      final isBookmarked = provider.bookmarkedStates[
+                              widget.seekerData.personalData!.personal.id] ==
+                          true;
                       return CommonAppbarWidget(
                         isBackArrow: true,
-                        icon: provider.bookmarkedStates[widget
-                                    .seekerData.personalData!.personal.id] ==
-                                true
+                        icon: isBookmarked
                             ? Icons.bookmark
                             : Icons.bookmark_outline,
                         action: () {
@@ -389,8 +374,7 @@ class _SeekerDetailsState extends State<SeekerDetails>
                         title: CustomFunctions.toSentenceCase(seekerName),
                       );
                     }),
-                    _buildProfileCard(
-                        theme: theme, seekerData: widget.seekerData),
+                    _buildProfileCard(seekerData: widget.seekerData),
                     DetailsTabWidget(seekerData: widget.seekerData),
                   ],
                 ),
@@ -402,42 +386,34 @@ class _SeekerDetailsState extends State<SeekerDetails>
     );
   }
 
-  Widget _profileTabWidget({
-    required ThemeData theme,
-  }) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15),
-        child: Column(
-          spacing: 15,
-          children: [
-            const SizedBox(
-              height: 5,
-            ),
-            Text(
-              "View the seeker's personal and professional information, including contact details, skills, experience, and qualifications",
-              style: theme.textTheme.bodyMedium!.copyWith(color: greyTextColor),
-            ),
-            _buildSummaryWidget(theme: theme, seekerData: widget.seekerData),
-            _buildSkillWidget(theme: theme, skills: []),
-            _buildBasicDetailsWidget(
-                theme: theme, seekerData: widget.seekerData),
-            _buildExperienceWidget(theme: theme, seekerData: widget.seekerData),
-            _buildQualificationWidget(
-                theme: theme, seekerData: widget.seekerData),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _jobActivityTabWidget({
-    required ThemeData theme,
-  }) {
-    return Column(
-      children: [],
-    );
-  }
+  // Widget _profileTabWidget({
+  //   required ThemeData theme,
+  // }) {
+  //   return SingleChildScrollView(
+  //     child: Padding(
+  //       padding: const EdgeInsets.symmetric(horizontal: 15),
+  //       child: Column(
+  //         spacing: 15,
+  //         children: [
+  //           const SizedBox(
+  //             height: 5,
+  //           ),
+  //           Text(
+  //             "View the seeker's personal and professional information, including contact details, skills, experience, and qualifications",
+  //             style: theme.textTheme.bodyMedium!.copyWith(color: greyTextColor),
+  //           ),
+  //           _buildSummaryWidget(seekerData: widget.seekerData),
+  //           _buildSkillWidget(theme: theme, skills: []),
+  //           _buildBasicDetailsWidget(
+  //               theme: theme, seekerData: widget.seekerData),
+  //           _buildExperienceWidget(theme: theme, seekerData: widget.seekerData),
+  //           _buildQualificationWidget(
+  //               theme: theme, seekerData: widget.seekerData),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
   void _showInterviewScheduleSheet(
       {required ThemeData theme,
@@ -704,7 +680,7 @@ class _SeekerDetailsState extends State<SeekerDetails>
             }));
   }
 
-  void _showInviteSheet({required ThemeData theme}) {
+  void _showInviteSheet() {
     bool isLoading = false;
     showModalBottomSheet(
         context: context,
@@ -736,13 +712,15 @@ class _SeekerDetailsState extends State<SeekerDetails>
                             children: [
                               Text(
                                 "Do you want to invite",
-                                style: theme.textTheme.titleMedium!.copyWith(),
+                                style: AppTheme.mediumTitleText(lightTextColor)
+                                    .copyWith(),
                               ),
                               Text(
                                 " ${CustomFunctions.toSentenceCase(widget.seekerData.personalData!.user.name.toString())}",
-                                style: theme.textTheme.titleMedium!.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: buttonColor),
+                                style: AppTheme.mediumTitleText(lightTextColor)
+                                    .copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: buttonColor),
                               )
                             ],
                           )
@@ -774,23 +752,22 @@ class _SeekerDetailsState extends State<SeekerDetails>
                                       }).toList()
                                     : [];
                             return CommonDropdownWidget(
-                                    hintText: "Select job",
-                                    labelText: "Job",
-                                    list: _jobTitleLists,
-                                    onChanged: (value) {
-                                      setModalState(() {
-                                        _selectedJob = value ?? '';
-                                        // Find the job object that matches the selected title
+                              hintText: "Select job",
+                              labelText: "Job",
+                              list: _jobTitleLists,
+                              onChanged: (value) {
+                                setModalState(() {
+                                  _selectedJob = value ?? '';
+                                  // Find the job object that matches the selected title
 
-                                        final job = provider.jobLists
-                                            ?.firstWhere((job) =>
-                                                job.title == _selectedJob);
+                                  final job = provider.jobLists?.firstWhere(
+                                      (job) => job.title == _selectedJob);
 
-                                        jobId = job?.id;
-                                      });
-                                    },
-                                    selectedVariable: _selectedJob,
-                                    theme: theme)
+                                  jobId = job?.id;
+                                });
+                              },
+                              selectedVariable: _selectedJob,
+                            )
                                 .animate()
                                 .fadeIn(duration: 900.ms)
                                 .slideX(begin: -0.5, end: 0);
@@ -850,8 +827,7 @@ class _SeekerDetailsState extends State<SeekerDetails>
             }));
   }
 
-  Widget _buildProfileCard(
-      {required ThemeData theme, required SeekerModel seekerData}) {
+  Widget _buildProfileCard({required SeekerModel seekerData}) {
     return AnimatedContainer(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -871,9 +847,28 @@ class _SeekerDetailsState extends State<SeekerDetails>
               height: 100.h,
               width: 100.w,
               decoration: BoxDecoration(
-                color: secondaryColor,
+                color: Colors.transparent,
                 borderRadius: BorderRadius.circular(10.r),
               ),
+              child:  ClipRRect(
+                borderRadius: BorderRadius.circular(10.r),
+                        child: CachedNetworkImage(
+                          imageUrl: widget.seekerData.personalData!.personal.profileImage.toString(),
+                          placeholder: (context, url) => const Center(
+                            child: CircularProgressIndicator(
+                              backgroundColor: greyTextColor,
+                              color: secondaryColor,
+                            ),
+                          ),
+                          errorWidget: (context, url, error) => Image.asset(
+                            "assets/images/profile_picture.jpg",
+                            fit: BoxFit.cover,
+                          ),
+                          fit: BoxFit.cover,
+                          // width: 60,
+                          // height: 60,
+                        ),
+                      ).animate().fadeIn(duration: 500.ms).scale(),
             ),
             Expanded(
                 child: Column(
@@ -890,19 +885,19 @@ class _SeekerDetailsState extends State<SeekerDetails>
                           ? widget.seekerData.employmentData != null
                               ? widget.seekerData.employmentData!.first.jobRole
                                   .toString()
-                              : ""
+                              : "N/A"
                           : "Fresher"),
-                  style: theme.textTheme.titleLarge!.copyWith(),
+                  style: AppTheme.mediumTitleText(lightTextColor).copyWith(),
                 ).animate().fadeIn(duration: 900.ms).scale(),
                 Text.rich(TextSpan(text: "", children: [
                   TextSpan(
                       text: "0",
-                      style: theme.textTheme.bodyMedium!
+                      style: AppTheme.mediumTitleText(lightTextColor)
                           .copyWith(fontWeight: FontWeight.bold)),
                   TextSpan(text: "yr "),
                   TextSpan(
                       text: "0",
-                      style: theme.textTheme.bodyMedium!
+                      style: AppTheme.mediumTitleText(lightTextColor)
                           .copyWith(fontWeight: FontWeight.bold)),
                   TextSpan(text: "m"),
                 ])),
@@ -914,7 +909,13 @@ class _SeekerDetailsState extends State<SeekerDetails>
                     Text(
                       "📧",
                     ),
-                    Text(seekerData.personalData!.user.email.toString())
+                    Expanded(
+                      child: Text(
+                        seekerData.personalData!.user.email.toString(),
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTheme.bodyText(lightTextColor),
+                      ),
+                    )
                   ],
                 ),
                 Row(
@@ -925,25 +926,95 @@ class _SeekerDetailsState extends State<SeekerDetails>
                     Text(
                       "📱",
                     ),
-                    Text(seekerData.personalData!.user.phoneNumber.toString())
+                    Text(
+                      seekerData.personalData!.user.phoneNumber.toString(),
+                      style: AppTheme.bodyText(lightTextColor),
+                    )
                   ],
                 ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: ReusableButton(
-                        height: 30.h,
-                        textColor: Colors.white,
-                        iconWidget: const Icon(
-                          Icons.download_rounded,
-                          color: Colors.white,
-                        ),
-                        action: () {},
-                        text: "Download Resume",
-                      ).animate().fadeIn(duration: 800.ms).scale(),
-                    ),
-                  ],
-                )
+                widget.fromResponse == true
+                    ? Row(
+                        children: [
+                          Expanded(
+                            child: ReusableButton(
+                              height: 30.h,
+                              textColor: Colors.white,
+                              iconWidget: const Icon(
+                                Icons.download_rounded,
+                                color: Colors.white,
+                              ),
+                              action: () async {
+                                if (widget.responseData != null) {
+
+                                  
+                                  final result =
+                                      await Provider.of<ResumeProvider>(context,
+                                              listen: false)
+                                          .downloadResume(
+                                              id: widget.responseData!.id,
+                                              context: context);
+
+                                              CommonSnackbar.show(context, message: result.toString());
+
+                                  if (result != null) {
+                                    if (result == true) {
+                                     
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Text("Downloaded sucessfully. You can view the resume in saved CV section in resdex"),
+                                          behavior: SnackBarBehavior.floating,
+                                          margin: const EdgeInsets.symmetric(
+                                              horizontal: 20, vertical: 20),
+                                          shape: RoundedRectangleBorder(
+                                            side: const BorderSide(
+                                                color: borderColor, width: 1),
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          ),
+                                          elevation: 0,
+                                          backgroundColor: Colors.black,
+                                          duration: const Duration(seconds: 20),
+                                          showCloseIcon: true,
+                                        ),
+                                      );
+                                    }else{
+                                      CommonSnackbar.show(context, message: "Failed to download. Please try again later");
+                                    }
+                                  }else{
+                                    CommonSnackbar.show(context, message: "Something went wrong. Please try again later");
+                                  }
+                                }
+                              },
+                              text: "Download Resume",
+                            ).animate().fadeIn(duration: 800.ms).scale(),
+                          ),
+                        ],
+                      )
+                    :  Row(
+                        children: [
+                          Expanded(
+                            child: ReusableButton(
+                              height: 30.h,
+                              textColor: Colors.white,
+                              iconWidget: const Icon(
+                                Icons.visibility,
+                                color: Colors.white,
+                              ),
+                              action: () async {
+                               
+                                if (widget.seekerData.personalData != null && widget.seekerData.personalData!.personal.cv != null) {
+                                    Navigator.push(context, AnimatedNavigation().fadeAnimation(PdfViewerScreen(cv: "https://job.emergiogames.com${widget.seekerData.personalData!.personal.cv}",)));
+                                }else{
+                                  CommonSnackbar.show(context, message: "CV not found for this profile");
+                                }
+                              },
+                              text: "View Resume",
+                            ).animate().fadeIn(duration: 800.ms).scale(),
+                          ),
+                        ],
+                      )
+                    
               ],
             ))
           ],
@@ -952,24 +1023,27 @@ class _SeekerDetailsState extends State<SeekerDetails>
     ).animate().fadeIn(duration: 500.ms).slideY(begin: 0.5, end: 0);
   }
 
-  Widget _buildSummaryWidget(
-      {required ThemeData theme, required SeekerModel seekerData}) {
+  Widget _buildSummaryWidget({required SeekerModel seekerData}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 10,
       children: [
         Text(
           "Summary",
-          style: theme.textTheme.titleLarge!
-              .copyWith(fontWeight: FontWeight.bold, color: secondaryColor),
+          style: AppTheme.mediumTitleText(secondaryColor)
+              .copyWith(fontWeight: FontWeight.bold),
         ),
         AnimatedContainer(
           duration: 200.ms,
           child: Column(
             children: [
               Text(
-                "Performing hot reload...cReloaded 1 of 2617 libraries in 1,247ms (compile: 59 ms, reload: 514 ms, reassemble: 321 ms). D/EGL_emulation(14066): app_time_stats: avg=58219.61ms min=58219.61ms max=58219.61ms count=1",
-                style: theme.textTheme.bodyMedium!.copyWith(),
+                seekerData.personalData != null
+                    ? CustomFunctions.toSentenceCase(seekerData
+                        .personalData!.personal.introduction
+                        .toString())
+                    : "N/A",
+                style: AppTheme.bodyText(lightTextColor).copyWith(),
               )
             ],
           ),
@@ -1042,457 +1116,6 @@ class _SeekerDetailsState extends State<SeekerDetails>
     );
   }
 
-  Widget _buildExperienceWidget(
-      {required ThemeData theme, required SeekerModel seekerData}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "Experiences",
-          style: theme.textTheme.titleLarge!
-              .copyWith(fontWeight: FontWeight.bold, color: secondaryColor),
-        ),
-        SizedBox(height: 20), // Replace spacing parameter
-        seekerData.employmentData != null &&
-                seekerData.employmentData!.isNotEmpty
-            ? Column(
-                children:
-                    seekerData.employmentData!.asMap().entries.map((data) {
-                  final index = data.key;
-                  final employmentData = data.value;
-                  final _borderColor =
-                      index.isEven ? secondaryColor : buttonColor;
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: AnimatedContainer(
-                      duration: 900.ms,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(15.r),
-                        boxShadow: [
-                          BoxShadow(
-                              blurRadius: 8.r,
-                              offset: const Offset(0, 4.5),
-                              color: borderColor)
-                        ],
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          spacing: 8,
-                          children: [
-                            _buildItemWidget(
-                                theme: theme,
-                                text: CustomFunctions.toSentenceCase(
-                                    employmentData.companyName ?? "N/A"),
-                                fontWeight: FontWeight.bold,
-                                icon: Text("🏢")),
-                            _buildItemWidget(
-                              theme: theme,
-                              text:
-                                  "Experience : ${CustomFunctions.toSentenceCase(employmentData.experience ?? "0")}yr",
-                              fontWeight: FontWeight.normal,
-                              fontSize: 12.sp,
-                              // icon: Icon(Icons.business)
-                            ),
-                            Row(
-                              children: [
-                                Expanded(
-                                  // Correct usage of Expanded inside Row
-                                  child: _buildItemWidget(
-                                      theme: theme,
-                                      text:
-                                          "${CustomFunctions.toSentenceCase(employmentData.jobTitle ?? "N/A")}",
-                                      fontSize: 12.sp,
-                                      fontWeight: FontWeight.normal,
-                                      icon: Text(
-                                        "👨‍💼",
-                                      )),
-                                ),
-                                Expanded(
-                                  // Correct usage of Expanded inside Row
-                                  child: _buildItemWidget(
-                                      theme: theme,
-                                      text:
-                                          "${CustomFunctions.toSentenceCase(employmentData.jobTitle ?? "N/A")}",
-                                      fontSize: 12.sp,
-                                      fontWeight: FontWeight.normal,
-                                      icon: Text("💼")),
-                                ),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: _buildItemWidget(
-                                    theme: theme,
-                                    text:
-                                        "CTC : ${formatCTC(employmentData.ctc ?? "0")}",
-                                    icon: const Text(
-                                      "💰",
-                                    ),
-                                    fontSize: 12.sp,
-                                    fontWeight: FontWeight.normal,
-                                  ),
-                                ),
-                                Expanded(
-                                  child: _buildItemWidget(
-                                      theme: theme,
-                                      text:
-                                          "Notice period : ${CustomFunctions.toSentenceCase(employmentData.noticePeriod ?? "N/A")}",
-                                      fontSize: 12.sp,
-                                      fontWeight: FontWeight.normal,
-                                      icon: const Text("⏰")),
-                                ),
-                              ],
-                            ),
-                            _buildItemWidget(
-                                theme: theme,
-                                text:
-                                    "Industry : ${employmentData.roleCategory ?? "N/A"}",
-                                fontWeight: FontWeight.normal,
-                                fontSize: 12.sp,
-                                icon: const Text(
-                                  "🏭",
-                                )),
-                          ],
-                        ),
-                      ),
-                    )
-                        .animate()
-                        .fadeIn(duration: 500.ms)
-                        .slideY(begin: 0.5, end: 0),
-                  );
-                }).toList(),
-              )
-            : _buildEmptyDataWidget(
-                icon: Icons.work_outline, text: "No experience found")
-      ],
-    );
-  }
-
-  Widget _buildQualificationWidget(
-      {required ThemeData theme, required SeekerModel seekerData}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 20,
-      children: [
-        Text(
-          "Qualifications",
-          style: theme.textTheme.titleLarge!
-              .copyWith(fontWeight: FontWeight.bold, color: secondaryColor),
-        ),
-        widget.seekerData.qualificationData != null &&
-                widget.seekerData.qualificationData!.isNotEmpty
-            ? Column(
-                children:
-                    seekerData.qualificationData!.asMap().entries.map((data) {
-                  final index = data.key;
-                  final qualificationData = data.value;
-                  final _borderColor =
-                      index.isEven ? secondaryColor : buttonColor;
-
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: AnimatedContainer(
-                      duration: 900.ms,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(15.r),
-                        boxShadow: [
-                          BoxShadow(
-                              blurRadius: 8.r,
-                              offset: const Offset(0, 4.5),
-                              color: borderColor)
-                        ],
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          spacing: 10,
-                          children: [
-                            _buildQualificationItemWIdget(
-                                theme: theme,
-                                title: "Education",
-                                subTitle: qualificationData.education ?? 'N/A',
-                                icon: "🎓"),
-                            _buildQualificationItemWIdget(
-                                theme: theme,
-                                title: "Course",
-                                subTitle: qualificationData.course ?? 'N/A',
-                                icon: '📘'),
-                            _buildQualificationItemWIdget(
-                                theme: theme,
-                                title: "University",
-                                subTitle: qualificationData.university ?? 'N/A',
-                                icon: "🏫"),
-                            Row(
-                              children: [
-                                Text("📅 "),
-                                Expanded(
-                                    child: Text("Duration",
-                                        style: theme.textTheme.titleMedium!
-                                            .copyWith(
-                                                fontSize: 12.sp,
-                                                fontWeight: FontWeight.bold))),
-                                Text(": "),
-                                Expanded(
-                                  child: Text(
-                                      "${qualificationData.startingYr ?? "0"} - ${qualificationData.endingYr ?? "0"}",
-                                      style:
-                                          theme.textTheme.titleMedium!.copyWith(
-                                        fontSize: 12.sp,
-                                      )),
-                                )
-                              ],
-                            ),
-                            _buildQualificationItemWIdget(
-                                theme: theme,
-                                title: "Grade",
-                                subTitle: qualificationData.grade ?? 'N/A',
-                                icon: "⭐"),
-                          ],
-                        ),
-                      ),
-                    )
-                        .animate()
-                        .fadeIn(duration: 500.ms)
-                        .slideY(begin: 1, end: 0),
-                  );
-                }).toList(),
-              )
-            : _buildEmptyDataWidget(
-                icon: Icons.workspace_premium, text: "No qualification Found")
-      ],
-    );
-  }
-
-  Widget _buildBasicDetailsWidget(
-      {required ThemeData theme, required SeekerModel seekerData}) {
-    String getFormattedDate(String date) {
-      final DateTime dateTime = DateTime.parse(date);
-      return "${dateTime.day}/${dateTime.month}/${dateTime.year}";
-    }
-
-    return Column(
-      spacing: 20,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "Personal Details",
-          style: theme.textTheme.titleLarge!
-              .copyWith(fontWeight: FontWeight.bold, color: secondaryColor),
-        ),
-        seekerData.personalData != null
-            ? Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: AnimatedContainer(
-                      duration: 900.ms,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(15.r),
-                        boxShadow: [
-                          BoxShadow(
-                              blurRadius: 8.r,
-                              offset: const Offset(0, 4.5),
-                              color: borderColor)
-                        ],
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(10),
-                        child: Column(
-                          spacing: 10,
-                          children: [
-                            _buildQualificationItemWIdget(
-                                theme: theme,
-                                title: "Email",
-                                subTitle: seekerData.personalData!.user.email ??
-                                    "N/A",
-                                icon: "📧"),
-                            _buildQualificationItemWIdget(
-                                theme: theme,
-                                title: "Phone",
-                                subTitle:
-                                    seekerData.personalData!.user.phoneNumber ??
-                                        "N/A",
-                                icon: "📱"),
-                            _buildQualificationItemWIdget(
-                                theme: theme,
-                                title: "Professional Role",
-                                subTitle: CustomFunctions.toSentenceCase(
-                                    seekerData.personalData!.user.role ??
-                                        "N/A"),
-                                icon: "👨‍💼"),
-                            Row(children: [
-                              const Text("📍"),
-                              const SizedBox(
-                                width: 8,
-                              ),
-                              Expanded(
-                                  child: Text("Location",
-                                      style: theme.textTheme.titleMedium!
-                                          .copyWith(
-                                              fontSize: 12.sp,
-                                              fontWeight: FontWeight.bold))),
-                              const Text(": "),
-                              Expanded(
-                                child: seekerData
-                                            .personalData!.personal.address !=
-                                        null
-                                    ? Row(
-                                        spacing: 8,
-                                        children: [
-                                          Flexible(
-                                            child: Row(
-                                                spacing: 8,
-                                                children: List.generate(
-                                                    seekerData
-                                                        .personalData!
-                                                        .personal
-                                                        .address!
-                                                        .length, (index) {
-                                                  final _address = seekerData
-                                                      .personalData!
-                                                      .personal
-                                                      .address![index];
-                                                  return Flexible(
-                                                    child: Text(
-                                                        CustomFunctions
-                                                            .toSentenceCase(
-                                                                _address),
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                        style: theme.textTheme
-                                                            .titleMedium!
-                                                            .copyWith(
-                                                          fontSize: 12.sp,
-                                                        )),
-                                                  );
-                                                })),
-                                          ),
-                                          Flexible(
-                                            child: Text(
-                                              seekerData.personalData!.personal
-                                                      .city ??
-                                                  "",
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                          Flexible(
-                                              child: Text(seekerData
-                                                      .personalData!
-                                                      .personal
-                                                      .state ??
-                                                  "")),
-                                        ],
-                                      )
-                                    : Text("N/A"),
-                              ),
-                            ]),
-                            _buildQualificationItemWIdget(
-                                theme: theme,
-                                title: "Total experience",
-                                subTitle:
-                                    "${seekerData.personalData!.personal.totalExperienceYears} - ${seekerData.personalData!.personal.totalExperienceMonths}",
-                                icon: "⏳"),
-                            _buildQualificationItemWIdget(
-                                theme: theme,
-                                title: "Preferred Salary",
-                                subTitle: formatCTC(seekerData.personalData!
-                                    .personal.preferedSalaryPackage),
-                                icon: "💰"),
-                            Row(children: [
-                              const Text("📍"),
-                              const SizedBox(
-                                width: 8,
-                              ),
-                              Expanded(
-                                  child: Text("Preferred Locations",
-                                      style: theme.textTheme.titleMedium!
-                                          .copyWith(
-                                              fontSize: 12.sp,
-                                              fontWeight: FontWeight.bold))),
-                              Text(": "),
-                              Expanded(
-                                child: seekerData.personalData!.personal
-                                            .preferedWorkLocations !=
-                                        null
-                                    ? Row(
-                                        children: List.generate(
-                                            seekerData
-                                                .personalData!
-                                                .personal
-                                                .preferedWorkLocations!
-                                                .length, (index) {
-                                        final _locations = seekerData
-                                            .personalData!
-                                            .personal
-                                            .preferedWorkLocations![index];
-                                        return Expanded(
-                                            child: Text(
-                                                CustomFunctions.toSentenceCase(
-                                                    _locations),
-                                                style: theme
-                                                    .textTheme.titleMedium!
-                                                    .copyWith(
-                                                  fontSize: 12.sp,
-                                                )));
-                                      }))
-                                    : Text("N/A"),
-                              ),
-                            ]),
-                            _buildQualificationItemWIdget(
-                                theme: theme,
-                                title: "Date of Birth",
-                                subTitle: formatCTC(getFormattedDate(seekerData
-                                    .personalData!.personal.dob
-                                    .toString())),
-                                icon: "🎂"),
-                            _buildQualificationItemWIdget(
-                                theme: theme,
-                                title: "Nationality",
-                                subTitle: CustomFunctions.toSentenceCase(
-                                    seekerData.personalData!.personal
-                                            .nationality ??
-                                        "N/A"),
-                                icon: "🌏"),
-                            _buildQualificationItemWIdget(
-                                theme: theme,
-                                title: "Gender",
-                                subTitle:
-                                    seekerData.personalData!.personal.gender ??
-                                        "N/A",
-                                icon: "👤"),
-                            _buildQualificationItemWIdget(
-                                theme: theme,
-                                title: "Is Differently Able",
-                                subTitle: seekerData.personalData!.personal
-                                            .isDifferentlyAbled ==
-                                        true
-                                    ? "Yes"
-                                    : "No",
-                                icon: "🚶"),
-                          ],
-                        ),
-                      ),
-                    )
-                        .animate()
-                        .fadeIn(duration: 500.ms)
-                        .slideY(begin: 0.5, end: 0),
-                  )
-                ],
-              )
-            : const CommonErrorWidget()
-      ],
-    );
-  }
 
   Widget _buildQualificationItemWIdget(
       {required ThemeData theme,

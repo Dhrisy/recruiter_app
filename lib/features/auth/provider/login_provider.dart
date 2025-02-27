@@ -205,4 +205,13 @@ class LoginProvider extends ChangeNotifier {
       return null;
     }
   }
+
+  Future<String?>  retryOTP({required String phone}) async{
+    try {
+      final result = await AuthRepository().retryOTP(phone: phone);
+     return result;
+    } catch (e) {
+      return e.toString();
+    }
+  }
 }

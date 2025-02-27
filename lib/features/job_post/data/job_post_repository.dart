@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:recruiter_app/features/job_post/model/job_post_model.dart';
 import 'package:recruiter_app/services/jobs_service.dart';
 import 'package:recruiter_app/services/refresh_token_service.dart';
@@ -43,14 +45,12 @@ class JobPostRepository {
       // Attempt to fetch posted jobs
       var response = await JobsService.fetchPostedJobs();
 
-    
-
       // Handle the success response
       if (response.statusCode == 200) {
         List<dynamic> responseData = jsonDecode(response.body);
         List<JobPostModel> jobsList =
             responseData.map((job) => JobPostModel.fromJson(job)).toList();
-            
+
         return jobsList;
       }
 

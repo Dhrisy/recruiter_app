@@ -94,7 +94,7 @@ class JobsService {
           "benefits": "job.benefits",
           "roles": "",
           "currency": job.currency,
-          "active": job.status
+          // "active": job.status
         }),
         headers: {
           'Authorization': 'Bearer ${token.toString()}',

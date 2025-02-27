@@ -101,6 +101,8 @@ class AccountProvider extends ChangeNotifier {
     isLoading = true;
     notifyListeners();
 
+    
+
     try {
       // Fetch UserModel
       final userResult = await AccountRepository().fetchUserData();

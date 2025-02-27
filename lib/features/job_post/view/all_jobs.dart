@@ -110,7 +110,7 @@ class _AllJobsState extends State<AllJobs> {
                             : const SizedBox.shrink(),
 
 
-                        provider.jobLists!.isEmpty
+                      provider.jobLists != null &&   provider.jobLists!.isEmpty
                             ? const CommonNodatafoundWidget()
                             : const SizedBox.shrink(),
 

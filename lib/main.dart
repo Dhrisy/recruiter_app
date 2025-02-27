@@ -24,6 +24,7 @@ import 'package:recruiter_app/features/questionaires/bloc/questionaire_bloc.dart
 import 'package:recruiter_app/features/questionaires/data/questionaire_repository.dart';
 import 'package:recruiter_app/features/resdex/provider/email_template_provider.dart';
 import 'package:recruiter_app/features/resdex/provider/interview_provider.dart';
+import 'package:recruiter_app/features/resdex/provider/resume_provider.dart';
 import 'package:recruiter_app/features/resdex/provider/search_seeker_provider.dart';
 import 'package:recruiter_app/features/responses/provider/seeker_provider.dart';
 import 'package:recruiter_app/features/seeker_details/invite_seeker_provider.dart';
@@ -164,7 +165,8 @@ class _MyAppState extends State<MyApp> {
            ChangeNotifierProvider(create: (context) => SettingsProvider()),
            ChangeNotifierProvider(create: (context) => NotificationProvider()),
            ChangeNotifierProvider(create: (context) => PlanProvider()),
-           ChangeNotifierProvider(create: (context) => RegisterProvider())
+           ChangeNotifierProvider(create: (context) => RegisterProvider()),
+           ChangeNotifierProvider(create: (context) => ResumeProvider())
         ],
         child: MultiBlocProvider(
           providers: [

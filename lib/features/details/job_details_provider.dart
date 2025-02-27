@@ -105,7 +105,6 @@ class JobDetailsProvider extends ChangeNotifier {
     try {
       final result =
           await JobDetailsRepository().fetchInterviewScheduledSeekers(jobId: jobId);
-          print("kkkkkk  $result");
       if (result == null) {
         interviewMessage = "error";
 

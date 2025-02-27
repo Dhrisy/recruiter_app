@@ -52,7 +52,8 @@ class _ResponseState extends State<Response>
             _isLoading = false;
             _seekerLists =
                 Provider.of<SeekerProvider>(context, listen: false).allSeekers;
-                print(_seekerLists != null ? _seekerLists!.length : "gggggggggggggg");
+            print(
+                _seekerLists != null ? _seekerLists!.length : "gggggggggggggg");
           });
         }
       });
@@ -142,7 +143,7 @@ class _ResponseState extends State<Response>
                 children: [
                   Row(
                     children: [
-                      Expanded(
+                    const  Expanded(
                         child: CommonAppbarWidget(
                           title: "Responses",
                         ),
@@ -151,11 +152,15 @@ class _ResponseState extends State<Response>
                           builder: (context, provider, child) {
                         return Padding(
                           padding: const EdgeInsets.only(right: 15),
-                          child: Text("( ${_seekerLists?.length} )",
-                          style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                            fontWeight:FontWeight.bold,
-                            color: secondaryColor
-                          ),),
+                          child: Text(
+                            "( ${_seekerLists != null ? _seekerLists!.length : "0"} )",
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium!
+                                .copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: secondaryColor),
+                          ),
                         );
                       })
                     ],

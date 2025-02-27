@@ -17,7 +17,6 @@ class CommonAppbarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Container(
       width: double.infinity,
       // height: MediaQuery.of(context).size.height * 0.05.h,
@@ -50,6 +49,7 @@ class CommonAppbarWidget extends StatelessWidget {
                 Expanded(
                   child: Text(
                     title,
+                    overflow: TextOverflow.ellipsis,
                     style:
                         AppTheme.headingText(lightTextColor),
                   )

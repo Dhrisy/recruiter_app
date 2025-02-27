@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:recruiter_app/core/constants.dart';
+import 'package:recruiter_app/core/theme.dart';
 import 'package:recruiter_app/core/utils/custom_functions.dart';
 import 'package:recruiter_app/features/resdex/model/seeker_model.dart';
 import 'package:recruiter_app/features/resdex/provider/search_seeker_provider.dart';
@@ -30,9 +31,11 @@ class _DetailsTabWidgetState extends State<DetailsTabWidget> {
             .bookmarkedStates[id] ??
         false;
     return Column(
+       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 15,
       children: [
-        _buildSkillWidget(theme: theme, skills: []),
+        _buildSummaryWidget(seekerData: widget.seekerData),
+        _buildSkillWidget(skills: []),
         _buildBasicDetailsWidget(theme: theme, seekerData: widget.seekerData),
         _buildExperienceWidget(theme: theme, seekerData: widget.seekerData),
         _buildQualificationWidget(theme: theme, seekerData: widget.seekerData),
@@ -41,23 +44,28 @@ class _DetailsTabWidgetState extends State<DetailsTabWidget> {
   }
 
   Widget _buildSummaryWidget(
-      {required ThemeData theme, required SeekerModel seekerData}) {
+      {required SeekerModel seekerData}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 10,
       children: [
         Text(
           "Summary",
-          style: theme.textTheme.titleLarge!
-              .copyWith(fontWeight: FontWeight.bold, color: secondaryColor),
+          style: AppTheme.mediumTitleText(secondaryColor)
+              .copyWith(fontWeight: FontWeight.bold),
         ),
         AnimatedContainer(
           duration: 200.ms,
           child: Column(
             children: [
               Text(
-                "Performing hot reload...cReloaded 1 of 2617 libraries in 1,247ms (compile: 59 ms, reload: 514 ms, reassemble: 321 ms). D/EGL_emulation(14066): app_time_stats: avg=58219.61ms min=58219.61ms max=58219.61ms count=1",
-                style: theme.textTheme.bodyMedium!.copyWith(),
+                seekerData.personalData != null
+                    ? CustomFunctions.toSentenceCase(seekerData
+                        .personalData!.personal.introduction
+                        .toString())
+                    : "N/A",
+                    textAlign: TextAlign.justify,
+                style: AppTheme.bodyText(greyTextColor).copyWith(),
               )
             ],
           ),
@@ -88,7 +96,7 @@ class _DetailsTabWidgetState extends State<DetailsTabWidget> {
   }
 
   Widget _buildSkillWidget(
-      {required ThemeData theme, required List<String> skills}) {
+      { required List<String> skills}) {
     return Wrap(
       children: [
         Column(
@@ -97,7 +105,7 @@ class _DetailsTabWidgetState extends State<DetailsTabWidget> {
           children: [
             Text(
               "Skills",
-              style: theme.textTheme.titleLarge!
+              style: AppTheme.mediumTitleText(lightTextColor)
                   .copyWith(fontWeight: FontWeight.bold, color: secondaryColor),
             ),
             skills.isNotEmpty
@@ -112,6 +120,7 @@ class _DetailsTabWidgetState extends State<DetailsTabWidget> {
                         padding: const EdgeInsets.only(bottom: 10),
                         child: ChipContainerWidget(
                           text: item,
+                          
                           color: color,
                           textColor: Colors.white,
                           // duration: animationDuration,
@@ -192,7 +201,7 @@ class _DetailsTabWidgetState extends State<DetailsTabWidget> {
                                   child: _buildItemWidget(
                                       theme: theme,
                                       text:
-                                          "${CustomFunctions.toSentenceCase(employmentData.jobTitle ?? "N/A")}",
+                                          CustomFunctions.toSentenceCase(employmentData.jobTitle ?? "N/A"),
                                       fontSize: 12.sp,
                                       fontWeight: FontWeight.normal,
                                       icon: Text(
@@ -204,7 +213,7 @@ class _DetailsTabWidgetState extends State<DetailsTabWidget> {
                                   child: _buildItemWidget(
                                       theme: theme,
                                       text:
-                                          "${CustomFunctions.toSentenceCase(employmentData.jobTitle ?? "N/A")}",
+                                          CustomFunctions.toSentenceCase(employmentData.jobTitle ?? "N/A"),
                                       fontSize: 12.sp,
                                       fontWeight: FontWeight.normal,
                                       icon: Text("💼")),
@@ -323,16 +332,16 @@ class _DetailsTabWidgetState extends State<DetailsTabWidget> {
                                 Text("📅 "),
                                 Expanded(
                                     child: Text("Duration",
-                                        style: theme.textTheme.titleMedium!
+                                        style: AppTheme.bodyText(lightTextColor)
                                             .copyWith(
                                                 fontSize: 12.sp,
                                                 fontWeight: FontWeight.bold))),
-                                Text(": "),
+                                Text(": ", style: AppTheme.bodyText(lightTextColor),),
                                 Expanded(
                                   child: Text(
                                       "${qualificationData.startingYr ?? "0"} - ${qualificationData.endingYr ?? "0"}",
                                       style:
-                                          theme.textTheme.titleMedium!.copyWith(
+                                          AppTheme.bodyText(lightTextColor).copyWith(
                                         fontSize: 12.sp,
                                       )),
                                 )
@@ -425,7 +434,7 @@ class _DetailsTabWidgetState extends State<DetailsTabWidget> {
                               ),
                               Expanded(
                                   child: Text("Location",
-                                      style: theme.textTheme.titleMedium!
+                                      style: AppTheme.bodyText(lightTextColor)
                                           .copyWith(
                                               fontSize: 12.sp,
                                               fontWeight: FontWeight.bold))),
@@ -434,51 +443,45 @@ class _DetailsTabWidgetState extends State<DetailsTabWidget> {
                                 child: seekerData
                                             .personalData!.personal.address !=
                                         null
-                                    ? Row(
+                                    ? Wrap(
                                         spacing: 8,
                                         children: [
-                                          Flexible(
-                                            child: Row(
-                                                spacing: 8,
-                                                children: List.generate(
-                                                    seekerData
-                                                        .personalData!
-                                                        .personal
-                                                        .address!
-                                                        .length, (index) {
-                                                  final _address = seekerData
+                                          Wrap(
+                                              spacing: 8,
+                                              children: List.generate(
+                                                  seekerData
                                                       .personalData!
                                                       .personal
-                                                      .address![index];
-                                                  return Flexible(
-                                                    child: Text(
-                                                        CustomFunctions
-                                                            .toSentenceCase(
-                                                                _address),
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                        style: theme.textTheme
-                                                            .titleMedium!
-                                                            .copyWith(
-                                                          fontSize: 12.sp,
-                                                        )),
-                                                  );
-                                                })),
+                                                      .address!
+                                                      .length, (index) {
+                                                final _address = seekerData
+                                                    .personalData!
+                                                    .personal
+                                                    .address![index];
+                                                return Text(
+                                                    CustomFunctions
+                                                        .toSentenceCase(
+                                                            _address),
+                                                    // overflow: TextOverflow
+                                                    //     .ellipsis,
+                                                    style: AppTheme.bodyText(lightTextColor)
+                                                        .copyWith(
+                                                      fontSize: 12.sp,
+                                                    ));
+                                              })),
+                                          Text(
+                                            seekerData.personalData!.personal
+                                                    .city ??
+                                                "",
+                                            overflow: TextOverflow.ellipsis,
+                                            style: AppTheme.bodyText(lightTextColor),
                                           ),
-                                          Flexible(
-                                            child: Text(
-                                              seekerData.personalData!.personal
-                                                      .city ??
-                                                  "",
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                          Flexible(
-                                              child: Text(seekerData
-                                                      .personalData!
-                                                      .personal
-                                                      .state ??
-                                                  "")),
+                                          Text(seekerData
+                                                  .personalData!
+                                                  .personal
+                                                  .state ??
+                                              "",
+                                              style: AppTheme.bodyText(lightTextColor),),
                                         ],
                                       )
                                     : Text("N/A"),
@@ -503,11 +506,11 @@ class _DetailsTabWidgetState extends State<DetailsTabWidget> {
                               ),
                               Expanded(
                                   child: Text("Preferred Locations",
-                                      style: theme.textTheme.titleMedium!
+                                      style: AppTheme.bodyText(lightTextColor)
                                           .copyWith(
                                               fontSize: 12.sp,
                                               fontWeight: FontWeight.bold))),
-                              Text(": "),
+                              Text(": ", style: AppTheme.bodyText(lightTextColor),),
                               Expanded(
                                 child: seekerData.personalData!.personal
                                             .preferedWorkLocations !=
@@ -527,8 +530,7 @@ class _DetailsTabWidgetState extends State<DetailsTabWidget> {
                                             child: Text(
                                                 CustomFunctions.toSentenceCase(
                                                     _locations),
-                                                style: theme
-                                                    .textTheme.titleMedium!
+                                                style: AppTheme.bodyText(lightTextColor)
                                                     .copyWith(
                                                   fontSize: 12.sp,
                                                 )));
@@ -595,12 +597,12 @@ class _DetailsTabWidgetState extends State<DetailsTabWidget> {
         ),
         Expanded(
             child: Text(title,
-                style: theme.textTheme.titleMedium!
+                style: AppTheme.titleText(lightTextColor)
                     .copyWith(fontSize: 12.sp, fontWeight: FontWeight.bold))),
-        Text(": "),
+        Text(": ", style: AppTheme.bodyText(lightTextColor),),
         Expanded(
             child: Text(subTitle,
-                style: theme.textTheme.titleMedium!.copyWith(
+                style: AppTheme.bodyText(lightTextColor).copyWith(
                   fontSize: 12.sp,
                 )))
       ],
@@ -622,7 +624,7 @@ class _DetailsTabWidgetState extends State<DetailsTabWidget> {
           child: Text(
             text,
             overflow: TextOverflow.ellipsis,
-            style: theme.textTheme.titleMedium!
+            style: AppTheme.bodyText(lightTextColor)
                 .copyWith(fontWeight: fontWeight, fontSize: fontSize ?? 15.sp),
           ),
         ),
@@ -655,7 +657,7 @@ class _DetailsTabWidgetState extends State<DetailsTabWidget> {
               color: greyTextColor,
             ),
             Text(text,
-                style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                style: AppTheme.bodyText(greyTextColor).copyWith(
                     fontSize: 13.sp,
                     fontWeight: FontWeight.w500,
                     color: greyTextColor))

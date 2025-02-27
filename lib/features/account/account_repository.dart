@@ -7,6 +7,8 @@ import 'package:recruiter_app/services/refresh_token_service.dart';
 class AccountRepository {
   Future<Map<String, dynamic>?> fetchAccountDetails(
       {int? retryCount = 0, int? maxRetries = 3}) async {
+
+        
     try {
       final response = await AccountService.fetchAccountDetails();
 

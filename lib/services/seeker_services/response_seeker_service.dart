@@ -16,4 +16,17 @@ class ResponseSeekerService {
 
     return response;
   }
+
+   static Future<http.Response> editResponseStatus({required int jobId}) async {
+    final url =
+        Uri.parse("${ApiLists.updateJobApplications}?applied_id=$jobId");
+
+    final token = await CustomFunctions().retrieveCredentials("access_token");
+    final response = await http.patch(url, headers: {
+      'Authorization': 'Bearer ${token.toString()}',
+      'Content-Type': 'application/json',
+    });
+
+    return response;
+  }
 }

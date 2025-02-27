@@ -11,7 +11,6 @@ class BannerWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
-    final theme = Theme.of(context);
     return Container(
       height: screenHeight * 0.2,
       width: double.infinity,
@@ -20,7 +19,7 @@ class BannerWidget extends StatelessWidget {
           borderRadius: BorderRadius.circular(borderRadius),
           image: DecorationImage(
               image: banner.image != null
-                  ? NetworkImage(banner.image)
+                  ? NetworkImage(banner.image!)
                   : AssetImage("assets/images/banner_image.png"),
               fit: BoxFit.cover)),
       // child: Padding(

@@ -150,9 +150,6 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
       minSalary = minYears.toString();
       maxSalary = maxYears.toString();
     });
-
-    print(minYears);
-    print(maxYears);
   }
 
   void updateCheckboxState(
@@ -273,13 +270,12 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
                         ? CandidateInvited()
                         : SizedBox.shrink(),
 
-                        currentScreenIndex == 2
+                    currentScreenIndex == 2
                         ? InterviewScheduledWidget()
                         : SizedBox.shrink(),
- currentScreenIndex == 3
+                    currentScreenIndex == 3
                         ? SavedCvWidget()
                         : SizedBox.shrink(),
-
 
                     currentScreenIndex == 4
                         ? SavedSearches()
@@ -951,13 +947,14 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
                   child: Text(
                 title,
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                    color: currentScreenIndex == index
+                style: AppTheme.bodyText(currentScreenIndex == index
                         ? Colors.white
-                        : lightTextColor,
-                    fontWeight: currentScreenIndex == index
-                        ? FontWeight.bold
-                        : FontWeight.normal),
+                        : lightTextColor)
+                    .copyWith(
+                      fontSize: 13,
+                        fontWeight: currentScreenIndex == index
+                            ? FontWeight.bold
+                            : FontWeight.normal),
               ))
             ],
           ),
@@ -965,7 +962,4 @@ class _ResedexState extends State<Resedex> with SingleTickerProviderStateMixin {
       ).animate().fadeIn(duration: 300.ms).scale(duration: 600.ms),
     );
   }
-
-
-
 }

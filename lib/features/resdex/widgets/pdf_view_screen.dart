@@ -4,9 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:recruiter_app/widgets/common_appbar_widget.dart';
+import 'package:path/path.dart' as p;
+
 
 class PdfViewerScreen extends StatefulWidget {
-  const PdfViewerScreen({Key? key}) : super(key: key);
+  final String cv;
+  const PdfViewerScreen({Key? key, required this.cv}) : super(key: key);
 
   @override
   _PdfViewerScreenState createState() => _PdfViewerScreenState();
@@ -27,8 +30,8 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
       final file = File('${dir.path}/sample_cv.pdf');
 
       // Sample PDF URL for testing
-      const samplePdfUrl =
-          "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
+      final samplePdfUrl =
+         widget.cv;
 
       final response = await Dio().download(samplePdfUrl, file.path);
       if (response.statusCode == 200) {
@@ -44,6 +47,7 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
 
  @override
 Widget build(BuildContext context) {
+  String fileName = p.basename(widget.cv);
   return Material(
     child: Scaffold(
       body: localFilePath != null
@@ -53,13 +57,14 @@ Widget build(BuildContext context) {
               child: Column(
                   children: [
                     CommonAppbarWidget(
-                      title: "Name.pdf",
+                      title: fileName,
                       isBackArrow: true,),
                     Expanded(
                       child: PDFView(
                         filePath: localFilePath!,
                         enableSwipe: true,
-                        swipeHorizontal: true,
+                        
+                        swipeHorizontal: false,
                         autoSpacing: true,
                         pageFling: true,
                       ),
@@ -68,7 +73,7 @@ Widget build(BuildContext context) {
                 ),
             ),
           )
-          : Center(child: CircularProgressIndicator()),
+          : const Center(child: CircularProgressIndicator()),
     ),
   );
 }

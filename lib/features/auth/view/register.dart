@@ -161,7 +161,7 @@ class _RegisterState extends State<Register> {
                           }
                           return null;
                         },
-                        labelText: "Company name",
+                        labelText: "Name",
                         // isRequired: true,
                       ),
                       const SizedBox(
@@ -217,8 +217,8 @@ class _RegisterState extends State<Register> {
                               pwError = true;
                             });
                             return "";
-                          } else if (password.length < 10) {
-                            return "Password must contain at least 10 characters";
+                          } else if (password.length < 8) {
+                            return "Password must contain at least 8 characters";
                           }
 
                           setState(() {

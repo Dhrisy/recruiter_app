@@ -69,4 +69,23 @@ class AccountService {
 
     return response;
   }
+
+
+  static Future<http.Response> deleteUser() async {
+    final url = Uri.parse(ApiLists.editUser); // Replace with actual API endpoint
+    final accessToken =
+        await CustomFunctions().retrieveCredentials("access_token");
+
+    try {
+      return await http.delete(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          'Authorization': 'Bearer ${accessToken.toString()}',
+        },
+      );
+    } catch (e) {
+      throw Exception("Failed to delete user data: $e");
+    }
+  }
 }

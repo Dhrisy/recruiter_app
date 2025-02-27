@@ -427,6 +427,10 @@ class _LoginScreenState extends State<LoginScreen> {
             borderRadius: BorderRadius.circular(borderRadius),
             borderSide: BorderSide(color: Colors.red.shade900)),
       ),
+      inputFormatters: [
+        FilteringTextInputFormatter.allow(RegExp(r'^[a-zA-Z0-9!%*?&@\$]+$'))
+
+      ],
     );
   }
 }
@@ -968,6 +972,9 @@ class _ForgotPassWordState extends State<ForgotPassWord> {
             borderRadius: BorderRadius.circular(borderRadius),
             borderSide: BorderSide(color: Colors.red.shade900)),
       ),
+      inputFormatters: [
+       FilteringTextInputFormatter.allow(RegExp(r'^[a-zA-Z0-9!%*?&@\$]+$'))
+      ],
     );
   }
 

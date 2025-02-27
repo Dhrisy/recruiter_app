@@ -220,12 +220,10 @@ class _Questionaire1State extends State<Questionaire1> {
 
     try {
       var response = await request.send();
-      print(response.statusCode);
       var responseBody =
-          await response.stream.bytesToString(); // Convert stream to string
+          await response.stream.bytesToString(); 
 
-      print("Status Code: ${response.statusCode}");
-      print("Response Body: $responseBody");
+      
       if (response.statusCode == 200) {
         return true;
       } else if (response.statusCode == 401) {
@@ -243,8 +241,8 @@ class _Questionaire1State extends State<Questionaire1> {
   void _navigateToPage(int index) {
     _pageController.animateToPage(
       index,
-      duration: Duration(milliseconds: 300), // Adjust duration as needed
-      curve: Curves.easeInOut, // Smooth animation
+      duration: Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
     );
     setState(() {
       _currentIndex = index;
@@ -464,7 +462,7 @@ class _Questionaire1State extends State<Questionaire1> {
                             _pickImageBottomSheet();
                           },
                           child: CircleAvatar(
-                            radius: 90.r,
+                            radius: 60.r,
                             backgroundColor: Colors.transparent,
                             backgroundImage: _image != null
                                 ? FileImage(_image!)

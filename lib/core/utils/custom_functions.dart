@@ -87,7 +87,6 @@ class CustomFunctions {
   /// Checks for internet connection before making API calls
   static Future<bool> checkInternetConnection() async {
     var connectivityResult = await Connectivity().checkConnectivity();
-    print(connectivityResult);
     if (connectivityResult.contains(ConnectivityResult.none)) {
       return false; // No internet
     }
@@ -102,9 +101,10 @@ class CustomFunctions {
     }
   }
 
-  static void showNoInternetPopup(BuildContext context) {
+  static void showNoInternetPopup(BuildContext context, {required VoidCallback action}) {
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text("No Internet Connection"),
@@ -112,8 +112,10 @@ class CustomFunctions {
               "Please check your internet connection and try again."),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text("OK"),
+              onPressed: () {
+                action();
+              },
+              child: const Text("Try again"),
             ),
           ],
         );

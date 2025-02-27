@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 import 'package:recruiter_app/core/utils/navigation_animation.dart';
+import 'package:recruiter_app/features/resdex/provider/resume_provider.dart';
 import 'package:recruiter_app/features/resdex/widgets/pdf_view_screen.dart';
 
 class SavedCvWidget extends StatefulWidget {
@@ -12,6 +14,23 @@ class SavedCvWidget extends StatefulWidget {
 }
 
 class _SavedCvWidgetState extends State<SavedCvWidget> {
+
+
+  @override
+  void initState() {
+    super.initState();
+
+
+WidgetsBinding.instance.addPostFrameCallback((_){
+
+  // Provider.of<ResumeProvider>(context, listen: false).d
+
+});
+
+  }
+
+
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -67,7 +86,7 @@ class _SavedCvWidgetState extends State<SavedCvWidget> {
                       crossAxisAlignment: WrapCrossAlignment.end,
                       children: [
                         ElevatedButton.icon(onPressed: () {
-                          Navigator.push(context, AnimatedNavigation().fadeAnimation(PdfViewerScreen()));
+                          Navigator.push(context, AnimatedNavigation().fadeAnimation(PdfViewerScreen(cv: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",)));
                         }, label: Text("View CV")),
                         OutlinedButton.icon(onPressed: (){
                         

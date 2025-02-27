@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:recruiter_app/core/constants.dart';
@@ -224,6 +225,15 @@ class _JobDetailsState extends State<JobDetails> with TickerProviderStateMixin {
                                     case "close":
                                       bool status = false;
 
+                                      Fluttertoast.showToast(
+    msg: widget.jobData.status.toString(),
+    toastLength: Toast.LENGTH_SHORT, // or Toast.LENGTH_LONG
+    gravity: ToastGravity.BOTTOM, // Position: TOP, CENTER, BOTTOM
+    backgroundColor: Colors.black,
+    textColor: Colors.white,
+    fontSize: 16.0,
+  );
+
                                       if (widget.jobData.status == true) {
                                         status = false;
                                       }else{
@@ -268,6 +278,15 @@ class _JobDetailsState extends State<JobDetails> with TickerProviderStateMixin {
                                               title: widget.jobData.title,
                                               vaccancy:
                                                   widget.jobData.vaccancy));
+
+                                                   Fluttertoast.showToast(
+    msg: result.toString(),
+    toastLength: Toast.LENGTH_SHORT, // or Toast.LENGTH_LONG
+    gravity: ToastGravity.BOTTOM, // Position: TOP, CENTER, BOTTOM
+    backgroundColor: Colors.black,
+    textColor: Colors.white,
+    fontSize: 16.0,
+  );
 
                                       if (result == "success") {
                                         Navigator.pushAndRemoveUntil(

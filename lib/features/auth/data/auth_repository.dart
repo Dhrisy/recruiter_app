@@ -36,7 +36,6 @@ class AuthRepository {
         whatsappUpdations: whatsappUpdations,
       );
 
-      
       final Map<String, dynamic> responseData =
           jsonDecode(registerResponse.body);
 
@@ -48,7 +47,6 @@ class AuthRepository {
         return "An unexpected error occurred";
       }
     } catch (e) {
-      
       return "An error occurred during registration";
     }
   }
@@ -147,14 +145,13 @@ class AuthRepository {
 
   Future<String?> forgotPw({required String phone}) async {
     try {
-       bool hasInternet = await CustomFunctions.checkInternetConnection();
-       print("cccccccccc  $hasInternet");
+      bool hasInternet = await CustomFunctions.checkInternetConnection();
+
       if (!hasInternet) {
         return "Check your internet connection";
       }
       final response = await ForgotPwService().forgotPw(phone: phone);
 
-      print("Response of forgot pw ${response.statusCode}, ${response.body}");
       Map<String, dynamic> responseData = jsonDecode(response.body);
       // Handle the success response
       if (response.statusCode == 200) {
@@ -163,7 +160,6 @@ class AuthRepository {
         return responseData["message"];
       }
     } catch (e) {
-      print("Unexpected error in forgot password $e");
       return null;
     }
   }
@@ -172,24 +168,12 @@ class AuthRepository {
   Future<String?> emailSentOtp({required String email}) async {
     try {
       final response = await OtpService().emailSentOtp(email: email);
-      print(
-          "Response of email erify ${response.statusCode},  ${response.body}");
+    
       final Map<String, dynamic> responseData = jsonDecode(response.body);
-      
-      Fluttertoast.showToast(
-        msg: responseData["message"],
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 16.0
-    );
+
+     
       if (response.statusCode == 200) {
-        // await CustomFunctions()
-        //     .storeCredentials("access_token", responseData["access"]);
-        // await CustomFunctions()
-        //     .storeCredentials("refresh_token", responseData["refresh"]);
+        
         return "success";
       } else {
         return responseData["message"];
@@ -210,7 +194,7 @@ class AuthRepository {
           "Response of email erify ${response.statusCode},  ${response.body}");
       final Map<String, dynamic> responseData = jsonDecode(response.body);
       if (response.statusCode == 200) {
-         await CustomFunctions()
+        await CustomFunctions()
             .storeCredentials("access_token", responseData["access"]);
         await CustomFunctions()
             .storeCredentials("refresh_token", responseData["refresh"]);
@@ -256,7 +240,6 @@ class AuthRepository {
       required String phone,
       required String otp}) async {
     try {
-      
       final response = await ChangePwService.changePwByForgotPw(
           password: password, phone: phone, otp: otp);
       print("${response.statusCode},   ${response.body}");
@@ -320,6 +303,29 @@ class AuthRepository {
       }
     } catch (e) {
       return null;
+    }
+  }
+
+// retry OTP
+  Future<String?> retryOTP({required String phone}) async {
+    try {
+      bool hasInternet = await CustomFunctions.checkInternetConnection();
+
+      if (!hasInternet) {
+        return "Check your internet connection";
+      }
+
+      final response = await OtpService.retryOtp(phone: phone);
+
+      if (response.statusCode == 201) {
+        return "success";
+      } else {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        return responseData["message"];
+      }
+    } catch (e) {
+      print(e);
+      return e.toString();
     }
   }
 }

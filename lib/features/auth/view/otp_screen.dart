@@ -49,6 +49,8 @@ class _OtpScreenState extends State<OtpScreen> {
   final TextEditingController _otpCont = TextEditingController();
   final TextEditingController _changePhnCont = TextEditingController();
   final _otpFormKey = GlobalKey<FormState>();
+  bool isError = false;
+  bool isSentOTP = false;
 
   @override
   void initState() {
@@ -87,7 +89,7 @@ class _OtpScreenState extends State<OtpScreen> {
         child: Container(
           height: double.infinity,
           width: double.infinity,
-          decoration: BoxDecoration(color: Colors.transparent),
+          decoration: const BoxDecoration(color: Colors.transparent),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Stack(
@@ -147,6 +149,7 @@ class _OtpScreenState extends State<OtpScreen> {
                                   } else if (_changePhnCont.text.length < 10) {
                                     return "Phone number must contain 10 character";
                                   }
+                                  return null;
                                 },
                               )
                             : InkWell(
@@ -178,6 +181,11 @@ class _OtpScreenState extends State<OtpScreen> {
                           height: 20,
                         ),
                         _buildOtpField(context),
+
+                        isError == true
+                        ? Text("This field is required",
+                        style: AppTheme.bodyText(Colors.red)
+                        ) : const SizedBox.shrink(),
                         const SizedBox(
                           height: 20,
                         ),
@@ -228,7 +236,7 @@ class _OtpScreenState extends State<OtpScreen> {
                     Future.delayed(Duration(seconds: 1), () {
                       Navigator.push(
                           context,
-                          AnimatedNavigation().fadeAnimation(Questionaire1(
+                          AnimatedNavigation().fadeAnimation(const Questionaire1(
                             isRegistering: true,
                           )));
                     });
@@ -246,10 +254,26 @@ class _OtpScreenState extends State<OtpScreen> {
                     alignment: Alignment.bottomCenter,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 20),
-                      child: ReusableButton(
+                      child:
+
+                    _changePhnCont.text.trim().isNotEmpty && isSentOTP == false
+                    ?  ReusableButton(
+                      action: (){
+
+                    }, text: "Send OTP")
+                    : ReusableButton(
                         isLoading: state is AuthLoading,
                         action: () async {
                           if (_otpFormKey.currentState!.validate()) {
+
+                            if(_otpCont.text.trim().isEmpty){
+                              setState((){
+                                isError = true;
+                              });
+                            }else if(_changePhnCont.text.trim().isNotEmpty){
+
+                            }
+
                             if (widget.phone != null && widget.planId != null) {
                               final result = await Provider.of<PlanProvider>(
                                       context,
@@ -277,7 +301,7 @@ class _OtpScreenState extends State<OtpScreen> {
                           //   Navigator.push(context, AnimatedNavigation().fadeAnimation(Questionaire1()));
                           // });
                         },
-                        text: "Confirm",
+                        text: _changePhnCont.text.trim().isNotEmpty ? "Send OTP" : "Confirm",
                         width: 200.w,
                         radius: 30.r,
                         textColor: Colors.white,

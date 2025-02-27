@@ -16,6 +16,7 @@ class ReusableTextfield extends StatefulWidget {
   final void Function(String)? onSubmit;
   final FloatingLabelBehavior? float;
   final int? lengthLimit;
+  final bool? readOnly;
   const ReusableTextfield(
       {Key? key,
       this.labelText,
@@ -29,6 +30,7 @@ class ReusableTextfield extends StatefulWidget {
       this.onSubmit,
       this.float,
       this.borderColor,
+      this.readOnly,
       this.lengthLimit})
       : super(key: key);
 
@@ -42,8 +44,9 @@ class _ReusableTextfieldState extends State<ReusableTextfield> {
     return TextFormField(
       controller: widget.controller,
       validator: widget.validation,
+      readOnly: widget.readOnly ?? false,
       keyboardType: widget.keyBoardType,
-      onChanged: widget.onChanged ?? (_) {},
+      onChanged: widget.onChanged,
       onFieldSubmitted: widget.onSubmit ?? (_) {},
       maxLines: widget.maxLines ?? 1,
       style: AppTheme.bodyText(lightTextColor),
@@ -74,8 +77,11 @@ class _ReusableTextfieldState extends State<ReusableTextfield> {
       ),
       inputFormatters: [
         LengthLimitingTextInputFormatter(widget.lengthLimit != null ? 10 : 500),
-        FilteringTextInputFormatter.allow(
-                RegExp(r'^[a-zA-Z0-9@._-]+$')),
+        widget.labelText == "Password"
+        ? FilteringTextInputFormatter.allow(RegExp(r'^[a-zA-Z0-9!%*?&@\$]+$')) : FilteringTextInputFormatter.allow(RegExp(r'^[a-zA-Z0-9@._\s-]+$')),
+        // widget.lengthLimit == 10
+        //     ? FilteringTextInputFormatter.allow(RegExp(r'^[a-zA-Z0-9@._-]+$'))
+        //     : FilteringTextInputFormatter.allow(RegExp(r'^[a-zA-Z0-9@._\s-]+$')),
       ],
     );
   }

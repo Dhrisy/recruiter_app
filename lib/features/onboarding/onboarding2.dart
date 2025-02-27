@@ -79,10 +79,7 @@ class Onboarding2 extends StatelessWidget {
                                         // final value = prefs.getBool("isDarkMode");
                                         // final AppThemeDataBloc _themeBloc =
                                         //     BlocProvider.of<AppThemeDataBloc>(
-                                        //         context);
-                                    
-                                        //         print("kkkkkk $value");
-                                     
+                                        //         context);        
                                         // if (value == true) {
                                         //   prefs.setBool("isDarkMode", false);
                                         //   _themeBloc

@@ -22,9 +22,11 @@ class HomeProvider extends ChangeNotifier {
   Future<void> fetchBanners() async {
     try {
       final result = await HomeRepository().fetchBanners();
+    
       if (result != null) {
         bannersLists = result["list"];
         bannerMessage = result["message"];
+
         notifyListeners();
       } else {
         bannersLists = null;

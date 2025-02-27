@@ -107,6 +107,7 @@ class _AccountState extends State<Account> with SingleTickerProviderStateMixin {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     final theme = Theme.of(context);
+    
 
     return Material(
       child: Scaffold(
@@ -128,6 +129,17 @@ class _AccountState extends State<Account> with SingleTickerProviderStateMixin {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
+                      Padding(
+                        padding: const EdgeInsets.only(right: 15),
+                        child: CommonAppbarWidget(
+                                          title: "Account",
+                                          icon: Icons.settings,
+                                          action: () {
+                                            Navigator.push(context,
+                          AnimatedNavigation().fadeAnimation(SettingsScreen()));
+                                          },
+                                        ),
+                      ),
                       // provider.userData != null
                       // ? _buildCompanyData(
                       //       area: provider.accountData != null
@@ -192,6 +204,10 @@ class _AccountState extends State<Account> with SingleTickerProviderStateMixin {
                               ),
                           )
                           : _buildCompanyData(
+                            companyName: provider.accountData != null
+                                  ? provider.accountData!.name
+                                      .toString()
+                                  : "N/A",
                               area: provider.accountData != null
                                   ? provider.accountData!.functionalArea
                                       .toString()
@@ -200,14 +216,15 @@ class _AccountState extends State<Account> with SingleTickerProviderStateMixin {
                                 borderRadius: BorderRadius.circular(50),
                                 child: CachedNetworkImage(
                                 
-                                  imageUrl: provider.accountData!.logo.toString(),
+                                  imageUrl: provider.accountData != null
+                                  ?  provider.accountData!.logo.toString() : "",
                                   
                                   placeholder: (context, url) => const Center(
                                     child:
                                         CircularProgressIndicator(
                                           backgroundColor: greyTextColor,
                                           color: secondaryColor,
-                                        ), // Loading indicator
+                                        ),
                                   ),
                                   errorWidget: (context, url, error) =>
                                       Image.asset(
@@ -274,10 +291,10 @@ class _AccountState extends State<Account> with SingleTickerProviderStateMixin {
   }
 
   Widget _buildCompanyData(
-      {required String website, required Widget image, required String area}) {
+      {required String website, required Widget image, required String area, required String companyName}) {
     return Consumer<AccountProvider>(builder: (context, provider, child) {
       if (provider.userData == null) {
-        return Text("data");
+        return const CommonErrorWidget();
       }
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -289,14 +306,7 @@ class _AccountState extends State<Account> with SingleTickerProviderStateMixin {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CommonAppbarWidget(
-                  title: "Account",
-                  icon: Icons.settings,
-                  action: () {
-                    Navigator.push(context,
-                        AnimatedNavigation().fadeAnimation(SettingsScreen()));
-                  },
-                ),
+                
                 const SizedBox(
                   height: 10,
                 ),
@@ -320,22 +330,7 @@ class _AccountState extends State<Account> with SingleTickerProviderStateMixin {
                         spacing: 15,
                         children: [
                           image,
-                          // CircleAvatar(
-                          //   radius: 45.r,
-                          //   backgroundColor: Colors.transparent,
-
-                          //   // :  Image.asset(
-                          //   //   "assets/images/default_company_logo.png",
-                          //   //   fit: BoxFit.cover,
-                          //   // ),
-                          //   //   child: provider.accountData!.logo != null
-                          //   //   ? Image.network(provider.accountData!.logo.toString(),
-                          //   //   fit: BoxFit.cover,)
-                          //   // :  Image.asset(
-                          //   //     "assets/images/default_company_logo.png",
-                          //   //     fit: BoxFit.cover,
-                          //   //   ),
-                          // ),
+                         
                           Expanded(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -344,11 +339,11 @@ class _AccountState extends State<Account> with SingleTickerProviderStateMixin {
                               children: [
                                 Text(
                                   CustomFunctions.toSentenceCase(
-                                      provider.userData?.name ?? "N/A"),
+                                      companyName),
                                   style: AppTheme.bodyText(lightTextColor)
                                       .copyWith(
                                           fontWeight: FontWeight.bold,
-                                          fontSize: 24),
+                                          fontSize: 20),
                                 ),
                                 // Text(CustomFunctions.toSentenceCase(provider.accountData!.name.toString())),
                                 Row(
@@ -363,7 +358,7 @@ class _AccountState extends State<Account> with SingleTickerProviderStateMixin {
                                         child: Expanded(
                                           child: Text(
                                             website.toString(),
-                                            overflow: TextOverflow.ellipsis,
+                                            // overflow: TextOverflow.ellipsis,
                                             style:
                                                 AppTheme.bodyText(Colors.blue),
                                           ),

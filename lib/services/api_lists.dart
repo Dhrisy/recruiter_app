@@ -59,4 +59,6 @@ class ApiLists {
      static String subscribeEndPoint = "$baseUrl/common/subscribe";
 
     static String allRecruiterPlansEndPoint = "$baseUrl/common/recruiter_plans";
+    static String downloadResumeEndPoint = "$baseUrl/recruiter_actions/update_resume_count";
+    static String getAllResumesEndPoint = "$baseUrl/recruiter_actions/resumes_downloaded";
 }

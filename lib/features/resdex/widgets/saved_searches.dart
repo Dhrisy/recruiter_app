@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:recruiter_app/core/constants.dart';
 import 'package:recruiter_app/features/resdex/model/seeker_model.dart';
@@ -81,7 +82,8 @@ class _SavedSearchesState extends State<SavedSearches> {
                     final isBookmarked = provider.bookmarkedStates[
                             seekerData.personalData?.personal.id] ??
                         false;
-                
+
+                    
                     return SeekerCard(
                         seekerData: seekerData,
                         isBookmarked: isBookmarked,

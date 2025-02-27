@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -5,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:recruiter_app/core/constants.dart';
+import 'package:recruiter_app/core/theme.dart';
 import 'package:recruiter_app/features/account/account_provider.dart';
 import 'package:recruiter_app/features/home/viewmodel/home_provider.dart';
 import 'package:recruiter_app/features/questionaires/view/questionaire1.dart';
@@ -29,7 +31,6 @@ class _ProfileCompletionCardState extends State<ProfileCompletionCard> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Consumer<AccountProvider>(
         builder: (context, accountProvider, child) {
       return InkWell(
@@ -61,11 +62,27 @@ class _ProfileCompletionCardState extends State<ProfileCompletionCard> {
               padding: const EdgeInsets.all(10),
               child: Row(
                 children: [
-                  CircleAvatar(
-                    radius: 30.r,
-                    backgroundImage:
-                        const AssetImage("assets/images/default_profile.webp"),
-                  ),
+                 ClipRRect(
+                        borderRadius: BorderRadius.circular(50),
+                        child: CachedNetworkImage(
+                          imageUrl: accountProvider.accountData != null
+                              ? accountProvider.accountData!.logo.toString()
+                              : "",
+                          placeholder: (context, url) => const Center(
+                            child: CircularProgressIndicator(
+                              backgroundColor: greyTextColor,
+                              color: secondaryColor,
+                            ),
+                          ),
+                          errorWidget: (context, url, error) => Image.asset(
+                            "assets/images/default_company_logo.png",
+                            fit: BoxFit.cover,
+                          ),
+                          fit: BoxFit.cover,
+                          width: 60,
+                          height: 60,
+                        ),
+                      ),
                   const SizedBox(
                     width: 10,
                   ),
@@ -76,16 +93,16 @@ class _ProfileCompletionCardState extends State<ProfileCompletionCard> {
                       children: [
                         Text(
                           "To start connecting with top talent today!",
-                          style: theme.textTheme.bodySmall!
-                              .copyWith(color: Colors.white, fontSize: 11.sp),
+                          style: AppTheme.bodyText(Colors.white)
+                              .copyWith(fontSize: 11.sp),
                         ),
                         // const SizedBox(
                         //   height: 5,
                         // ),
                         Text(
                           "Complete your profile!",
-                          style: theme.textTheme.bodyMedium!
-                              .copyWith(color: Colors.white, fontSize: 14.sp),
+                          style: AppTheme.bodyText(Colors.white)
+                              .copyWith( fontSize: 14.sp),
                         ),
                       ],
                     ),
@@ -105,8 +122,8 @@ class _ProfileCompletionCardState extends State<ProfileCompletionCard> {
                       provider.countData != null
                           ? "${provider.countData!.profileCompletionPercentage.toStringAsFixed(2)}%"
                           : "0%",
-                      style: theme.textTheme.bodyMedium!
-                          .copyWith(color: Colors.white),
+                      style: AppTheme.bodyText(Colors.white)
+                          ,
                     ),
                   ),
                   const SizedBox(

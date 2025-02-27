@@ -6,6 +6,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:recruiter_app/core/constants.dart';
+import 'package:recruiter_app/core/theme.dart';
 import 'package:recruiter_app/core/utils/navigation_animation.dart';
 import 'package:recruiter_app/features/account/account_data.dart';
 import 'package:recruiter_app/features/account/account_provider.dart';
@@ -15,7 +16,9 @@ import 'package:recruiter_app/features/plans/plans_screen.dart';
 import 'package:recruiter_app/features/questionaires/view/questionaire1.dart';
 import 'package:recruiter_app/features/settings/closed_jobs.dart';
 import 'package:recruiter_app/features/settings/suggestion_screen.dart';
+import 'package:recruiter_app/features/settings/viewmodel/settings_provider.dart';
 import 'package:recruiter_app/features/splash_screen/splash_screen.dart';
+import 'package:recruiter_app/widgets/common_alertdialogue.dart';
 import 'package:recruiter_app/widgets/common_appbar_widget.dart';
 import 'package:recruiter_app/widgets/reusable_button.dart';
 
@@ -34,7 +37,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height.h;
-    final theme = Theme.of(context);
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
@@ -62,7 +64,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     child: Text(
                       "Customize your app experience. Manage your preferences, account settings, and more to ensure everything works just the way you like",
                       textAlign: TextAlign.center,
-                      style: theme.textTheme.bodyMedium!
+                      style: AppTheme.bodyText(greyTextColor)
                           .copyWith(color: greyTextColor),
                     ),
                   ),
@@ -70,7 +72,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       builder: (context, provider, child) {
                     return _buildSettingsItem(context, 'Edit Account', () {
                       if (provider.accountData != null) {
-                        
                         Navigator.push(
                             context,
                             AnimatedNavigation().slideAnimation(Questionaire1(
@@ -78,7 +79,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               accountData: provider.accountData,
                             )));
                       } else {
-                       
                         Navigator.push(
                             context,
                             AnimatedNavigation().slideAnimation(Questionaire1(
@@ -135,11 +135,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               const SimplePage(title: 'Terms and Conditions')),
                     ),
                   ),
-                  _buildDeleteAccount(context,
-                      text: "Delete Account",
-                      action: () {},
-                      theme: theme,
-                      isDelete: true),
+                  _buildDeleteAccount(context, text: "Delete Account",
+                      action: () async {
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return CommonAlertDialog(
+                              title: "Delete Account",
+                              message:
+                                  "Are you sure you want to delete your account?",
+                              onConfirm: () async {
+                                
+                                Provider.of<SettingsProvider>(context,
+                                        listen: false)
+                                    .deleteAccount(context);
+                              },
+                              onCancel: () {
+                                Navigator.pop(context);
+                              },
+                              height: 100);
+                        });
+                  }, isDelete: true),
                   const SizedBox(
                     height: 20,
                   ),
@@ -272,13 +288,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ],
       ),
       child: ListTile(
-        title: Text(
-          title,
-          style: TextStyle(
-            fontSize: 16,
-            color: isDeleteAccount ? Colors.redAccent : Colors.black87,
-          ),
-        ),
+        title: Text(title,
+            style: AppTheme.bodyText(
+                    isDeleteAccount ? Colors.redAccent : Colors.black87)
+                .copyWith(
+              fontSize: 16,
+            )
+           
+            ),
         trailing: const Icon(
           Icons.arrow_forward_ios,
           size: 16,
@@ -292,7 +309,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget _buildDeleteAccount(BuildContext context,
       {required String text,
       required VoidCallback action,
-      required ThemeData theme,
+    
       required bool isDelete}) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -310,18 +327,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       child: ListTile(
         title: Text(text,
-            style: theme.textTheme.titleMedium!.copyWith(
+            style:  AppTheme.bodyText(isDelete == true ? Colors.red : lightTextColor).copyWith(
                 fontSize: 14.sp,
-                color: isDelete == true ? Colors.red : lightTextColor,
                 fontWeight: FontWeight.bold)),
         trailing: const Icon(
           Icons.arrow_forward_ios,
           size: 16,
           color: Colors.grey,
         ),
-        onTap: () {
-          // Handle delete account
-        },
+        onTap: action,
       ),
     );
   }
