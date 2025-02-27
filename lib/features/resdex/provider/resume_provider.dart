@@ -20,14 +20,7 @@ class ResumeProvider extends ChangeNotifier {
       }
 
       final result = await ResumeRepository().downloadResume(id: id);
-       Fluttertoast.showToast(
-          msg: result.toString(),
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.CENTER,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-          fontSize: 16.0);
+     
       return result;
     } catch (e) {
       print(e);

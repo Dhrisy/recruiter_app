@@ -11,14 +11,7 @@ class ResumeRepository {
       {required int id, retryCount = 0, maxRetries = 3}) async {
     try {
       final response = await ResumeService.downloadResume(id: id);
-       Fluttertoast.showToast(
-          msg: response.body.toString(),
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.CENTER,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-          fontSize: 16.0);
+     
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         return true;

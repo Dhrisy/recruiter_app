@@ -225,14 +225,7 @@ class _JobDetailsState extends State<JobDetails> with TickerProviderStateMixin {
                                     case "close":
                                       bool status = false;
 
-                                      Fluttertoast.showToast(
-    msg: widget.jobData.status.toString(),
-    toastLength: Toast.LENGTH_SHORT, // or Toast.LENGTH_LONG
-    gravity: ToastGravity.BOTTOM, // Position: TOP, CENTER, BOTTOM
-    backgroundColor: Colors.black,
-    textColor: Colors.white,
-    fontSize: 16.0,
-  );
+                                     
 
                                       if (widget.jobData.status == true) {
                                         status = false;
@@ -279,15 +272,7 @@ class _JobDetailsState extends State<JobDetails> with TickerProviderStateMixin {
                                               vaccancy:
                                                   widget.jobData.vaccancy));
 
-                                                   Fluttertoast.showToast(
-    msg: result.toString(),
-    toastLength: Toast.LENGTH_SHORT, // or Toast.LENGTH_LONG
-    gravity: ToastGravity.BOTTOM, // Position: TOP, CENTER, BOTTOM
-    backgroundColor: Colors.black,
-    textColor: Colors.white,
-    fontSize: 16.0,
-  );
-
+                                                 
                                       if (result == "success") {
                                         Navigator.pushAndRemoveUntil(
                                             context,
