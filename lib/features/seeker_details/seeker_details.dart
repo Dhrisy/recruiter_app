@@ -954,7 +954,6 @@ class _SeekerDetailsState extends State<SeekerDetails>
                                               id: widget.responseData!.id,
                                               context: context);
 
-                                              CommonSnackbar.show(context, message: result.toString());
 
                                   if (result != null) {
                                     if (result == true) {

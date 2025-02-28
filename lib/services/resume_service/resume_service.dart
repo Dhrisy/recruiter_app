@@ -15,4 +15,18 @@ class ResumeService {
 
     return response;
   }
+
+
+   static Future<http.Response> fetchAllDownloadedResumes() async {
+    final url =
+        Uri.parse("${ApiLists.getAllResumesEndPoint}");
+
+    final token = await CustomFunctions().retrieveCredentials("access_token");
+
+    final response = await http.get(url, headers: {
+      'Authorization': 'Bearer ${token.toString()}',
+    });
+
+    return response;
+  }
 }

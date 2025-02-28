@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:recruiter_app/core/utils/custom_functions.dart';
 
 class SeekerModel {
@@ -41,6 +43,7 @@ class SeekerPersonalModel {
   });
 
   factory SeekerPersonalModel.fromJson(Map<String, dynamic> json) {
+   
     return SeekerPersonalModel(
       user: User.fromJson(json["user"]),
       personal: Personal.fromJson(json["personal"]),

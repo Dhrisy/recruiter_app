@@ -3,9 +3,10 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:recruiter_app/core/utils/custom_functions.dart';
 import 'package:recruiter_app/features/resdex/data/resume_repository.dart';
 import 'package:recruiter_app/features/resdex/model/job_response_model.dart';
+import 'package:recruiter_app/features/resdex/model/resume_model.dart';
 
 class ResumeProvider extends ChangeNotifier {
-  JobResponseModel? downloadResumes;
+  List<ResumeModel>? downloadResumes;
   String errorMessage = "";
 
   Future<bool?> downloadResume(
@@ -25,6 +26,22 @@ class ResumeProvider extends ChangeNotifier {
     } catch (e) {
       print(e);
       return false;
+    }
+  }
+
+
+  Future<void>  fetchREsumes() async{
+    try {
+    final result =  await ResumeRepository().fetchAllDownloadedResume();
+    if(result != null){
+      downloadResumes = result;
+      notifyListeners();
+    }else{
+      downloadResumes = null;
+      notifyListeners();
+    }
+    } catch (e) {
+      
     }
   }
 }

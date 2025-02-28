@@ -17,7 +17,7 @@ class JobResponseModel {
 
   factory JobResponseModel.fromJson(Map<String, dynamic> json) {
     return JobResponseModel(
-        id: json["id"],
+        id: json["id"] ?? 0,
         viewed: json["viewed"].toString(),
         status: json["status"] ?? "",
         seeker: SeekerModel.fromJson(json["candidate"]),
