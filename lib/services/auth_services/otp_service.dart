@@ -18,6 +18,20 @@ class OtpService {
     return response;
   }
 
+   Future<http.Response> mobileOtpVerify({required String otp, required String phone}) async {
+    final url = Uri.parse(ApiLists.mobileOtpVerifyEndPoint);
+
+    final response = await http.post(
+      url,
+      body: jsonEncode({"otp": otp, "phone": phone}),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    );
+
+    return response;
+  }
+
  Future<http.Response> emailSentOtp({required String email}) async {
     final url = Uri.parse(ApiLists.emailSentOtpEndPoint);
 
@@ -31,5 +45,15 @@ class OtpService {
 
     return response;
   }
+ static Future<http.Response>  retryOtp({required String phone}) async{
+    final url = Uri.parse(ApiLists.mobileOtpRetryEndPoint);
+    final response = await http.post(url,
+    body: jsonEncode({
+      "phone": phone
+    }));
 
+    print("Response of retyr otp  ${response.statusCode},  ${response.body}");
+
+    return response;
+  }
 }

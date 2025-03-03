@@ -40,7 +40,7 @@ class _ReusableButtonState extends State<ReusableButton> {
   Widget build(BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(widget.radius ?? 15.r),
-      onTap: widget.action,
+      onTap: widget.isLoading == true ? (){} : widget.action,
       child: Container(
         height: widget.height ?? 45.h,
         width: widget.width ?? double.infinity,
@@ -74,7 +74,12 @@ class _ReusableButtonState extends State<ReusableButton> {
                 ),
 
                   widget.iconWidget != null
-                  ? widget.iconWidget! : const SizedBox.shrink()
+                  ? Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: widget.iconWidget!,
+                  ) : const SizedBox.shrink(),
+
+
           ],
         ),
       ),

@@ -66,7 +66,7 @@ class Onboarding2 extends StatelessWidget {
                                             const EdgeInsets.only(left: 8, top: 8),
                                         child: Text(
                                           "Back",
-                                          style: theme.textTheme.bodyMedium,
+                                          style: AppTheme.bodyText(lightTextColor)
                                         ),
                                       ),
                                     ),
@@ -79,10 +79,7 @@ class Onboarding2 extends StatelessWidget {
                                         // final value = prefs.getBool("isDarkMode");
                                         // final AppThemeDataBloc _themeBloc =
                                         //     BlocProvider.of<AppThemeDataBloc>(
-                                        //         context);
-                                    
-                                        //         print("kkkkkk $value");
-                                     
+                                        //         context);        
                                         // if (value == true) {
                                         //   prefs.setBool("isDarkMode", false);
                                         //   _themeBloc
@@ -104,7 +101,7 @@ class Onboarding2 extends StatelessWidget {
                                             const EdgeInsets.only(right: 0, top: 8),
                                         child: Text(
                                           "Skip",
-                                          style: theme.textTheme.bodyMedium,
+                                          style: AppTheme.bodyText(lightTextColor)
                                         ),
                                       ),
                                     )
@@ -139,13 +136,13 @@ class Onboarding2 extends StatelessWidget {
                           children: [
                             Text(
                               'All your recruitment needs in one powerful platform',
-                              style: theme.textTheme.headlineMedium,
+                              style: AppTheme.headingText(lightTextColor),
                               textAlign: TextAlign.center,
                             ),
                             SizedBox(height: 20.h),
                             Text(
                               'A comprehensive solution for managing job postings, candidate applications, and seamless communication with potential hires',
-                              style:theme.textTheme.bodyMedium,
+                              style:AppTheme.bodyText(lightTextColor),
                               textAlign: TextAlign.center,
                             ),
                           ],

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:recruiter_app/core/constants.dart';
+import 'package:recruiter_app/core/theme.dart';
 
 class CommonAppbarWidget extends StatelessWidget {
   final String title;
@@ -16,7 +17,6 @@ class CommonAppbarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Container(
       width: double.infinity,
       // height: MediaQuery.of(context).size.height * 0.05.h,
@@ -49,8 +49,9 @@ class CommonAppbarWidget extends StatelessWidget {
                 Expanded(
                   child: Text(
                     title,
+                    overflow: TextOverflow.ellipsis,
                     style:
-                        theme.textTheme.headlineMedium!.copyWith(fontSize: 20.sp),
+                        AppTheme.headingText(lightTextColor),
                   )
                       .animate()
                       .fadeIn(

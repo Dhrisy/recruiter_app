@@ -27,7 +27,7 @@ class AccountService {
         body: jsonEncode({
           "id": account.id,
           "name": account.name,
-          "logo":  account.logo,
+          // "logo":  account.logo,
           "about": account.about,
           "website": account.website,
           "functional_area": account.functionalArea,
@@ -57,5 +57,35 @@ class AccountService {
     });
 
     return response;
+  }
+
+
+  static Future<http.Response> fetchUserData() async {
+    final token = await CustomFunctions().retrieveCredentials("access_token");
+    final url = Uri.parse(ApiLists.editUser);
+    final response = await http.get(url, headers: {
+      'Authorization': 'Bearer ${token.toString()}',
+    });
+
+    return response;
+  }
+
+
+  static Future<http.Response> deleteUser() async {
+    final url = Uri.parse(ApiLists.editUser); // Replace with actual API endpoint
+    final accessToken =
+        await CustomFunctions().retrieveCredentials("access_token");
+
+    try {
+      return await http.delete(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          'Authorization': 'Bearer ${accessToken.toString()}',
+        },
+      );
+    } catch (e) {
+      throw Exception("Failed to delete user data: $e");
+    }
   }
 }

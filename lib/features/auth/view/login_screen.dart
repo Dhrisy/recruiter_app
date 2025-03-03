@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -7,6 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:provider/provider.dart';
 import 'package:recruiter_app/core/constants.dart';
+import 'package:recruiter_app/core/theme.dart';
 import 'package:recruiter_app/core/utils/navigation_animation.dart';
 import 'package:recruiter_app/features/auth/bloc/auth_bloc.dart';
 import 'package:recruiter_app/features/auth/bloc/auth_event.dart';
@@ -17,6 +20,7 @@ import 'package:recruiter_app/features/auth/view/register.dart';
 import 'package:recruiter_app/features/auth/view/welcome_screen.dart';
 import 'package:recruiter_app/features/home/viewmodel/home_provider.dart';
 import 'package:recruiter_app/features/plans/plans_screen.dart';
+import 'package:recruiter_app/widgets/common_alertdialogue.dart';
 import 'package:recruiter_app/widgets/common_snackbar.dart';
 import 'package:recruiter_app/widgets/reusable_button.dart';
 import 'package:recruiter_app/widgets/reusable_textfield.dart';
@@ -82,49 +86,55 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Material(
-        child: Scaffold(
-      body: Container(
-        height: double.infinity,
-        width: double.infinity,
-        decoration: BoxDecoration(),
-        child: Stack(
-          children: [
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: SvgPicture.asset(
-                "assets/svgs/group_circle.svg",
-                fit: BoxFit.fill,
+    return PopScope(
+      onPopInvoked: (didPop) async {
+        if (didPop || !mounted) return;
+
+        Navigator.of(context).pop();
+      },
+      child: Material(
+          child: Scaffold(
+        body: Container(
+          height: double.infinity,
+          width: double.infinity,
+          decoration: BoxDecoration(),
+          child: Stack(
+            children: [
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: SvgPicture.asset(
+                  "assets/svgs/group_circle.svg",
+                  fit: BoxFit.fill,
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: PageView(
-                      controller: _pageController,
-                      children: [
-                        _buildLogin(theme: theme),
-                      ],
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: PageView(
+                        controller: _pageController,
+                        children: [
+                          _buildLogin(),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-    ));
+      )),
+    );
   }
 
   bool isValidEmail(String email) {
     final emailRegex =
-        RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+        RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+(?<!\.)\.[a-zA-Z]{2,}$');
     return emailRegex.hasMatch(email);
   }
 
@@ -172,7 +182,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildLogin({required ThemeData theme}) {
+  Widget _buildLogin() {
     return SizedBox(
       // color: Colors.green,
       height: double.infinity,
@@ -203,6 +213,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           ReusableTextfield(
                             controller: _emailCont,
+                            keyBoardType: TextInputType.emailAddress,
                             labelText: "Email",
                             hintText: "Email",
                             validation: (_) {
@@ -238,6 +249,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             children: [
                               InkWell(
                                   onTap: () async {
+                                    _emailCont.clear();
+                                    _pwCont.clear();
                                     Navigator.push(
                                         context,
                                         AnimatedNavigation()
@@ -245,8 +258,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                   },
                                   child: Text(
                                     "Forgot password?",
-                                    style: theme.textTheme.bodyMedium!
-                                        .copyWith(color: buttonColor),
+                                    style: AppTheme.bodyText(buttonColor)
+                                        .copyWith(),
                                   )),
                             ],
                           ),
@@ -271,7 +284,29 @@ class _LoginScreenState extends State<LoginScreen> {
                     (Route<dynamic> route) => false);
                 CommonSnackbar.show(context, message: "Successfully logged in");
               } else if (state is AuthFailure) {
-                CommonSnackbar.show(context, message: state.error);
+                if (state.error == "Please subscribe to a plan") {
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return CommonAlertDialog(
+                            title: "Subscribe",
+                            message: "You need to purchase a plan to continue",
+                            onConfirm: () {
+                              Navigator.push(
+                                  context,
+                                  AnimatedNavigation()
+                                      .fadeAnimation(PlansScreen(
+                                    forSubscription: true,
+                                  )));
+                            },
+                            onCancel: () {
+                              Navigator.pop(context);
+                            },
+                            height: 200);
+                      });
+                } else {
+                  CommonSnackbar.show(context, message: state.error);
+                }
               } else if (state is EmailVerifyNeeded) {
                 _showAlertDialog(context);
               }
@@ -287,6 +322,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         action: () {
                           if (_loginFormKey.currentState!.validate()) {
                             context.read<AuthBloc>().add(EmailLoginEvent(
+                                context: context,
                                 email: _emailCont.text,
                                 password: _pwCont.text));
                           } else {
@@ -303,7 +339,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text("Don't you have an account? "),
+                          Text(
+                            "Don't you have an account? ",
+                            style: AppTheme.bodyText(lightTextColor).copyWith(),
+                          ),
                           Consumer<LoginProvider>(
                               builder: (context, provider, child) {
                             return InkWell(
@@ -320,9 +359,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                 },
                                 child: Text(
                                   "Sign up",
-                                  style: theme.textTheme.bodyMedium!.copyWith(
-                                      color: buttonColor,
-                                      fontWeight: FontWeight.w600),
+                                  style: AppTheme.bodyText(buttonColor)
+                                      .copyWith(
+                                          color: buttonColor,
+                                          fontWeight: FontWeight.w600),
                                 ));
                           })
                         ],
@@ -350,8 +390,20 @@ class _LoginScreenState extends State<LoginScreen> {
       keyboardType: keyboardType,
       maxLines: 1,
       obscureText: !isVisisble,
+      style: AppTheme.bodyText(lightTextColor),
+      onChanged: (value) {
+        if (value.contains(' ')) {
+          controller.text = value.replaceAll(' ', '');
+          controller.selection = TextSelection.fromPosition(
+            TextPosition(offset: controller.text.length),
+          );
+        }
+      },
       decoration: InputDecoration(
         hintText: "",
+        labelStyle: AppTheme.bodyText(greyTextColor),
+        hintStyle: AppTheme.bodyText(greyTextColor),
+        errorStyle: AppTheme.bodyText(Colors.red),
         labelText: labelText,
         suffixIcon: InkWell(
             onTap: () {
@@ -375,6 +427,10 @@ class _LoginScreenState extends State<LoginScreen> {
             borderRadius: BorderRadius.circular(borderRadius),
             borderSide: BorderSide(color: Colors.red.shade900)),
       ),
+      inputFormatters: [
+        FilteringTextInputFormatter.allow(RegExp(r'^[a-zA-Z0-9!%*?&@\$]+$'))
+
+      ],
     );
   }
 }
@@ -394,6 +450,7 @@ class _ForgotPassWordState extends State<ForgotPassWord> {
   final _forgotPwFormKey = GlobalKey<FormState>();
   final _otpFormKey = GlobalKey<FormState>();
   final _createPwFormKey = GlobalKey<FormState>();
+  String otpError = "";
 
   bool hasEightChars = false;
   bool hasUppercase = false;
@@ -402,195 +459,352 @@ class _ForgotPassWordState extends State<ForgotPassWord> {
   bool hasSmallLetter = false;
   bool isMatch = true;
 
-  void _validatePassword(String password) {
+  bool resendOTP = false;
+  int resendAttempts = 0; // Track the number of attempts
+  bool isResendDisabled = false; // Disable resend after 3 attempts
+  int remainingTime = 30; // Countdown time
+  Timer? _timer;
+
+  bool isPasswdView = false;
+  bool isConfirmPwView = false;
+
+  void startResendCooldown() {
     setState(() {
-      hasEightChars = password.length >= 8;
-      hasUppercase = password.contains(RegExp(r'[A-Z]'));
-      hasSpecialChar = password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'));
-      hasNumber = password.contains(RegExp(r'[0-9]'));
-      hasSmallLetter = password.contains(RegExp(r'[a-z]'));
+      isResendDisabled = true;
+      remainingTime = 30; // Reset timer
+    });
+
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      if (remainingTime > 0) {
+        setState(() {
+          remainingTime--;
+        });
+      } else {
+        timer.cancel();
+        setState(() {
+          isResendDisabled = false;
+          resendAttempts = 0; // Reset count
+        });
+      }
+    });
+  }
+
+  final allowedSpecialChars = RegExp(r'[@\$!%*?&]');
+
+  void _validatePassword(String value) {
+    setState(() {
+      hasEightChars = value.length >= 8;
+      hasUppercase = value.contains(RegExp(r'[A-Z]'));
+      hasSmallLetter = value.contains(RegExp(r'[a-z]'));
+      hasNumber = value.contains(RegExp(r'[0-9]'));
+      hasSpecialChar = allowedSpecialChars.hasMatch(value);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Material(
-      child: Scaffold(
-        body: Consumer<LoginProvider>(builder: (context, provider, child) {
-          return Form(
-            key: _forgotPwFormKey,
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                child: Column(
-                  children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SizedBox(
-                                height:
-                                    MediaQuery.of(context).size.height * 0.1,
-                              ),
-                              Row(
-                                children: [
-                                  InkWell(
-                                      onTap: () {
-                                        provider.setOtpSuccess(false);
-                                        _phnController.clear();
-                                        Navigator.pop(context);
-                                      },
-                                      child: Icon(Icons.arrow_back)),
-                                  const SizedBox(
-                                    width: 10,
-                                  ),
-                                  Text(
-                                    "Forgot password",
-                                    style: GoogleFonts.beVietnamPro(
-                                        fontSize: 23.sp,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 15,
-                              ),
-                              provider.otpSuccess == false
-                                  ? Column(
-                                      children: [
-                                        ReusableTextfield(
-                                          controller: _phnController,
-                                          labelText: "Phone number",
-                                          hintText: "Enter your phone",
-                                          validation: (_) {
-                                            if (_phnController.text
-                                                .trim()
-                                                .isEmpty) {
-                                              return "This field is required";
-                                            }
-                                            return null;
-                                          },
-                                        ),
-                                        const Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                                "An OTP will be sent to your phone"),
-                                          ],
-                                        ),
-                                        const SizedBox(
-                                          height: 20,
-                                        ),
-                                      ],
-                                    )
-                                  : Column(
-                                      children: [
-                                        _buildOtpField(context),
-                                        const SizedBox(
-                                          height: 10,
-                                        ),
-                                        Text(
-                                          "Enter the OTP which is sent to your phone number",
-                                          textAlign: TextAlign.center,
-                                          style: theme.textTheme.bodySmall!
-                                              .copyWith(color: greyTextColor),
-                                        ),
-                                        InkWell(
-                                            onTap: () async {
-                                              await provider
-                                                  .forgotPasswordGetOtp(
-                                                      phn: _phnController.text);
-                                            },
-                                            child: const Text("Resend")),
-                                        _buildCreateNewPassword(
-                                            context: context, theme: theme),
-                                        const SizedBox(
-                                          height: 20,
-                                        )
-                                      ],
-                                    )
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Column(
+    // final theme = Theme.of(context);
+    return PopScope(
+      onPopInvoked: (didPop) {
+        Provider.of<LoginProvider>(context, listen: false).setOtpSuccess(false);
+        _phnController.clear();
+        // Navigator.pop();
+      },
+      child: Material(
+        child: Scaffold(
+          body: Consumer<LoginProvider>(builder: (context, provider, child) {
+            return Form(
+              key: _forgotPwFormKey,
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: Column(
+                    children: [
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          ReusableButton(
-                            action: () async {
-                              if (provider.otpSuccess == true) {
-                                print(_otpController.text);
-                                final result = await provider.changePassword(
-                                    password: _passwordCont.text,
-                                    phone: _phnController.text,
-                                    otp: _otpController.text);
+                          Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.1,
+                                ),
+                                Row(
+                                  children: [
+                                    InkWell(
+                                        onTap: () {
+                                          provider.setOtpSuccess(false);
+                                          _phnController.clear();
+                                          Navigator.pop(context);
+                                        },
+                                        child: Icon(Icons.arrow_back)),
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    Text(
+                                      "Forgot password",
+                                      style: GoogleFonts.beVietnamPro(
+                                          fontSize: 23.sp,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 15,
+                                ),
+                                provider.otpSuccess == false
+                                    ? Column(
+                                        children: [
+                                          ReusableTextfield(
+                                            controller: _phnController,
+                                            keyBoardType: TextInputType.phone,
+                                            labelText: "Phone number",
+                                            hintText: "Enter your phone",
+                                            lengthLimit: 10,
+                                            validation: (_) {
+                                              if (_phnController.text
+                                                  .trim()
+                                                  .isEmpty) {
+                                                return "This field is required";
+                                              } else if (_phnController
+                                                      .text.length <
+                                                  10) {
+                                                return "Phone number should be 10 digits";
+                                              } else if (!RegExp(r'^[0-9]+$')
+                                                  .hasMatch(
+                                                      _phnController.text)) {
+                                                return "Invalid phone number";
+                                              } else if (_phnController.text ==
+                                                  "1234567890") {
+                                                return "Invalid phone number";
+                                              }
+                                              return null;
+                                            },
+                                          ),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                "An OTP will be sent to your phone",
+                                                style: AppTheme.bodyText(
+                                                    greyTextColor),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(
+                                            height: 20,
+                                          ),
+                                        ],
+                                      )
+                                    : Column(
+                                        children: [
+                                          _buildOtpField(context),
+                                          const SizedBox(
+                                            height: 6,
+                                          ),
+                                          Text(
+                                            otpError,
+                                            style: AppTheme.bodyText(Colors.red)
+                                                .copyWith(fontSize: 11.sp),
+                                          ),
+                                          const SizedBox(
+                                            height: 10,
+                                          ),
+                                          Text(
+                                            "Enter the OTP which is sent to your phone number",
+                                            textAlign: TextAlign.center,
+                                            style:
+                                                AppTheme.bodyText(greyTextColor)
+                                                    .copyWith(
+                                                        color: greyTextColor),
+                                          ),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                "Don't received yet? ",
+                                                style: AppTheme.bodyText(
+                                                    greyTextColor),
+                                              ),
+                                              resendOTP == true
+                                                  ? Text(
+                                                      "Sending...",
+                                                      style: AppTheme.bodyText(
+                                                          Colors.blue),
+                                                    )
+                                                  : isResendDisabled
+                                                      ? Text(
+                                                          "Try again in $remainingTime s",
+                                                          style:
+                                                              AppTheme.bodyText(
+                                                                  Colors.red),
+                                                        )
+                                                      : InkWell(
+                                                          onTap: () async {
+                                                            if (resendAttempts >=
+                                                                3) {
+                                                              startResendCooldown();
+                                                              setState(() {
+                                                                isResendDisabled =
+                                                                    true;
+                                                              });
 
-                                if (result == "success") {
-                                  print("success");
-                                  Navigator.pop(context);
-                                  CommonSnackbar.show(context,
-                                      message:
-                                          "Password changed successfully!");
-                                } else {
-                                  CommonSnackbar.show(context,
-                                      message: "Something went wrong");
-                                }
-                              } else {
-                                if (_forgotPwFormKey.currentState!.validate()) {
-                                  final result =
-                                      await provider.forgotPasswordGetOtp(
-                                          phn: _phnController.text);
+                                                              // Disable for 30 seconds
+                                                              Future.delayed(
+                                                                  Duration(
+                                                                      seconds:
+                                                                          30),
+                                                                  () {
+                                                                setState(() {
+                                                                  isResendDisabled =
+                                                                      false;
+                                                                  resendAttempts =
+                                                                      0; // Reset count after cooldown
+                                                                });
+                                                              });
 
-                                  if (result == "success") {
-                                    CommonSnackbar.show(context,
-                                        message:
-                                            "OTP sent to your mobile number");
-                                  } else {
-                                    CommonSnackbar.show(context,
-                                        message: result.toString());
-                                  }
-                                }
-                              }
+                                                              return CommonSnackbar
+                                                                  .show(context,
+                                                                      message:
+                                                                          "Too many requests. Try again in 30s");
+                                                            }
 
-                              //   if (_forgotPwFormKey.currentState!.validate()) {
-                              //     context.read<AuthBloc>().add(
-                              //         ForgotPasswordEvent(
-                              //             phone: _phnController.text.trim()));
-                              //   }
+                                                            setState(() {
+                                                              resendOTP = true;
+                                                              resendAttempts++; // Increment retry count
+                                                            });
 
-                              //   setState(() {
-                              //     _isOtp = false;
-                              //   });
-                            },
-                            text: provider.otpSuccess ? "Confirm" : "Send OTP",
-                            height: 40.h,
-                            textColor: Colors.white,
-                          ),
-                          const SizedBox(
-                            height: 15,
+                                                            final result = await provider
+                                                                .forgotPasswordGetOtp(
+                                                                    phn: _phnController
+                                                                        .text);
+
+                                                            if (result ==
+                                                                "success") {
+                                                              setState(() {
+                                                                resendOTP =
+                                                                    false;
+                                                              });
+                                                            } else {
+                                                              setState(() {
+                                                                resendOTP =
+                                                                    false;
+                                                              });
+
+                                                              CommonSnackbar.show(
+                                                                  context,
+                                                                  message: result
+                                                                      .toString());
+                                                            }
+                                                          },
+                                                          child: Text(
+                                                            "Resend",
+                                                            style: AppTheme
+                                                                .bodyText(Colors
+                                                                    .blue),
+                                                          )),
+                                            ],
+                                          ),
+                                          _buildCreateNewPassword(
+                                            context: context,
+                                          ),
+                                          const SizedBox(
+                                            height: 20,
+                                          )
+                                        ],
+                                      )
+                              ],
+                            ),
                           ),
                         ],
                       ),
-                    ),
-                  ],
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Column(
+                          children: [
+                            ReusableButton(
+                              isLoading:
+                                  provider.sentOTPLoading && resendOTP == false,
+                              action: () async {
+                                if (provider.otpSuccess == true) {
+                                  if (_otpController.text.trim().isEmpty) {
+                                    setState(() {
+                                      otpError = "Please enter 4 digits OTP";
+                                    });
+                                  } else if (_otpController.text.length < 4) {
+                                    setState(() {
+                                      otpError = "OTP should be 4 digits";
+                                    });
+                                  } else {
+                                    setState(() {
+                                      otpError = "";
+                                    });
+                                    if (_createPwFormKey.currentState!
+                                        .validate()) {
+                                      final result =
+                                          await provider.changePassword(
+                                              password: _passwordCont.text,
+                                              phone: _phnController.text,
+                                              otp: _otpController.text);
+
+                                      if (result == "success") {
+                                        print("success");
+                                        Navigator.pop(context);
+                                        CommonSnackbar.show(context,
+                                            message:
+                                                "Password changed successfully!");
+                                      } else {
+                                        CommonSnackbar.show(context,
+                                            message: result.toString());
+                                      }
+                                    }
+                                  }
+                                } else {
+                                  if (_forgotPwFormKey.currentState!
+                                          .validate() &&
+                                      provider.sentOTPLoading == false) {
+                                    final result =
+                                        await provider.forgotPasswordGetOtp(
+                                            phn: _phnController.text);
+
+                                    if (result == "success") {
+                                      CommonSnackbar.show(context,
+                                          message:
+                                              "OTP sent to your mobile number");
+                                    } else {
+                                      CommonSnackbar.show(context,
+                                          message: result.toString());
+                                    }
+                                  }
+                                }
+                              },
+                              text:
+                                  provider.otpSuccess ? "Confirm" : "Send OTP",
+                              height: 40.h,
+                              textColor: Colors.white,
+                            ),
+                            const SizedBox(
+                              height: 15,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          );
-        }),
+            );
+          }),
+        ),
       ),
     );
   }
 
-  Widget _buildCreateNewPassword(
-      {required BuildContext context, required ThemeData theme}) {
+  Widget _buildCreateNewPassword({required BuildContext context}) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -602,10 +816,8 @@ class _ForgotPassWordState extends State<ForgotPassWord> {
               SizedBox(
                 height: 20,
               ),
-              ReusableTextfield(
+              _passWordField(
                 controller: _passwordCont,
-                onChanged: _validatePassword,
-                labelText: "Password",
                 validation: (_) {
                   if (_passwordCont.text.trim().isEmpty) {
                     return "This field is required";
@@ -614,22 +826,83 @@ class _ForgotPassWordState extends State<ForgotPassWord> {
                   }
                   return null;
                 },
+                keyboardType: TextInputType.visiblePassword,
+                labelText: "Password",
+                isVisible: isPasswdView,
+                onChanged: (value) {
+                  if (value.contains(' ')) {
+                    _passwordCont.text = value.replaceAll(' ', '');
+                    _passwordCont.selection = TextSelection.fromPosition(
+                      TextPosition(offset: _passwordCont.text.length),
+                    );
+                  } else {
+                    _validatePassword(_passwordCont.text);
+                  }
+                },
+                icon: isPasswdView == false
+                    ? Icons.visibility
+                    : Icons.visibility_off,
+                obscureText: !isPasswdView,
+                onIconAction: () {
+                  setState(() {
+                    isPasswdView = !isPasswdView;
+                  });
+                  print(isPasswdView);
+                },
               ),
               const SizedBox(
                 height: 15,
               ),
-              ReusableTextfield(
+              _passWordField(
                 controller: _confirmPwCont,
-                labelText: "Re-enter password",
                 validation: (_) {
                   if (_confirmPwCont.text.trim().isEmpty) {
                     return "This field is required";
-                  } else if (_passwordCont.text != _confirmPwCont.text) {
+                  } else if (_passwordCont.text.trim() !=
+                      _confirmPwCont.text.trim()) {
                     return "Password doesn't match";
                   }
                   return null;
                 },
+                keyboardType: TextInputType.visiblePassword,
+                labelText: "Password",
+                isVisible: isConfirmPwView,
+                onChanged: (value) {
+                  if (value.contains(' ')) {
+                    _passwordCont.text = value.replaceAll(' ', '');
+                    _passwordCont.selection = TextSelection.fromPosition(
+                      TextPosition(offset: _passwordCont.text.length),
+                    );
+                  } else if (_passwordCont.text != value) {
+                    setState(() {
+                      isMatch = false;
+                    });
+                  } else {
+                    setState(() {
+                      isMatch = true;
+                    });
+                  }
+                },
+                icon: isConfirmPwView == false
+                    ? Icons.visibility
+                    : Icons.visibility_off,
+                obscureText: !isConfirmPwView,
+                onIconAction: () {
+                  setState(() {
+                    isConfirmPwView = !isConfirmPwView;
+                  });
+                },
               ),
+              isMatch == true
+                  ? const SizedBox.shrink()
+                  : Row(
+                      children: [
+                        Text(
+                          "Password doesn't match",
+                          style: AppTheme.bodyText(Colors.red),
+                        ),
+                      ],
+                    ),
               const SizedBox(
                 height: 15,
               ),
@@ -646,7 +919,7 @@ class _ForgotPassWordState extends State<ForgotPassWord> {
                 isValid: hasSmallLetter,
               ),
               ValidationCheckbox(
-                title: 'Contains special character',
+                title: 'Contains special character(@ \$ ! % * ? &)',
                 isValid: hasSpecialChar,
               ),
               ValidationCheckbox(
@@ -656,6 +929,51 @@ class _ForgotPassWordState extends State<ForgotPassWord> {
             ],
           ),
         )
+      ],
+    );
+  }
+
+  Widget _passWordField(
+      {required TextEditingController controller,
+      required String? Function(String?)? validation,
+      required TextInputType keyboardType,
+      required String labelText,
+      required bool isVisible,
+      required Function(String)? onChanged,
+      required onIconAction,
+      required bool obscureText,
+      required IconData icon}) {
+    return TextFormField(
+      controller: controller,
+      validator: validation,
+      keyboardType: keyboardType,
+      maxLines: 1,
+      obscureText: obscureText,
+      style: AppTheme.bodyText(lightTextColor),
+      onChanged: onChanged,
+      decoration: InputDecoration(
+        hintText: "",
+        labelStyle: AppTheme.bodyText(greyTextColor),
+        hintStyle: AppTheme.bodyText(greyTextColor),
+        errorStyle: AppTheme.bodyText(Colors.red),
+        labelText: labelText,
+        suffixIcon: InkWell(onTap: onIconAction, child: Icon(icon)),
+        enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(borderRadius),
+            borderSide: BorderSide(color: borderColor)),
+        disabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(borderRadius)),
+        focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(borderRadius)),
+        errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(borderRadius),
+            borderSide: BorderSide(color: Colors.red.shade900)),
+        focusedErrorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(borderRadius),
+            borderSide: BorderSide(color: Colors.red.shade900)),
+      ),
+      inputFormatters: [
+       FilteringTextInputFormatter.allow(RegExp(r'^[a-zA-Z0-9!%*?&@\$]+$'))
       ],
     );
   }
@@ -678,6 +996,8 @@ class _ForgotPassWordState extends State<ForgotPassWord> {
         // validator: (_) {
         //   if (_otpController.text.trim().isEmpty) {
         //     return "Please enter OTP";
+        //   }else if(_otpController.text.length < 4){
+        //     return "OTP should be 4 digits";
         //   }
         //   return null;
         // },
@@ -738,7 +1058,7 @@ class ValidationCheckbox extends StatelessWidget {
             color: isValid ? Colors.green : Colors.grey,
           ),
           SizedBox(width: 8),
-          Text(title, style: Theme.of(context).textTheme.bodyMedium),
+          Text(title, style: AppTheme.bodyText(greyTextColor)),
         ],
       ),
     );

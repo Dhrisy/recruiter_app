@@ -40,7 +40,6 @@ class _JobCardWidgetState extends State<JobCardWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -102,12 +101,13 @@ class _JobCardWidgetState extends State<JobCardWidget> {
                                       widget.job.title.toString()),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  style: theme.textTheme.titleLarge!.copyWith(
-                                      fontSize: 14.sp,
-                                      fontWeight: FontWeight.bold,
-                                      color: _isSelected
-                                          ? Colors.white
-                                          : lightTextColor),
+                                  style: AppTheme.headingText(lightTextColor)
+                                      .copyWith(
+                                          fontSize: 14.sp,
+                                          fontWeight: FontWeight.bold,
+                                          color: _isSelected
+                                              ? Colors.white
+                                              : lightTextColor),
                                 ),
                               ),
                               // Icon(
@@ -122,10 +122,12 @@ class _JobCardWidgetState extends State<JobCardWidget> {
                               Text(
                                   "No.of vaccancies: ${widget.job.vaccancy.toString()}",
                                   overflow: TextOverflow.ellipsis,
-                                  style: theme.textTheme.bodyMedium!.copyWith(
-                                      color: _isSelected
-                                          ? Colors.white
-                                          : lightTextColor)),
+                                  style: AppTheme.bodyText(lightTextColor)
+                                      .copyWith(
+                                          color: _isSelected
+                                              ? Colors.white
+                                              : lightTextColor,
+                                              )),
                             ],
                           ),
                           Row(
@@ -142,10 +144,10 @@ class _JobCardWidgetState extends State<JobCardWidget> {
                               Text(
                                   "${CustomFunctions.toSentenceCase(widget.job.city.toString())}, ${CustomFunctions.toSentenceCase(widget.job.country.toString())}",
                                   overflow: TextOverflow.ellipsis,
-                                  style: theme.textTheme.bodyMedium!.copyWith(
-                                      color: _isSelected
+                                  style: AppTheme.bodyText(_isSelected
                                           ? Colors.white
-                                          : lightTextColor)),
+                                          : lightTextColor)
+                                      .copyWith()),
                             ],
                           ),
                         ],
@@ -158,39 +160,37 @@ class _JobCardWidgetState extends State<JobCardWidget> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                    widget.job.status == true
-                    ? Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10.r),
-                        border: Border.all(
-                          color: Colors.green
-                        )
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(5.0),
-                        child: Text("Active",
-                        style: theme.textTheme.bodyMedium!.copyWith(
-                          color: Colors.green,
-                        
-                        ),
-                        ),
-                      ),
-                    ) :   Container(
-                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10.r),
-                        border: Border.all(
-                          color: greyTextColor
-                        )
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(5.0),
-                        child: Text("Expired",
-                         style: theme.textTheme.bodyMedium!.copyWith(
-                          color: greyTextColor,
-                        
-                        ),),
-                      ),
-                    ),
+                        widget.job.status == true
+                            ? Container(
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10.r),
+                                    border: Border.all(color: Colors.green)),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(5.0),
+                                  child: Text(
+                                    "Active",
+                                    style: AppTheme.bodyText(lightTextColor)
+                                        .copyWith(
+                                      color: Colors.green,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : Container(
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10.r),
+                                    border: Border.all(color: greyTextColor)),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(5.0),
+                                  child: Text(
+                                    "Expired",
+                                    style: AppTheme.bodyText(lightTextColor)
+                                        .copyWith(
+                                      color: greyTextColor,
+                                    ),
+                                  ),
+                                ),
+                              ),
                         InkWell(
                             onTap: () {
                               FocusScope.of(context).unfocus();
@@ -203,13 +203,13 @@ class _JobCardWidgetState extends State<JobCardWidget> {
                                           "Dou you want to delete this job ${widget.job.title}",
                                       onConfirm: () async {
                                         if (widget.job.id != null) {
-                                          final result =
-                                              await Provider.of<JobPostingProvider>(
-                                                      context,
-                                                      listen: false)
-                                                  .deleteJobPost(
-                                                      jobId: widget.job.id!);
-                        
+                                          final result = await Provider.of<
+                                                      JobPostingProvider>(
+                                                  context,
+                                                  listen: false)
+                                              .deleteJobPost(
+                                                  jobId: widget.job.id!);
+
                                           if (result == "success") {
                                             Navigator.pop(context);
                                             CommonSnackbar.show(context,
@@ -244,167 +244,3 @@ class _JobCardWidgetState extends State<JobCardWidget> {
   }
 }
 
-class JobCardTwo extends StatefulWidget {
-  final String name;
-  final String jobTitle;
-  final String location;
-  final String timeAgo;
-  final String description;
-  final String profilePictureUrl;
-
-  const JobCardTwo({
-    Key? key,
-    required this.name,
-    required this.jobTitle,
-    required this.location,
-    required this.timeAgo,
-    required this.description,
-    required this.profilePictureUrl,
-  }) : super(key: key);
-
-  @override
-  _JobCardTwoState createState() => _JobCardTwoState();
-}
-
-class _JobCardTwoState extends State<JobCardTwo> {
-  bool _isSelected = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _isSelected = !_isSelected;
-        });
-      },
-      child: Stack(
-        children: [
-          Container(
-            height: 130.h,
-            padding: const EdgeInsets.all(10.0),
-            decoration: BoxDecoration(
-              gradient: _isSelected
-                  ? secondGradient
-                  : const LinearGradient(
-                      colors: [lightTextColor, lightTextColor],
-                    ),
-              borderRadius: BorderRadius.circular(20.0.r),
-              border: _isSelected
-                  ? Border.all(color: Colors.transparent, width: 2.0.w)
-                  : Border.all(color: buttonColor, width: 2.0.w),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 6.0.r,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  radius: 35.0.r,
-                  backgroundColor: const Color(0xFFE1BEE7),
-                  backgroundImage: NetworkImage(widget.profilePictureUrl),
-                ),
-                SizedBox(width: 16.0.w),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(widget.jobTitle,
-                        style: AppTheme.titleText(
-                                _isSelected ? lightTextColor : secondaryColor)
-                            .copyWith(fontWeight: FontWeight.w300)
-
-                        // const TextStyle(
-                        //   fontFamily: 'Roboto',
-                        //   fontWeight: FontWeight.w600,
-                        //   fontSize: 20.0,
-                        //   color: Colors.white,
-                        // ),
-                        ),
-                    SizedBox(height: 4.0.h),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Text(widget.name,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: AppTheme.smallText(_isSelected
-                                    ? lightTextColor
-                                    : secondaryColor)
-                                .copyWith(fontWeight: FontWeight.w400)),
-                        SizedBox(
-                          width: 10.w,
-                        ),
-                        Icon(
-                          Icons.location_on,
-                          color: lightTextColor,
-                          size: 15,
-                        ),
-                        Text(widget.location,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: AppTheme.smallText(_isSelected
-                                    ? lightTextColor
-                                    : secondaryColor)
-                                .copyWith(
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 10.sp)),
-                      ],
-                    ),
-                    SizedBox(height: 5.0.h),
-                    SizedBox(
-                      height: 30.h,
-                      width: 150.w,
-                      child: Expanded(
-                        child: Text(widget.description,
-                            maxLines: 3,
-                            overflow: TextOverflow.ellipsis,
-                            style: AppTheme.smallText(_isSelected
-                                    ? lightTextColor
-                                    : secondaryColor)
-                                .copyWith(
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 10.sp)),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          Positioned(
-              bottom: 7.h,
-              right: 15.w,
-              child: Text(
-                "View",
-                style: AppTheme.smallText(
-                  _isSelected ? lightTextColor : secondaryColor,
-                ).copyWith(fontSize: 10.sp),
-              )),
-          Positioned(
-              top: 10.h,
-              right: 10.w,
-              child: SizedBox(
-                  height: 20.h,
-                  width: 20.h,
-                  child: Image.asset(
-                      color: _isSelected ? lightTextColor : secondaryColor,
-                      "assets/savedIcon.png"))),
-          Positioned(
-            top: 40.h,
-            right: 5.w,
-            child: Text(
-              widget.timeAgo,
-              style: AppTheme.smallText(
-                      _isSelected ? lightTextColor : secondaryColor)
-                  .copyWith(fontWeight: FontWeight.w400, fontSize: 10.sp),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}

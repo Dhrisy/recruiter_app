@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:recruiter_app/features/home/model/banner_model.dart';
 import 'package:recruiter_app/features/home/model/count_model.dart';
 import 'package:recruiter_app/services/home_services/banner_service.dart';
@@ -14,7 +13,6 @@ class HomeRepository {
       print("count response ${response.body}");
 
       print(response.statusCode);
-      print(response.body);
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
@@ -33,45 +31,31 @@ class HomeRepository {
     }
   }
 
+  Future<Map<String, dynamic>?> fetchBanners(
+      {int? retryCount = 0, int? maxRetries = 3}) async {
+    try {
+      final response = await BannerService.fetchBanners();
 
-  Future<Map<String, dynamic>?>  fetchBanners({
-    int? retryCount = 0,
-    int? maxRetries = 3
-  }) async{
-    try{
-final response = await BannerService.fetchBanners();
-print("response of banners  ${response.statusCode},  ${response.body}");
+      if (response.statusCode == 200) {
+        final List<dynamic> responseData = jsonDecode(response.body);
 
-if(response.statusCode == 200){
-  final List<dynamic> responseData = jsonDecode(response.body);
-
-  List<BannerModel> banners = responseData.map((item)
-  => BannerModel.fromJson(item)).toList();
-
-  return {
-    "list": banners,
-    "message": "success"
-  };
-  
-}else if(response.statusCode == 401){
-  await RefreshTokenService.refreshToken();
-return fetchBanners(
-  retryCount: retryCount! + 1,
-  maxRetries: maxRetries
-);
-}else{
-  final Map<String, dynamic> responseData = jsonDecode(response.body);
-return {
-    "list": null,
-    "message": responseData["message"]
-  };
-
-}
-    }catch(e){
-return {
-    "list": null,
-    "message": e.toString(),
-  };
+        List<BannerModel> banners =
+            responseData.map((item) => BannerModel.fromJson(item)).toList();
+       
+        return {"list": banners, "message": "success"};
+      } else if (response.statusCode == 401) {
+        await RefreshTokenService.refreshToken();
+        return fetchBanners(
+            retryCount: retryCount! + 1, maxRetries: maxRetries);
+      } else {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        return {"list": null, "message": responseData["message"]};
+      }
+    } catch (e) {
+      return {
+        "list": null,
+        "message": e.toString(),
+      };
     }
   }
 }

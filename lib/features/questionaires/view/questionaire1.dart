@@ -1,16 +1,22 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dio/dio.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:linear_progress_bar/linear_progress_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:recruiter_app/core/constants.dart';
+import 'package:recruiter_app/core/theme.dart';
 import 'package:recruiter_app/core/utils/city_lists.dart';
 import 'package:recruiter_app/core/utils/country_lists.dart';
+import 'package:recruiter_app/core/utils/custom_functions.dart';
 import 'package:recruiter_app/core/utils/functional_area_lists.dart';
 import 'package:recruiter_app/core/utils/industry_lists.dart';
 import 'package:recruiter_app/core/utils/navigation_animation.dart';
@@ -24,18 +30,29 @@ import 'package:recruiter_app/features/questionaires/data/questionaire_repositor
 import 'package:recruiter_app/features/questionaires/model/questionaire_model.dart';
 import 'package:recruiter_app/features/questionaires/view/successfully_registered_screen.dart';
 import 'package:recruiter_app/services/account/account_service.dart';
+import 'package:recruiter_app/services/api_lists.dart';
+import 'package:recruiter_app/services/refresh_token_service.dart';
 import 'package:recruiter_app/widgets/common_snackbar.dart';
 import 'package:recruiter_app/widgets/reusable_button.dart';
 import 'package:recruiter_app/widgets/reusable_textfield.dart';
 import 'package:path/path.dart' as path;
+import 'package:http/http.dart' as http;
 
 class Questionaire1 extends StatefulWidget {
   final bool? isFromHome;
   final bool? isEdit;
   final AccountData? accountData;
   final int? index;
+  final bool? isback;
+  final bool? isRegistering;
   const Questionaire1(
-      {super.key, this.isFromHome, this.isEdit, this.accountData, this.index});
+      {super.key,
+      this.isFromHome,
+      this.isEdit,
+      this.accountData,
+      this.index,
+      this.isback,
+      this.isRegistering});
 
   @override
   State<Questionaire1> createState() => _Questionaire1State();
@@ -67,28 +84,165 @@ class _Questionaire1State extends State<Questionaire1> {
   final _comapnyFormKey = GlobalKey<FormState>();
   final _locationFormKey = GlobalKey<FormState>();
   final _contactFormKey = GlobalKey<FormState>();
-  File? _selectedImage;
+  // File? _selectedImage;
+
+  File? _image;
+  final ImagePicker _picker = ImagePicker();
+  final Dio _dio = Dio();
 
   // Pick image from gallery or camera
-  Future<void> _pickImage(ImageSource source) async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: source);
+  // Future<void> _pickImage(ImageSource source) async {
+  //   final picker = ImagePicker();
+  //   final pickedFile = await picker.pickImage(source: source);
 
+  //   if (pickedFile != null) {
+  //     setState(() {
+  //       _selectedImage = File(pickedFile.path);
+  //     });
+  //   } else {
+  //     print("No image selected.");
+  //   }
+  // }
+
+  // Function to pick image
+  void _pickImageBottomSheet() async {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext context) {
+          return Container(
+            width: double.infinity,
+            height: 150.h,
+            child: Padding(
+              padding: const EdgeInsets.all(15),
+              child: Column(
+                children: [
+                 
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Choose logo",
+                        style: AppTheme.mediumTitleText(secondaryColor),
+                      ),
+                    ],
+                  ),
+                   const SizedBox(
+                    height: 25,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          _pickImage(ImageSource.camera);
+                        },
+                        child: SizedBox(
+                          child: Column(
+                            children: [
+                              const Icon(
+                                Icons.camera_alt,
+                                color: buttonColor,
+                              ),
+                              Text(
+                                "Camera",
+                                style: AppTheme.bodyText(lightTextColor),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () {
+                          _pickImage(ImageSource.gallery);
+                        },
+                        child: SizedBox(
+                          child: Column(
+                            children: [
+                              const Icon(Icons.photo, color: buttonColor),
+                              Text("Gallery",
+                                  style: AppTheme.bodyText(lightTextColor))
+                            ],
+                          ),
+                        ),
+                      )
+                    ],
+                  )
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    final pickedFile = await _picker.pickImage(source: source);
     if (pickedFile != null) {
       setState(() {
-        _selectedImage = File(pickedFile.path);
+        _image = File(pickedFile.path);
       });
-    } else {
-      print("No image selected.");
+    }
+
+    Navigator.pop(context);
+  }
+
+  // Function to upload the image
+  Future<bool?> _uploadImage() async {
+    if (_image == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Please select an image")),
+      );
+      return null;
+    }
+
+    // final result = await QuestionaireRepository().logoPosting(image: _image);
+    // if (result == "success") {
+    //   return true;
+    // } else {
+    //   return false;
+    // }
+
+    String url =
+        "${ApiLists.baseUrl}/company/company/logo"; // Replace with actual API URL
+    var request = http.MultipartRequest("POST", Uri.parse(url));
+    final token = await CustomFunctions().retrieveCredentials("access_token");
+    request.headers.addAll({
+      'Authorization': 'Bearer ${token.toString()}',
+      "Content-Type": "multipart/form-data",
+    });
+
+    request.files.add(
+      await http.MultipartFile.fromPath(
+        'logo',
+        _image!.path,
+        filename: path.basename(_image!.path),
+      ),
+    );
+
+    try {
+      var response = await request.send();
+      var responseBody =
+          await response.stream.bytesToString(); 
+
+      
+      if (response.statusCode == 200) {
+        return true;
+      } else if (response.statusCode == 401) {
+        await RefreshTokenService.refreshToken();
+
+        return _uploadImage();
+      }
+    } catch (e) {
+      return false;
     }
   }
 
+ 
   // Navigate to a specific index
   void _navigateToPage(int index) {
     _pageController.animateToPage(
       index,
-      duration: Duration(milliseconds: 300), // Adjust duration as needed
-      curve: Curves.easeInOut, // Smooth animation
+      duration: Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
     );
     setState(() {
       _currentIndex = index;
@@ -128,97 +282,124 @@ class _Questionaire1State extends State<Questionaire1> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Material(
-      child: SafeArea(
-          child: Scaffold(
-        appBar: AppBar(),
-        body: Stack(
-          children: [
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: SvgPicture.asset(
-                "assets/svgs/group_circle.svg",
-                fit: BoxFit.fill,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: Column(
-                children: [
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  LinearProgressBar(
-                    maxSteps: 3,
-                    progressType: LinearProgressBar.progressTypeLinear,
-                    currentStep: _currentIndex + 1,
-                    progressColor: buttonColor,
-                    backgroundColor: borderColor,
-                    valueColor: AlwaysStoppedAnimation<Color>(buttonColor),
-                    semanticsLabel: "Label",
-                    semanticsValue: "Value",
-                    minHeight: 11,
-                    borderRadius: BorderRadius.circular(25.r),
-                  ),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  Expanded(
-                      child: BlocConsumer<QuestionaireBloc, QuestionaireState>(
-                          listener: (context, state) {
-                    if (state is QuestionaireFailure) {
-                      return CommonSnackbar.show(context, message: state.error);
-                    }
+    final screenHeight = MediaQuery.of(context).size.height.h;
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) async {
+        if (didPop || !mounted) return;
 
-                    if (state is QuestionaireSuccess) {
-                      Navigator.pushAndRemoveUntil(
-                          context,
-                          AnimatedNavigation()
-                              .scaleAnimation(SuccessfullyRegisteredScreen()),
-                          (Route<dynamic> route) => false);
-                    }
-                  }, builder: (context, state) {
-                    return PageView(
-                      controller: _pageController,
-                      onPageChanged: (value) {
-                        setState(() {
-                          _currentIndex = value;
-                        });
-                      },
-                      scrollDirection: Axis.vertical,
-                      physics: NeverScrollableScrollPhysics(),
-                      children: [
-                        _buildCompanyDetailWidget(theme: theme),
-                        _buildLocationDetailsWidget(theme: theme),
-                        _buildContactDetails(theme: theme),
-                        // _buildSuccessfullWidget(theme: theme)
-                      ],
-                    );
-                  }))
-                ],
+        if (widget.isRegistering == true) {
+          SystemNavigator.pop(); // Exit the app
+        } else if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop(); // Navigate back
+        }
+      },
+      child: Material(
+        child: Scaffold(
+          body: Stack(
+            children: [
+              SizedBox(
+                width: double.infinity,
+                height: screenHeight * 0.45,
+                child: SvgPicture.asset(
+                  "assets/svgs/onboard_1.svg",
+                  fit: BoxFit.cover,
+                ),
               ),
-            ),
-          ],
+              SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: Column(
+                    children: [
+                      widget.isRegistering != true
+                          ? Row(
+                              children: [
+                                InkWell(
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: SizedBox(
+                                        child: Text(
+                                      "Back",
+                                      style: AppTheme.bodyText(lightTextColor),
+                                    ))),
+                              ],
+                            )
+                          : const SizedBox.shrink(),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      LinearProgressBar(
+                        maxSteps: 3,
+                        progressType: LinearProgressBar.progressTypeLinear,
+                        currentStep: _currentIndex + 1,
+                        progressColor: secondaryColor,
+                        backgroundColor: borderColor,
+                        valueColor: AlwaysStoppedAnimation<Color>(secondaryColor),
+                        semanticsLabel: "Label",
+                        semanticsValue: "Value",
+                        minHeight: 11,
+                        borderRadius: BorderRadius.circular(25.r),
+                      ),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      Expanded(
+                          child:
+                              BlocConsumer<QuestionaireBloc, QuestionaireState>(
+                                  listener: (context, state) {
+                        if (state is QuestionaireFailure) {
+                          return CommonSnackbar.show(context,
+                              message: state.error);
+                        }
+
+                        if (state is QuestionaireSuccess) {
+                          Navigator.pushAndRemoveUntil(
+                              context,
+                              AnimatedNavigation().scaleAnimation(
+                                  SuccessfullyRegisteredScreen()),
+                              (Route<dynamic> route) => false);
+                        }
+                      }, builder: (context, state) {
+                        return PageView(
+                          controller: _pageController,
+                          onPageChanged: (value) {
+                            setState(() {
+                              _currentIndex = value;
+                            });
+                          },
+                          scrollDirection: Axis.vertical,
+                          physics: NeverScrollableScrollPhysics(),
+                          children: [
+                            _buildCompanyDetailWidget(),
+                            _buildLocationDetailsWidget(),
+                            _buildContactDetails(),
+                            // _buildSuccessfullWidget(theme: theme)
+                          ],
+                        );
+                      }))
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
-      )),
+      ),
     );
   }
 
-  Widget _buildCompanyDetailWidget({required ThemeData theme}) {
+  Widget _buildCompanyDetailWidget() {
     return SingleChildScrollView(
       child: Form(
         key: _comapnyFormKey,
         child: Column(
           children: [
             Text(
-              "Ok, let's set up your company account! Provide the details below",
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodyLarge!
-                  .copyWith(fontSize: 20.sp, fontWeight: FontWeight.bold),
-            ),
+                "Ok, let's set up your company account! Provide the details below",
+                textAlign: TextAlign.center,
+                style: AppTheme.headingText(lightTextColor)
+                    .copyWith(fontSize: 20.sp, fontWeight: FontWeight.w100)),
             const SizedBox(
               height: 15,
             ),
@@ -227,8 +408,8 @@ class _Questionaire1State extends State<Questionaire1> {
                 Expanded(
                   child: Text("These details will be displayed to job seekers",
                       textAlign: TextAlign.center,
-                      style: theme.textTheme.bodySmall!
-                          .copyWith(color: greyTextColor)),
+                      style: AppTheme.bodyText(greyTextColor)
+                          .copyWith(fontSize: 12.sp)),
                 ),
               ],
             ),
@@ -239,31 +420,83 @@ class _Questionaire1State extends State<Questionaire1> {
               height: 140.h,
               child: Column(
                 children: [
-                  InkWell(
-                    onTap: () {
-                      _pickImage(ImageSource.camera);
-                    },
-                    child: CircleAvatar(
-                      radius: 60.r,
-                      backgroundColor: Colors.transparent,
-                      backgroundImage: _selectedImage != null
-                          ? FileImage(_selectedImage!)
-                          : const AssetImage("assets/images/default_logo.webp"),
-                    ),
-                  ),
+                  widget.isEdit == true &&
+                          widget.accountData != null &&
+                          _image == null
+                      ? InkWell(
+                          onTap: () {
+                            _pickImageBottomSheet();
+                          },
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(50),
+                            child: CachedNetworkImage(
+                              imageUrl: widget.accountData!.logo.toString(),
+                              placeholder: (context, url) => const Center(
+                                child: CircularProgressIndicator(
+                                  backgroundColor: greyTextColor,
+                                  color: secondaryColor,
+                                ), // Loading indicator
+                              ),
+                              errorWidget: (context, url, error) => Image.asset(
+                                "assets/images/default_logo.webp",
+                                fit: BoxFit.cover,
+                              ),
+                              fit: BoxFit.cover,
+                              width: 90,
+                              height: 90,
+                            ),
+                          ),
+
+                          //  CircleAvatar(
+                          //     radius: 60.r,
+                          //     backgroundColor: Colors.transparent,
+                          //     backgroundImage: widget.accountData!.logo != null
+                          //         ? NetworkImage(
+                          //             widget.accountData!.logo.toString(),
+                          //           )
+                          //         : const AssetImage(
+                          //             "assets/images/default_logo.webp")),
+                        )
+                      : InkWell(
+                          onTap: () {
+                            _pickImageBottomSheet();
+                          },
+                          child: CircleAvatar(
+                            radius: 60.r,
+                            backgroundColor: Colors.transparent,
+                            backgroundImage: _image != null
+                                ? FileImage(_image!)
+                                : const AssetImage(
+                                    "assets/images/default_logo.webp"),
+                          ),
+                        ),
                   const SizedBox(
                     height: 10,
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      InkWell(
-                          onTap: () {
-                            setState(() {
-                              _selectedImage = null;
-                            });
-                          },
-                          child: Icon(Icons.delete))
+                      _image == null && widget.accountData?.logo != null
+                          ? InkWell(
+                              onTap: () {
+                                _pickImageBottomSheet();
+                              },
+                              child: SizedBox(
+                                  child: Text(
+                                "Edit picture",
+                                style: AppTheme.bodyText(Colors.blue),
+                              )),
+                            )
+                          : InkWell(
+                              onTap: () {
+                                // _uploadImage();
+                                setState(() {
+                                  _image = null;
+                                });
+
+                                
+                              },
+                              child: Icon(Icons.delete))
                       // Text("Edit"), const SizedBox(
                       //   width: 10,
                       // ),
@@ -330,82 +563,88 @@ class _Questionaire1State extends State<Questionaire1> {
             const SizedBox(
               height: 15,
             ),
+            // Container(
+            //   height: 45.h,
+            //   // color: Colors.green,
+            //   child: DropdownSearch<String>(
+            //     decoratorProps: DropDownDecoratorProps(
+            //       expands: true,
+            //       baseStyle: AppTheme.bodyText(lightTextColor),
+            //       decoration: InputDecoration(
+            //         labelText: 'Industry',
+            //         labelStyle: AppTheme.bodyText(greyTextColor),
+            //         border: OutlineInputBorder(
+            //           borderRadius: BorderRadius.circular(10),
+            //           borderSide: const BorderSide(color: borderColor),
+            //         ),
+            //         focusedBorder: OutlineInputBorder(
+            //           borderRadius: BorderRadius.circular(10),
+            //           borderSide: const BorderSide(color: borderColor),
+            //         ),
+            //         enabledBorder: OutlineInputBorder(
+            //           borderRadius: BorderRadius.circular(10),
+            //           borderSide: const BorderSide(color: borderColor),
+            //         ),
+            //       ),
+            //     ),
+            //     items: (filter, infiniteScrollProps) => industryLists,
+            //     selectedItem:
+            //         _selectedIndustry.isEmpty ? null : _selectedIndustry,
+            //     onChanged: (String? newValue) {
+            //       setState(() {
+            //         _selectedIndustry = newValue ?? "";
+            //       });
+            //     },
+            //     popupProps: PopupProps.menu(
+            //       showSearchBox: true,
+            //       searchFieldProps: TextFieldProps(
+            //         decoration: InputDecoration(
+            //           labelStyle: AppTheme.bodyText(lightTextColor),
+            //           hintText: 'Search industry...',
+            //           hintStyle: AppTheme.bodyText(lightTextColor),
+            //           border: OutlineInputBorder(
+            //             borderRadius: BorderRadius.circular(10),
+            //             borderSide: const BorderSide(color: borderColor),
+            //           ),
+            //           focusedBorder: OutlineInputBorder(
+            //             borderRadius: BorderRadius.circular(10),
+            //             borderSide: const BorderSide(color: borderColor),
+            //           ),
+            //         ),
+            //       ),
+            //     ),
+            //   ),
+            // ),
+            // industryError
+            //     ? Row(
+            //         children: [
+            //           Text(
+            //             "This field is required",
+            //             style: AppTheme.bodyText(Colors.red)
+            //                 .copyWith(fontSize: 12.sp),
+            //           ),
+            //         ],
+            //       )
+            //     : const SizedBox.shrink(),
+            // const SizedBox(
+            //   height: 15,
+            // ),
             Container(
-              height: 45.h,
-              // color: Colors.green,
-              child: DropdownSearch<String>(
-                decoratorProps: DropDownDecoratorProps(
-                  expands: true,
-                  decoration: InputDecoration(
-                    labelText: 'Industry',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: borderColor),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: borderColor),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: borderColor),
-                    ),
-                  ),
-                ),
-                items: (filter, infiniteScrollProps) => industryLists,
-                selectedItem:
-                    _selectedIndustry.isEmpty ? null : _selectedIndustry,
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _selectedIndustry = newValue ?? "";
-                  });
-                },
-                popupProps: PopupProps.menu(
-                  showSearchBox: true,
-                  searchFieldProps: TextFieldProps(
-                    decoration: InputDecoration(
-                      hintText: 'Search industry...',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(color: borderColor),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(color: borderColor),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            industryError
-                ? Row(
-                    children: [
-                      Text(
-                        "This field is required",
-                        style: theme.textTheme.bodyMedium!
-                            .copyWith(color: Colors.red.shade900),
-                      ),
-                    ],
-                  )
-                : const SizedBox.shrink(),
-            const SizedBox(
-              height: 15,
-            ),
-            Container(
-              height: 45.h,
+              height: 50.h,
               // color: Colors.green,
               child: DropdownSearch<String>(
                 validator: (_) {
-                  if (_selectedIndustry == '') {
+                  if (_selectedFunctionalArea == '') {
                     return "This field is required";
                   }
                   return null;
                 },
                 decoratorProps: DropDownDecoratorProps(
                   expands: true,
+                  baseStyle: AppTheme.bodyText(lightTextColor),
                   decoration: InputDecoration(
                     labelText: 'Functional area',
+                    labelStyle: AppTheme.bodyText(greyTextColor),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                       borderSide: const BorderSide(color: borderColor),
@@ -434,6 +673,7 @@ class _Questionaire1State extends State<Questionaire1> {
                   searchFieldProps: TextFieldProps(
                     decoration: InputDecoration(
                       hintText: 'Search area...',
+                      hintStyle: AppTheme.bodyText(lightTextColor),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                         borderSide: const BorderSide(color: borderColor),
@@ -452,8 +692,8 @@ class _Questionaire1State extends State<Questionaire1> {
                     children: [
                       Text(
                         "This field is required",
-                        style: theme.textTheme.bodyMedium!
-                            .copyWith(color: Colors.red.shade900),
+                        style: AppTheme.bodyText(Colors.red)
+                            .copyWith(fontSize: 12.sp),
                       ),
                     ],
                   )
@@ -467,27 +707,11 @@ class _Questionaire1State extends State<Questionaire1> {
             ReusableButton(
               action: () {
                 if (_comapnyFormKey.currentState!.validate()) {
-                  if (_selectedIndustry == '') {
-                    setState(() {
-                      industryError = true;
-                    });
-                  } else if (_selectedFunctionalArea == '') {
-                    setState(() {
-                      areaError = true;
-                      industryError = false;
-                    });
-                  } else {
-                    setState(() {
-                      industryError = false;
-                      areaError = false;
-                    });
-                    _pageController.nextPage(
-                        duration: Duration(milliseconds: 500),
-                        curve: Curves.easeInOut);
-                  }
+                  FocusScope.of(context).unfocus();
+                  _pageController.nextPage(
+                      duration: Duration(milliseconds: 500),
+                      curve: Curves.easeInOut);
                 }
-
-                FocusScope.of(context).unfocus();
               },
               text: "Next",
               textSize: 16.sp,
@@ -503,7 +727,7 @@ class _Questionaire1State extends State<Questionaire1> {
     );
   }
 
-  Widget _buildLocationDetailsWidget({required ThemeData theme}) {
+  Widget _buildLocationDetailsWidget() {
     return Stack(
       children: [
         SingleChildScrollView(
@@ -511,20 +735,17 @@ class _Questionaire1State extends State<Questionaire1> {
             key: _locationFormKey,
             child: Column(
               children: [
-                Text(
-                  "Hi Emergio games",
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodyLarge!
-                      .copyWith(fontSize: 20.sp, fontWeight: FontWeight.bold),
-                ),
+                Text("Hi Emergio games",
+                    textAlign: TextAlign.center,
+                    style: AppTheme.headingText(lightTextColor).copyWith(
+                        fontSize: 20.sp, fontWeight: FontWeight.normal)),
                 const SizedBox(
-                  height: 15,
+                  height: 10,
                 ),
                 Text(
                   "Provide your company location details",
                   textAlign: TextAlign.center,
-                  style:
-                      theme.textTheme.bodyLarge!.copyWith(color: greyTextColor),
+                  style: AppTheme.bodyText(greyTextColor),
                 ),
                 const SizedBox(
                   height: 25,
@@ -556,8 +777,11 @@ class _Questionaire1State extends State<Questionaire1> {
                               child: DropdownSearch<String>(
                                 decoratorProps: DropDownDecoratorProps(
                                   expands: true,
+                                  baseStyle: AppTheme.bodyText(lightTextColor),
                                   decoration: InputDecoration(
                                     labelText: 'City',
+                                    labelStyle:
+                                        AppTheme.bodyText(greyTextColor),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(10),
                                       borderSide:
@@ -589,6 +813,8 @@ class _Questionaire1State extends State<Questionaire1> {
                                   searchFieldProps: TextFieldProps(
                                     decoration: InputDecoration(
                                       hintText: 'Search city...',
+                                      hintStyle:
+                                          AppTheme.bodyText(lightTextColor),
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(10),
                                         borderSide: const BorderSide(
@@ -614,8 +840,12 @@ class _Questionaire1State extends State<Questionaire1> {
                               child: DropdownSearch<String>(
                                 decoratorProps: DropDownDecoratorProps(
                                   expands: true,
+                                  baseStyle: AppTheme.bodyText(lightTextColor)
+                                      .copyWith(),
                                   decoration: InputDecoration(
                                     labelText: 'Country',
+                                    labelStyle:
+                                        AppTheme.bodyText(greyTextColor),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(10),
                                       borderSide:
@@ -648,6 +878,8 @@ class _Questionaire1State extends State<Questionaire1> {
                                   searchFieldProps: TextFieldProps(
                                     decoration: InputDecoration(
                                       hintText: 'Search country...',
+                                      hintStyle:
+                                          AppTheme.bodyText(lightTextColor),
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(10),
                                         borderSide: const BorderSide(
@@ -670,8 +902,7 @@ class _Questionaire1State extends State<Questionaire1> {
                                 children: [
                                   Text(
                                     "City and country is required",
-                                    style: theme.textTheme.bodyMedium!
-                                        .copyWith(color: Colors.red.shade900),
+                                    style: AppTheme.bodyText(Colors.red),
                                   ),
                                 ],
                               )
@@ -737,7 +968,7 @@ class _Questionaire1State extends State<Questionaire1> {
     );
   }
 
-  Widget _buildContactDetails({required ThemeData theme}) {
+  Widget _buildContactDetails() {
     return Stack(
       children: [
         SingleChildScrollView(
@@ -749,26 +980,21 @@ class _Questionaire1State extends State<Questionaire1> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      "Contact information",
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.bodyLarge!.copyWith(
-                          fontSize: 20.sp, fontWeight: FontWeight.bold),
-                    ),
+                    Text("Contact information",
+                        textAlign: TextAlign.center,
+                        style: AppTheme.headingText(lightTextColor).copyWith(
+                            fontSize: 20.sp, fontWeight: FontWeight.normal)),
                   ],
                 ),
                 const SizedBox(
-                  height: 15,
+                  height: 8,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      "Provide your contact details",
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.bodyLarge!
-                          .copyWith(color: greyTextColor),
-                    ),
+                    Text("Provide your contact details",
+                        textAlign: TextAlign.center,
+                        style: AppTheme.bodyText(greyTextColor)),
                   ],
                 ),
                 const SizedBox(
@@ -790,6 +1016,8 @@ class _Questionaire1State extends State<Questionaire1> {
                 ReusableTextfield(
                   controller: _mobileNumberCont,
                   labelText: "Mobile number",
+                  lengthLimit: 10,
+                  keyBoardType: TextInputType.number,
                   validation: (_) {
                     if (_mobileNumberCont.text.trim().isEmpty) {
                       return "This field is required";
@@ -803,6 +1031,7 @@ class _Questionaire1State extends State<Questionaire1> {
                 ReusableTextfield(
                   controller: _landlineNumberCont,
                   labelText: "Landline number",
+                  keyBoardType: TextInputType.number,
                   isRequired: false,
                 ),
                 const SizedBox(
@@ -822,33 +1051,66 @@ class _Questionaire1State extends State<Questionaire1> {
                   height: 55,
                 ),
                 BlocConsumer<QuestionaireBloc, QuestionaireState>(
-                    listener: (context, state) {
+                    listener: (context, state) async {
                   if (widget.isFromHome == true) {
                     if (state is QuestionaireSuccess) {
-                      Navigator.pop(context);
-                      CommonSnackbar.show(context,
-                          message: "Job posted successfully");
+                      Provider.of<AccountProvider>(context, listen: false)
+                          .setEditLoading(true);
+                      Navigator.pushAndRemoveUntil(
+                          context,
+                          AnimatedNavigation()
+                              .scaleAnimation(SuccessfullyRegisteredScreen()),
+                          (Route<dynamic> route) => false);
+                      // Navigator.pop(context);
+                      CommonSnackbar.show(context, message: "");
                     }
                     if (state is QuestionaireFailure) {
+                      Provider.of<AccountProvider>(context, listen: false)
+                          .setEditLoading(true);
                       CommonSnackbar.show(context,
                           message: "Failed to post job");
                     }
+                  } else {
+                    if (state is QuestionaireSuccess &&
+                        widget.isRegistering != null &&
+                        widget.isRegistering == true) {
+                      Provider.of<AccountProvider>(context, listen: false)
+                          .setEditLoading(true);
+                      Navigator.pushAndRemoveUntil(
+                          context,
+                          AnimatedNavigation()
+                              .scaleAnimation(SuccessfullyRegisteredScreen()),
+                          (Route<dynamic> route) => false);
+                      CommonSnackbar.show(context,
+                          message: "Successfully added company details");
+                    } else if (widget.isEdit == true &&
+                        state is QuestionaireSuccess) {
+                      Provider.of<AccountProvider>(context, listen: false)
+                          .setEditLoading(true);
+                      Navigator.pushAndRemoveUntil(
+                          context,
+                          AnimatedNavigation()
+                              .scaleAnimation(CustomBottomNavBar(
+                            index: 3,
+                          )),
+                          (Route<dynamic> route) => false);
+
+                      // CommonSnackbar.show(context,
+                      //     message: "Failed to upload logo");
+                    }
+                    Provider.of<AccountProvider>(context, listen: false)
+                        .setEditLoading(true);
                   }
                 }, builder: (context, state) {
                   return Consumer<AccountProvider>(
                       builder: (context, provider, child) {
                     return ReusableButton(
-                      isLoading: provider.isLoading,
+                      isLoading: provider.isLoading || provider.editLoading,
                       action: () async {
                         if (widget.isEdit == true &&
-                            widget.accountData != null) {
-                          String fullPath = _selectedImage != null
-                              ? _selectedImage!.path.toString()
-                              : "";
-                          String fileName = path.basename(fullPath);
-
+                            widget.isRegistering != null &&
+                            widget.isRegistering != true) {
                           final account = AccountData(
-                              logo: fileName,
                               id: widget.accountData!.id,
                               contactLandNumber: _landlineNumberCont.text,
                               about: _aboutCont.text,
@@ -860,9 +1122,69 @@ class _Questionaire1State extends State<Questionaire1> {
                               designation: _designationCont.text,
                               functionalArea: _selectedFunctionalArea,
                               industry: _selectedIndustry,
-                              name: "Emergio games",
+                              name: _companyNameCont.text,
                               website: _companyWesiteCont.text,
                               postalCode: _postalCodeCont.text);
+
+                          if (_image != null) {
+                            final result = await _uploadImage();
+                            if (result == false) {
+                              CommonSnackbar.show(context,
+                                  message: "Failed to upload logo");
+                              return;
+                            }
+                          }
+
+                          final result = await Provider.of<AccountProvider>(
+                                  context,
+                                  listen: false)
+                              .editCompanyDetails(account: account);
+
+                          if (result == "success") {
+                            Navigator.pushAndRemoveUntil(
+                                context,
+                                AnimatedNavigation()
+                                    .fadeAnimation(CustomBottomNavBar(
+                                  index: 3,
+                                )),
+                                (Route<dynamic> route) => false);
+
+                            Provider.of<AccountProvider>(context, listen: false)
+                                .fetchAccountData();
+                            CommonSnackbar.show(context,
+                                message: "Chnage saved successfully");
+                          } else {
+                            CommonSnackbar.show(context,
+                                message: result.toString());
+                          }
+                        }
+
+                        if (widget.isEdit == true &&
+                            widget.accountData != null) {
+                          final account = AccountData(
+                              id: widget.accountData!.id,
+                              contactLandNumber: _landlineNumberCont.text,
+                              about: _aboutCont.text,
+                              address: [_addressCont.text],
+                              city: _selectedCity,
+                              contactMobileNumber: _mobileNumberCont.text,
+                              contactName: _personNameCont.text,
+                              country: _selectedCountry,
+                              designation: _designationCont.text,
+                              functionalArea: _selectedFunctionalArea,
+                              industry: _selectedIndustry,
+                              name: _companyNameCont.text,
+                              website: _companyWesiteCont.text,
+                              postalCode: _postalCodeCont.text);
+
+                          if (_image != null) {
+                            final result = await _uploadImage();
+                            if (result == false) {
+                              CommonSnackbar.show(context,
+                                  message: "Failed to upload logo");
+                              return;
+                            }
+                          }
 
                           final result = await Provider.of<AccountProvider>(
                                   context,
@@ -888,8 +1210,10 @@ class _Questionaire1State extends State<Questionaire1> {
                           }
                         } else {
                           if (_contactFormKey.currentState!.validate()) {
+                            provider.setEditLoading(true);
                             context.read<QuestionaireBloc>().add(
                                 QuestionaireSubmitEvent(
+                                    logo: _image != null ? _image : null,
                                     aboutCompany: _aboutCont.text,
                                     address: _addressCont.text,
                                     city: _selectedCity,
@@ -900,13 +1224,15 @@ class _Questionaire1State extends State<Questionaire1> {
                                     industry: _selectedIndustry,
                                     mobilePhn: _mobileNumberCont.text,
                                     postalCode: _postalCodeCont.text,
-                                    website: _companyWesiteCont.text));
+                                    website: _companyWesiteCont.text,
+                                    landline: _landlineNumberCont.text));
+
+                            // Navigator.pushAndRemoveUntil(
+                            //     context,
+                            //     AnimatedNavigation().scaleAnimation(
+                            //         SuccessfullyRegisteredScreen()),
+                            //     (Route<dynamic> route) => false);
                           }
-                          Navigator.pushAndRemoveUntil(
-                              context,
-                              AnimatedNavigation().scaleAnimation(
-                                  SuccessfullyRegisteredScreen()),
-                              (Route<dynamic> route) => false);
                         }
                       },
                       textSize: 18.sp,

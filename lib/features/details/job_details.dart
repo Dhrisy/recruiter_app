@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:recruiter_app/core/constants.dart';
@@ -224,6 +225,8 @@ class _JobDetailsState extends State<JobDetails> with TickerProviderStateMixin {
                                     case "close":
                                       bool status = false;
 
+                                     
+
                                       if (widget.jobData.status == true) {
                                         status = false;
                                       }else{
@@ -269,6 +272,7 @@ class _JobDetailsState extends State<JobDetails> with TickerProviderStateMixin {
                                               vaccancy:
                                                   widget.jobData.vaccancy));
 
+                                                 
                                       if (result == "success") {
                                         Navigator.pushAndRemoveUntil(
                                             context,

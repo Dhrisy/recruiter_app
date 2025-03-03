@@ -2,9 +2,9 @@ import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:recruiter_app/core/constants.dart';
+import 'package:recruiter_app/core/theme.dart';
 
 class CommonDropdownWidget extends StatefulWidget {
-    final ThemeData theme;
       final String selectedVariable;
       final List<String> list;
       final String hintText;
@@ -16,7 +16,6 @@ class CommonDropdownWidget extends StatefulWidget {
   required this.list,
   required this.onChanged,
   required this.selectedVariable,
-  required this.theme
   }) : super(key: key);
 
   @override
@@ -39,6 +38,7 @@ class _CommonDropdownWidgetState extends State<CommonDropdownWidget> {
         },
         decoratorProps: DropDownDecoratorProps(
           expands: false,
+          baseStyle: AppTheme.bodyText(lightTextColor),
           decoration: InputDecoration(
             labelText: widget.labelText,
             border: OutlineInputBorder(
@@ -60,9 +60,11 @@ class _CommonDropdownWidgetState extends State<CommonDropdownWidget> {
         onChanged: widget.onChanged,
         popupProps: PopupProps.menu(
           showSearchBox: true,
+          
           searchFieldProps: TextFieldProps(
             decoration: InputDecoration(
               hintText: widget.hintText,
+              hintStyle: AppTheme.bodyText(greyTextColor),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
                 borderSide: const BorderSide(color: borderColor),

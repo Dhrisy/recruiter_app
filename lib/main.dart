@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:recruiter_app/core/theme.dart';
@@ -9,6 +10,7 @@ import 'package:recruiter_app/features/account/account_provider.dart';
 import 'package:recruiter_app/features/auth/bloc/auth_bloc.dart';
 import 'package:recruiter_app/features/auth/data/auth_repository.dart';
 import 'package:recruiter_app/features/auth/provider/login_provider.dart';
+import 'package:recruiter_app/features/auth/provider/register_provider.dart';
 import 'package:recruiter_app/features/details/job_details_provider.dart';
 import 'package:recruiter_app/features/home/viewmodel/home_provider.dart';
 import 'package:recruiter_app/features/job_post/data/job_post_repository.dart';
@@ -22,6 +24,7 @@ import 'package:recruiter_app/features/questionaires/bloc/questionaire_bloc.dart
 import 'package:recruiter_app/features/questionaires/data/questionaire_repository.dart';
 import 'package:recruiter_app/features/resdex/provider/email_template_provider.dart';
 import 'package:recruiter_app/features/resdex/provider/interview_provider.dart';
+import 'package:recruiter_app/features/resdex/provider/resume_provider.dart';
 import 'package:recruiter_app/features/resdex/provider/search_seeker_provider.dart';
 import 'package:recruiter_app/features/responses/provider/seeker_provider.dart';
 import 'package:recruiter_app/features/seeker_details/invite_seeker_provider.dart';
@@ -86,6 +89,7 @@ int maxRetries = 3;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await GoogleFonts.pendingFonts();
 
   // Load theme preference before running the app
   final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -154,7 +158,9 @@ class _MyAppState extends State<MyApp> {
           ChangeNotifierProvider(create: (context) => HomeProvider()),
            ChangeNotifierProvider(create: (context) => SettingsProvider()),
            ChangeNotifierProvider(create: (context) => NotificationProvider()),
-           ChangeNotifierProvider(create: (context) => PlanProvider())
+           ChangeNotifierProvider(create: (context) => PlanProvider()),
+           ChangeNotifierProvider(create: (context) => RegisterProvider()),
+           ChangeNotifierProvider(create: (context) => ResumeProvider())
         ],
         child: MultiBlocProvider(
           providers: [
@@ -172,11 +178,11 @@ class _MyAppState extends State<MyApp> {
             builder: (context, state) {
               return MaterialApp(
                 title: 'Recruiter',
-                
+
                 debugShowCheckedModeBanner: false,
-                theme: state.isDarkMode
-                    ? RecruiterAppTheme.darkTheme
-                    : RecruiterAppTheme.lightTheme,
+                // theme: state.isDarkMode
+                //     ? RecruiterAppTheme.darkTheme
+                //     : RecruiterAppTheme.lightTheme,
                 home: SplashScreen(),
               );
             },

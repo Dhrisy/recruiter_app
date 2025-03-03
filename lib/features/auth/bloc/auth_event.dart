@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 abstract class AuthEvent {
   @override
   List<Object?> get props => [];
@@ -30,8 +32,9 @@ class RegisterEvent extends AuthEvent {
 class EmailLoginEvent extends AuthEvent {
   final String email;
   final String password;
+  final BuildContext context;
 
-  EmailLoginEvent({required this.email, required this.password});
+  EmailLoginEvent({required this.email, required this.password, required this.context});
 
   @override
   List<Object?> get props => [email, password];

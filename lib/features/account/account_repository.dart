@@ -5,7 +5,10 @@ import 'package:recruiter_app/services/account/account_service.dart';
 import 'package:recruiter_app/services/refresh_token_service.dart';
 
 class AccountRepository {
-  Future<AccountData?> fetchAccountDetails() async {
+  Future<Map<String, dynamic>?> fetchAccountDetails(
+      {int? retryCount = 0, int? maxRetries = 3}) async {
+
+        
     try {
       final response = await AccountService.fetchAccountDetails();
 
@@ -16,10 +19,16 @@ class AccountRepository {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
 
         AccountData accountData = AccountData.fromJson(responseData);
+        
 
-        return accountData;
+        return {"account": accountData, "message": ""};
+      } else if (response.statusCode == 401) {
+        await RefreshTokenService.refreshToken();
+        return fetchAccountDetails(
+            retryCount: retryCount! + 1, maxRetries: maxRetries);
       } else {
-        return null;
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        return {"account": null, "message": responseData["message"]};
       }
     } catch (e) {
       print(e);
@@ -48,8 +57,33 @@ class AccountRepository {
         return responseData["message"];
       }
     } catch (e) {
-      print(e);
       return e.toString();
+    }
+  }
+
+  Future<UserModel?> fetchUserData({
+    int? retryCount = 0,
+    int? maxRetries = 3,
+  }) async {
+    try {
+      final response = await AccountService.fetchUserData();
+      print("user response  ${response.body}");
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+
+        UserModel userData = UserModel.fromJson(responseData);
+        return userData;
+      } else if (response.statusCode == 401) {
+        // await RefreshTokenService.refreshToken();
+        // return fetchUserData(
+        //     retryCount: retryCount! + 1, maxRetries: maxRetries);
+      } else {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        return responseData["message"];
+      }
+    } catch (e) {
+      print(e);
+      return null;
     }
   }
 }

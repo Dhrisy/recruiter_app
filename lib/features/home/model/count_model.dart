@@ -23,7 +23,7 @@ class CountModel {
 
   factory CountModel.fromJson(Map<String, dynamic> json) {
     return CountModel(
-        profileCompletionPercentage: json["profile_completion_percentage"],
+        profileCompletionPercentage: _parseDouble(json["profile_completion_percentage"]),
         emptyModels: json["empty_models"],
         modelsWithEmptyFields: json["models_with_empty_fields"],
         remainingJobsCount: json["remaining_jobs_count"],
@@ -32,5 +32,12 @@ class CountModel {
         applicationCount: json["application_count"],
         activeJobsCount: json["active_jobs_count"],
         inactiveJobsCount: json["inactive_jobs_count"]);
+  }
+
+   static double _parseDouble(dynamic value, {double defaultValue = 0.0}) {
+    if (value is double) return value;
+    if (value is int) return value.toDouble(); // Convert int to double
+    if (value is String) return double.tryParse(value) ?? defaultValue; // Convert String to double
+    return defaultValue;
   }
 }

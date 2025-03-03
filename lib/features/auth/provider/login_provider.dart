@@ -1,4 +1,10 @@
+import 'dart:async';
+
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:recruiter_app/core/utils/custom_functions.dart';
 import 'package:recruiter_app/features/auth/data/auth_repository.dart';
 
 class LoginProvider extends ChangeNotifier {
@@ -10,6 +16,7 @@ class LoginProvider extends ChangeNotifier {
   bool otpSuccess = false;
   bool isLoading = false;
   String error = '';
+  bool sentOTPLoading = false;
 
   void setOtpSuccess(bool value) {
     otpSuccess = value;
@@ -39,6 +46,15 @@ class LoginProvider extends ChangeNotifier {
 
   Future<String?> verifyPhoneOtp(
       {required String phone, required String otp}) async {
+
+         final connectivityResult = await CustomFunctions.checkNetworkConnection();
+    if(connectivityResult != null){
+     isLoading = false;
+        notifyListeners();
+      return connectivityResult.toString();
+    }
+
+
     try {
       isLoading = true;
       final result =
@@ -88,33 +104,90 @@ class LoginProvider extends ChangeNotifier {
   }
 
   Future<String?> forgotPasswordGetOtp({required String phn}) async {
+    sentOTPLoading = true;
+    notifyListeners();
+
+    // // Check network connection
+    // var connectivityResult = await Connectivity().checkConnectivity();
+    // if (connectivityResult.contains(ConnectivityResult.none)) {
+    //   sentOTPLoading = false;
+    //   notifyListeners();
+    //   return "No internet connection. Please check your network.";
+    // }
+
+    final connectivityResult = await CustomFunctions.checkNetworkConnection();
+    if (connectivityResult != null) {
+      sentOTPLoading = false;
+        notifyListeners();
+      return connectivityResult.toString();
+    }
+
     try {
-      final result = await AuthRepository().forgotPw(phone: phn);
+      final result = await AuthRepository()
+          .forgotPw(phone: phn)
+          .timeout(const Duration(seconds: 10), onTimeout: () {
+        throw TimeoutException("Request timed out. Please check your network.");
+      });
+
       if (result == "success") {
         otpSuccess = true;
+        sentOTPLoading = false;
         notifyListeners();
         return "success";
       } else {
+        sentOTPLoading = false;
+        notifyListeners();
         return result.toString();
       }
     } catch (e) {
-      print(e);
-      return e.toString();
+      sentOTPLoading = false;
+      notifyListeners();
+      return e is TimeoutException
+          ? "Request timed out. Please check your network."
+          : e.toString();
     }
   }
 
-  Future<String?> changePassword(
-      {required String phone,
-      required String otp,
-      required String password}) async {
+  Future<String?> changePassword({
+    required String phone,
+    required String otp,
+    required String password,
+  }) async {
+    sentOTPLoading = true;
+    notifyListeners();
+
+    // Check network connection
+    final connectivityResult = await CustomFunctions.checkNetworkConnection();
+   
+    if (connectivityResult != null) {
+      sentOTPLoading = false;
+      notifyListeners();
+      return connectivityResult.toString();
+    }
+
+    // if (connectivityResult.contains(ConnectivityResult.none)) {
+    //   sentOTPLoading = false;
+    //   notifyListeners();
+    //   return "No internet connection. Please check your network.";
+    // }
+
     try {
       final result = await AuthRepository()
-          .changePassword(password: password, phone: phone, otp: otp);
-      print(result);
+          .changePassword(password: password, phone: phone, otp: otp)
+          .timeout(const Duration(seconds: 10), onTimeout: () {
+        throw TimeoutException("Request timed out. Please check your network.");
+      });
+
+      sentOTPLoading = false;
+      notifyListeners();
 
       return result.toString();
     } catch (e) {
-      return e.toString();
+      sentOTPLoading = false;
+      notifyListeners();
+      return e is TimeoutException
+          ? "Request timed out. Please check your network."
+          : e.toString();
     }
   }
 
@@ -130,6 +203,15 @@ class LoginProvider extends ChangeNotifier {
       }
     } catch (e) {
       return null;
+    }
+  }
+
+  Future<String?>  retryOTP({required String phone}) async{
+    try {
+      final result = await AuthRepository().retryOTP(phone: phone);
+     return result;
+    } catch (e) {
+      return e.toString();
     }
   }
 }

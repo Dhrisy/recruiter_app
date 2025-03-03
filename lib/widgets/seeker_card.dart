@@ -1,13 +1,14 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:recruiter_app/core/constants.dart';
+import 'package:recruiter_app/core/theme.dart';
 import 'package:recruiter_app/core/utils/custom_functions.dart';
 import 'package:recruiter_app/core/utils/navigation_animation.dart';
 import 'package:recruiter_app/features/details/job_details.dart';
 import 'package:recruiter_app/features/job_post/model/job_post_model.dart';
-import 'package:recruiter_app/features/job_post/viewmodel.dart/job_posting_provider.dart';
 import 'package:recruiter_app/features/resdex/model/invite_seeker_model.dart';
 import 'package:recruiter_app/features/resdex/model/job_response_model.dart';
 import 'package:recruiter_app/features/resdex/model/seeker_model.dart';
@@ -82,7 +83,7 @@ class _SeekerCardState extends State<SeekerCard>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    // final theme = Theme.of(context);
     if (widget.seekerData.personalData != null) {
       return Container(
         decoration: BoxDecoration(
@@ -125,7 +126,7 @@ class _SeekerCardState extends State<SeekerCard>
                         children: [
                           Text(
                             "Invited job : ",
-                            style: theme.textTheme.bodyMedium!
+                            style: AppTheme.bodyText(greyTextColor)
                                 .copyWith(color: greyTextColor),
                           ),
                           InkWell(
@@ -143,10 +144,10 @@ class _SeekerCardState extends State<SeekerCard>
                                       .toString()
                                       .toUpperCase()
                                   : "N/A",
-                              style: theme.textTheme.titleMedium!.copyWith(
+                              style:AppTheme.bodyText(Colors.blue).copyWith(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 12.sp,
-                                  color: Colors.blue),
+                                  ),
                             ),
                           ),
                         ],
@@ -157,7 +158,7 @@ class _SeekerCardState extends State<SeekerCard>
                         children: [
                           Text(
                             "Applied to : ",
-                            style: theme.textTheme.bodyMedium!
+                            style: AppTheme.bodyText(greyTextColor)
                                 .copyWith(color: greyTextColor),
                           ),
                           InkWell(
@@ -175,7 +176,7 @@ class _SeekerCardState extends State<SeekerCard>
                                       .toString()
                                       .toUpperCase()
                                   : "N/A",
-                              style: theme.textTheme.titleMedium!.copyWith(
+                              style: AppTheme.bodyText(greyTextColor).copyWith(
                                   color: Colors.blue,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 12.sp),
@@ -189,7 +190,7 @@ class _SeekerCardState extends State<SeekerCard>
                         children: [
                           Text(
                             "Applied to : ",
-                            style: theme.textTheme.bodyMedium!
+                            style: AppTheme.bodyText(greyTextColor)
                                 .copyWith(color: greyTextColor),
                           ),
                           Expanded(
@@ -209,7 +210,7 @@ class _SeekerCardState extends State<SeekerCard>
                                         .toString()
                                         .toUpperCase()
                                     : "N/A",
-                                style: theme.textTheme.titleMedium!.copyWith(
+                                style: AppTheme.bodyText(greyTextColor).copyWith(
                                     color: Colors.blue,
                                     fontWeight: FontWeight.bold,
                                     fontSize: 12.sp),
@@ -224,7 +225,7 @@ class _SeekerCardState extends State<SeekerCard>
                               widget.responseData != null
                                   ? widget.responseData!.status
                                   : "N/A",
-                              style: theme.textTheme.titleMedium!.copyWith(
+                              style: AppTheme.bodyText(greyTextColor).copyWith(
                                   color: Colors.blue,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 12.sp),
@@ -238,11 +239,26 @@ class _SeekerCardState extends State<SeekerCard>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Profile Image
-                    CircleAvatar(
-                      radius: 24,
-                      backgroundImage:
-                          AssetImage("assets/images/profile_picture.jpg"),
-                    ),
+                    ClipRRect(
+                        borderRadius: BorderRadius.circular(50),
+                        child: CachedNetworkImage(
+                          imageUrl: widget.seekerData.personalData!.personal.profileImage.toString() 
+                              ,
+                          placeholder: (context, url) => const Center(
+                            child: CircularProgressIndicator(
+                              backgroundColor: greyTextColor,
+                              color: secondaryColor,
+                            ),
+                          ),
+                          errorWidget: (context, url, error) => Image.asset(
+                            "assets/images/profile_picture.jpg",
+                            fit: BoxFit.cover,
+                          ),
+                          fit: BoxFit.cover,
+                          width: 60,
+                          height: 60,
+                        ),
+                      ).animate().fadeIn(duration: 500.ms).scale(),
                     const SizedBox(width: 16),
                     // Details Section
                     Expanded(
@@ -263,7 +279,7 @@ class _SeekerCardState extends State<SeekerCard>
                                             .toString()
                                             .toUpperCase(),
                                         overflow: TextOverflow.ellipsis,
-                                        style: theme.textTheme.titleLarge!
+                                        style: AppTheme.bodyText(greyTextColor)
                                             .copyWith(
                                                 fontSize: 15.sp,
                                                 fontWeight: FontWeight.w700),
@@ -275,9 +291,12 @@ class _SeekerCardState extends State<SeekerCard>
                                         ? Text("Fresher")
                                         : Expanded(
                                             child: Text(
-                                              "${CustomFunctions.toSentenceCase(widget.seekerData.personalData!.personal.introduction.toString())}",
+                                              widget.seekerData.employmentData != null
+                              ? CustomFunctions.toSentenceCase(widget.seekerData.employmentData!.first.jobRole.toString())
+                                  .toString()
+                              : "",
                                               overflow: TextOverflow.ellipsis,
-                                              style: theme.textTheme.bodyMedium!
+                                              style: AppTheme.bodyText(greyTextColor)
                                                   .copyWith(
                                                 color: greyTextColor,
                                               ),
@@ -345,14 +364,14 @@ class _SeekerCardState extends State<SeekerCard>
                 widget.seekerData.personalData!.personal.skills!.isEmpty
                     ? Text(
                         "No skills found",
-                        style: theme.textTheme.bodyMedium!.copyWith(
+                        style: AppTheme.bodyText(greyTextColor).copyWith(
                             color: greyTextColor, fontWeight: FontWeight.bold),
                       )
                     : Row(
                         children: [
                           Text(
                             "Skills : ",
-                            style: theme.textTheme.bodyMedium!.copyWith(
+                            style: AppTheme.bodyText(greyTextColor).copyWith(
                                 color: greyTextColor,
                                 fontWeight: FontWeight.bold),
                           ),

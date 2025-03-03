@@ -9,28 +9,30 @@ class QuestionaireBloc extends Bloc<Questionaireevent, QuestionaireState> {
   QuestionaireBloc(this.questionaireRepository) : super(QuestionaireLoading()) {
     on<QuestionaireSubmitEvent>((event, emit) async {
       emit(QuestionaireLoading());
-
       try {
+      
         final result = await questionaireRepository.questionaireSubmission(
-          questionaire: QuestionaireModel(
-              about: event.aboutCompany,
-              industry: event.industry,
-              functionalArea: event.functionalArea,
-              address: event.address,
-              city: event.city,
-              country: event.country,
-              postalCode: event.postalCode,
-              mobileNumber: event.mobilePhn,
-              designation: event.designation,
-              website: event.website,
-              contactPersonName: event.contactPersonName));
+            questionaire: QuestionaireModel(
+                logo: event.logo,
+                about: event.aboutCompany,
+                industry: event.industry,
+                functionalArea: event.functionalArea,
+                address: event.address,
+                city: event.city,
+                country: event.country,
+                postalCode: event.postalCode,
+                mobileNumber: event.mobilePhn,
+                designation: event.designation,
+                website: event.website,
+                landlineNumber: event.landline,
+                contactPersonName: event.contactPersonName));
 
-      if (result == "success") {
-        emit(QuestionaireSuccess());
-      } else if (result == "error") {
-        emit(QuestionaireFailure(
-            error: "Something went wrong. Couldn't submit the details"));
-      }
+        if (result == "success") {
+          emit(QuestionaireSuccess());
+        } else if (result == "error") {
+          emit(QuestionaireFailure(
+              error: "Something went wrong. Couldn't submit the details"));
+        }
       } catch (e) {
         emit(QuestionaireFailure(error: e.toString()));
       }

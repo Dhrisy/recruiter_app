@@ -17,6 +17,7 @@ class SeekerRepository {
   Future<List<SeekerModel>?> fetchAllSeekers() async {
     try {
       final response = await SeekerService.fetchAllSeekers();
+      print("seeker fet h  ${response.body}");
       if (response.statusCode == 200) {
         final List<dynamic> responseData = jsonDecode(response.body);
 

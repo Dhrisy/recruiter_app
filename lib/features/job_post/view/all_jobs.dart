@@ -11,6 +11,7 @@ import 'package:recruiter_app/viewmodels/job_viewmodel.dart';
 import 'package:recruiter_app/widgets/common_appbar_widget.dart';
 import 'package:recruiter_app/widgets/common_empty_list.dart';
 import 'package:recruiter_app/widgets/common_error_widget.dart';
+import 'package:recruiter_app/widgets/common_nodatafound_widget.dart';
 import 'package:recruiter_app/widgets/common_search_widget.dart';
 import 'package:recruiter_app/widgets/job_card_widget.dart';
 import 'package:recruiter_app/widgets/shimmer_list_loading.dart';
@@ -37,7 +38,6 @@ class _AllJobsState extends State<AllJobs> {
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height.h;
-    final theme = Theme.of(context);
     return PopScope(
       canPop: false,
       child: Material(
@@ -82,7 +82,6 @@ class _AllJobsState extends State<AllJobs> {
                             },
                           ),
                         ),
-                      
                         provider.jobLists != null && _searchCont.text.isEmpty
                             ? SingleChildScrollView(
                                 child: Padding(
@@ -99,6 +98,7 @@ class _AllJobsState extends State<AllJobs> {
                                       final borderColor = index.isEven
                                           ? buttonColor
                                           : secondaryColor;
+
                                       return JobCardWidget(
                                         job: job,
                                         borderColor: borderColor,
@@ -108,6 +108,13 @@ class _AllJobsState extends State<AllJobs> {
                                 ),
                               )
                             : const SizedBox.shrink(),
+
+
+                      provider.jobLists != null &&   provider.jobLists!.isEmpty
+                            ? const CommonNodatafoundWidget()
+                            : const SizedBox.shrink(),
+
+
                         provider.filteredJobs.isNotEmpty &&
                                 _searchCont.text.isNotEmpty
                             ? SingleChildScrollView(

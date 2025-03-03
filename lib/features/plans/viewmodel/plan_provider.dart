@@ -15,13 +15,13 @@ class PlanProvider extends ChangeNotifier {
   String? _error;
   String? get error => _error;
 
-  Future<void> fetchPlans() async {
+  Future<void> fetchPlans(BuildContext context) async {
     try {
       _isLoading = true;
       _error = null;
       notifyListeners();
 
-      _plans = await _planRepository.fetchAllPlans();
+      _plans = await _planRepository.fetchAllPlans(context);
       _isLoading = false;
       notifyListeners();
     } catch (e) {

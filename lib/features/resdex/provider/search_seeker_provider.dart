@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:recruiter_app/core/utils/custom_functions.dart';
 import 'package:recruiter_app/features/resdex/data/seeker_repository.dart';
 import 'package:recruiter_app/features/resdex/model/invite_seeker_model.dart';
@@ -28,7 +29,7 @@ class SearchSeekerProvider extends ChangeNotifier {
       if (result != null) {
         // seekersLists = result;
         lists = result;
-        await initializeBookmarkedStates(); // Initialize bookmarked states after fetching seekers
+        await initializeBookmarkedStates(); 
         error = '';
       } else {
         error = "Error fetching seekers.";
@@ -72,6 +73,7 @@ class SearchSeekerProvider extends ChangeNotifier {
   /// Initialize bookmarked states for seekers
   Future<void> initializeBookmarkedStates() async {
     final seekersLists = await lists;
+    
     if (seekersLists != null) {
       for (var seeker in seekersLists) {
         final id = seeker.personalData?.personal.id;
