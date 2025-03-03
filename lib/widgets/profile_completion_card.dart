@@ -34,7 +34,7 @@ class _ProfileCompletionCardState extends State<ProfileCompletionCard> {
         builder: (context, accountProvider, child) {
       return InkWell(
         onTap: () {
-          if (accountProvider.accountData != null) {
+          // if (accountProvider.accountData != null) {
             Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -42,7 +42,7 @@ class _ProfileCompletionCardState extends State<ProfileCompletionCard> {
                           isEdit: true,
                           accountData: accountProvider.accountData,
                         )));
-          }
+          // }
         },
         child: Consumer<HomeProvider>(builder: (context, provider, child) {
           return Container(
@@ -101,7 +101,7 @@ class _ProfileCompletionCardState extends State<ProfileCompletionCard> {
                     center: Text(
                       provider.countData != null
                           ? "${provider.countData!.profileCompletionPercentage}%"
-                          : "0%",
+                          : "0.0%",
                       style: theme.textTheme.bodyMedium!
                           .copyWith(color: Colors.white),
                     ),
